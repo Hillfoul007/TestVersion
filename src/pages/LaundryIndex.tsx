@@ -620,7 +620,11 @@ const LaundryIndex = () => {
 
         // Clear cart and form data
         localStorage.removeItem("laundry_cart");
+        localStorage.removeItem("mobile_service_cart");
+        localStorage.removeItem("service_cart");
+        localStorage.removeItem("cleancare_cart");
         localStorage.removeItem("laundry_booking_form");
+        localStorage.removeItem("cleancare_booking_form");
         localStorage.removeItem("user_bookings"); // Clear cached bookings
 
         // Clear any cached cart state
@@ -690,6 +694,9 @@ const LaundryIndex = () => {
 
           // Clear cart
           localStorage.removeItem("laundry_cart");
+          localStorage.removeItem("mobile_service_cart");
+          localStorage.removeItem("service_cart");
+          localStorage.removeItem("cleancare_cart");
 
           // Show booking confirmation screen
           setCurrentView("booking-confirmed");
