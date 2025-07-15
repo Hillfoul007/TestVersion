@@ -217,7 +217,21 @@ const MobileBookingFlow: React.FC<MobileBookingFlowProps> = ({
       if (bookingError) {
         setError(bookingError.message || "Failed to create booking");
       } else {
+        // Clear cart after successful booking
+        localStorage.removeItem("laundry_cart");
+        localStorage.removeItem("mobile_service_cart");
+        localStorage.removeItem("laundry_booking_form");
+
+        // Dispatch cart clear event
+        const clearCartEvent = new CustomEvent("clearCart");
+        window.dispatchEvent(clearCartEvent);
+
         setShowConfirmation(true);
+
+        // Call booking complete callback
+        if (onBookingComplete) {
+          onBookingComplete();
+        }
       }
     } catch (error: any) {
       setError(
