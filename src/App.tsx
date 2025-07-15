@@ -12,6 +12,7 @@ import {
 } from "@/utils/authPersistence";
 import "./App.css";
 import "./styles/mobile-fixes.css";
+import "./styles/mobile-touch-fixes.css";
 
 function App() {
   // Initialize authentication persistence and restore user session
