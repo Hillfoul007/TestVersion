@@ -113,6 +113,9 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
       console.log("🧹 Received cart clear event");
       setCart({});
       localStorage.removeItem("laundry_cart");
+      localStorage.removeItem("mobile_service_cart");
+      localStorage.removeItem("service_cart");
+      localStorage.removeItem("cleancare_cart");
     };
 
     const handleLogout = () => {
@@ -655,7 +658,7 @@ Confirm this booking?`;
             ),
           );
         } catch (checkoutError) {
-          console.error("💥 Checkout process failed:", checkoutError);
+          console.error("��� Checkout process failed:", checkoutError);
           addNotification(
             createErrorNotification(
               "Checkout Failed",
