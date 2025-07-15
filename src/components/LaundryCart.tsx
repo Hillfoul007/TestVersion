@@ -993,6 +993,8 @@ Confirm this booking?`;
                         phoneNumber,
                         selectedDate: selectedDate?.toISOString(),
                         selectedTime,
+                        deliveryDate: deliveryDate?.toISOString(),
+                        deliveryTime,
                         specialInstructions,
                         appliedCoupon,
                         timestamp: Date.now(),
