@@ -444,16 +444,17 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         <div className="bg-gradient-to-r from-green-500 to-green-600 text-white sticky top-0 z-50">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-3">
                 {currentUser && (
                   <>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-white hover:bg-white/20"
+                      className="text-white hover:bg-white/20 active:bg-white/30 p-3 h-10 w-10 mobile-button mobile-touch transition-all duration-200"
                       onClick={handleViewBookings}
+                      title="View Bookings"
                     >
-                      <Package className="h-4 w-4" />
+                      <Package className="h-5 w-5" />
                     </Button>
                     <div className="text-white">
                       <NotificationPanel />
@@ -500,11 +501,11 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                   }}
                   variant="ghost"
                   size="sm"
-                  className="text-white hover:bg-white/20 active:bg-white/30 px-4 py-2 mobile-button mobile-touch rounded-lg transition-all duration-200 font-medium"
+                  className="text-white hover:bg-white/20 active:bg-white/30 px-4 py-3 h-12 mobile-button mobile-touch rounded-lg transition-all duration-200 font-medium min-w-[100px]"
                   type="button"
                 >
-                  <User className="h-4 w-4 mr-2" />
-                  <span className="text-sm">Sign In</span>
+                  <User className="h-5 w-5 mr-2" />
+                  <span className="text-sm font-semibold">Sign In</span>
                 </Button>
               )}
             </div>
