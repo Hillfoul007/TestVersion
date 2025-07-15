@@ -266,6 +266,16 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
         console.log("✅ Booking created successfully:", data);
         // Store the completed booking data
         setCompletedBooking(data);
+
+        // Clear cart after successful booking
+        localStorage.removeItem("laundry_cart");
+        localStorage.removeItem("mobile_service_cart");
+        localStorage.removeItem("laundry_booking_form");
+
+        // Dispatch cart clear event
+        const clearCartEvent = new CustomEvent("clearCart");
+        window.dispatchEvent(clearCartEvent);
+
         // Close confirmation modal and show success alert
         setShowConfirmation(false);
         setShowBookingSuccess(true);
@@ -714,6 +724,13 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
         isVisible={showBookingSuccess}
         onClose={() => {
           setShowBookingSuccess(false);
+
+          // Ensure cart is cleared on success alert close as well
+          localStorage.removeItem("laundry_cart");
+          localStorage.removeItem("mobile_service_cart");
+          const clearCartEvent = new CustomEvent("clearCart");
+          window.dispatchEvent(clearCartEvent);
+
           if (onBookingComplete) {
             onBookingComplete();
           }
