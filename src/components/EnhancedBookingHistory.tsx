@@ -939,6 +939,9 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 if (service.price && service.price > 0) {
                                   price = service.price;
                                   totalServicePrice = price * quantity;
+                                  console.log(
+                                    `✅ Service object has price: ${serviceName} = ₹${price} x ${quantity} = ₹${totalServicePrice}`,
+                                  );
                                 }
                               } else {
                                 serviceName = String(
@@ -946,6 +949,11 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 );
                                 quantity = 1;
                               }
+
+                              console.log(
+                                `🔍 Processing service: "${serviceName}", quantity: ${quantity}, booking has item_prices:`,
+                                !!booking.item_prices,
+                              );
 
                               // First priority: Use stored item_prices from database
                               if (
