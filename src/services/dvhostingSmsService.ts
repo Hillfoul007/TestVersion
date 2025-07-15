@@ -9,7 +9,7 @@ const getApiBaseUrl = () => {
     !hostname.includes("localhost") && !hostname.includes("127.0.0.1");
 
   if (isProduction) {
-    return "https://cleancarepro-95it.onrender.com/api";
+    return "https://backend-vaxf.onrender.com/api";
   }
 
   return "http://localhost:3001/api";
