@@ -270,7 +270,10 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
         // Clear cart after successful booking
         localStorage.removeItem("laundry_cart");
         localStorage.removeItem("mobile_service_cart");
+        localStorage.removeItem("service_cart");
+        localStorage.removeItem("cleancare_cart");
         localStorage.removeItem("laundry_booking_form");
+        localStorage.removeItem("cleancare_booking_form");
 
         // Dispatch cart clear event
         const clearCartEvent = new CustomEvent("clearCart");
@@ -728,6 +731,8 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
           // Ensure cart is cleared on success alert close as well
           localStorage.removeItem("laundry_cart");
           localStorage.removeItem("mobile_service_cart");
+          localStorage.removeItem("service_cart");
+          localStorage.removeItem("cleancare_cart");
           const clearCartEvent = new CustomEvent("clearCart");
           window.dispatchEvent(clearCartEvent);
 
