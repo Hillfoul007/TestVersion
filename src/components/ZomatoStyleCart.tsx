@@ -108,6 +108,9 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
     const handleClearCart = () => {
       setCart({});
       localStorage.removeItem("laundry_cart");
+      localStorage.removeItem("mobile_service_cart");
+      localStorage.removeItem("service_cart");
+      localStorage.removeItem("cleancare_cart");
     };
 
     window.addEventListener("clearCart", handleClearCart);
@@ -576,7 +579,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-4">
               <CreditCard className="h-4 w-4 text-gray-600" />
-              <span className="font-medium">Total Bill ₹{getSubtotal()}</span>
+              <span className="font-medium">Total Bill ��{getSubtotal()}</span>
               <span className="text-sm text-green-600 font-medium">
                 ₹{getTotal()}
               </span>
