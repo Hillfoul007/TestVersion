@@ -110,6 +110,8 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
   }, [
     selectedDate,
     selectedTime,
+    deliveryDate,
+    deliveryTime,
     specialInstructions,
     couponCode,
     appliedCoupon,
