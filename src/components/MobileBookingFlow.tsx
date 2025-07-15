@@ -220,7 +220,10 @@ const MobileBookingFlow: React.FC<MobileBookingFlowProps> = ({
         // Clear cart after successful booking
         localStorage.removeItem("laundry_cart");
         localStorage.removeItem("mobile_service_cart");
+        localStorage.removeItem("service_cart");
+        localStorage.removeItem("cleancare_cart");
         localStorage.removeItem("laundry_booking_form");
+        localStorage.removeItem("cleancare_booking_form");
 
         // Dispatch cart clear event
         const clearCartEvent = new CustomEvent("clearCart");
