@@ -136,6 +136,8 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
       setSpecialInstructions("");
       setSelectedDate(undefined);
       setSelectedTime("");
+      setDeliveryDate(undefined);
+      setDeliveryTime("");
       setCouponCode("");
       setAppliedCoupon(null);
       setSelectedSavedAddress(null);
