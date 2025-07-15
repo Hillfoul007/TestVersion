@@ -317,6 +317,8 @@ export const bookingHelpers = {
             service_fee: Number(bookingData.service_fee || 0),
             discount: Number(bookingData.discount_amount || 0),
           },
+          // Save item prices for accurate booking history display
+          item_prices: bookingData.item_prices || [],
         };
 
         console.log(
