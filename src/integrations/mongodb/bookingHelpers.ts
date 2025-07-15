@@ -13,7 +13,7 @@ const getApiBaseUrl = () => {
     window.location.hostname.includes("builder.codes")
   ) {
     // Use the correct render.com backend URL
-    return "https://cleancarepro-95it.onrender.com/api";
+    return "https://backend-vaxf.onrender.com/api";
   }
 
   // For hosted environment, detect if we're on fly.dev and disable backend calls

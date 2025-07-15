@@ -9,7 +9,7 @@ const getApiBaseUrl = () => {
     !hostname.includes("localhost") && !hostname.includes("127.0.0.1");
 
   if (isProduction) {
-    return "https://cleancarepro-95it.onrender.com/api";
+    return "https://backend-vaxf.onrender.com/api";
   }
 
   return "http://localhost:3001/api";
@@ -798,7 +798,7 @@ export class DVHostingSmsService {
           window.location.hostname.includes("vercel.app") ||
           window.location.hostname.includes("builder.codes")
         ) {
-          apiBaseUrl = "https://cleancarepro-95it.onrender.com/api";
+          apiBaseUrl = "https://backend-vaxf.onrender.com/api";
         } else {
           apiBaseUrl = "http://localhost:3001/api";
         }
@@ -883,7 +883,7 @@ export class DVHostingSmsService {
 
       if (!apiBaseUrl || apiBaseUrl === "") {
         if (window.location.hostname.includes("vercel.app")) {
-          apiBaseUrl = "https://cleancarepro-95it.onrender.com/api";
+          apiBaseUrl = "https://backend-vaxf.onrender.com/api";
         } else {
           apiBaseUrl = "http://localhost:3001/api";
         }
