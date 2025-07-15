@@ -620,7 +620,11 @@ const LaundryIndex = () => {
 
         // Clear cart and form data
         localStorage.removeItem("laundry_cart");
+        localStorage.removeItem("mobile_service_cart");
+        localStorage.removeItem("service_cart");
+        localStorage.removeItem("cleancare_cart");
         localStorage.removeItem("laundry_booking_form");
+        localStorage.removeItem("cleancare_booking_form");
         localStorage.removeItem("user_bookings"); // Clear cached bookings
 
         // Clear any cached cart state
@@ -668,6 +672,9 @@ const LaundryIndex = () => {
           // Store booking data for confirmation screen
           const confirmationData = {
             bookingId: `local_${Date.now()}`,
+            custom_order_id:
+              localResult.data?.custom_order_id ||
+              `CC${Date.now().toString().slice(-6)}`, // Add custom_order_id for local bookings
             services: detailedServices, // Use detailed services with quantities
             totalAmount: cartData.totalAmount,
             pickupDate: cartData.pickupDate,
@@ -690,6 +697,9 @@ const LaundryIndex = () => {
 
           // Clear cart
           localStorage.removeItem("laundry_cart");
+          localStorage.removeItem("mobile_service_cart");
+          localStorage.removeItem("service_cart");
+          localStorage.removeItem("cleancare_cart");
 
           // Show booking confirmation screen
           setCurrentView("booking-confirmed");

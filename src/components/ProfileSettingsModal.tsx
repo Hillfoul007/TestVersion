@@ -100,7 +100,7 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md w-[95vw] mx-4 sm:mx-auto border-0 shadow-2xl rounded-3xl overflow-hidden bg-gradient-to-br from-white via-gray-50/50 to-green-50/30 animate-in zoom-in-95 duration-300 fade-in-0">
+      <DialogContent className="sm:max-w-md w-[95vw] mx-4 sm:mx-auto border-0 shadow-2xl rounded-3xl overflow-hidden bg-gradient-to-br from-white via-gray-50/50 to-green-50/30 animate-in zoom-in-95 duration-300 fade-in-0 max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pb-2">
           <DialogTitle className="flex items-center justify-between text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
             Profile Settings
@@ -118,7 +118,7 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 p-1">
+        <div className="space-y-6 p-1 max-h-[calc(90vh-120px)] overflow-y-auto">
           {/* Profile Picture */}
           <div className="flex justify-center">
             <div className="relative">
