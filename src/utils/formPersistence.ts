@@ -54,9 +54,12 @@ export const getBookingFormData = (): BookingFormData => {
     const saved = localStorage.getItem(STORAGE_KEYS.BOOKING_FORM);
     if (saved) {
       const data = JSON.parse(saved);
-      // Convert date string back to Date object
+      // Convert date strings back to Date objects
       if (data.selectedDate) {
         data.selectedDate = new Date(data.selectedDate);
+      }
+      if (data.deliveryDate) {
+        data.deliveryDate = new Date(data.deliveryDate);
       }
       return data;
     }
