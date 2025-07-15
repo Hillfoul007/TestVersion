@@ -432,7 +432,9 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
   const handleProceedToCheckout = async () => {
     // Prevent multiple submissions
     if (isProcessingCheckout) {
-      console.log("⚠️ Checkout already in progress, ignoring duplicate click");
+      console.log(
+        "⚠��� Checkout already in progress, ignoring duplicate click",
+      );
       return;
     }
 
@@ -468,6 +470,8 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
           phoneNumber,
           selectedDate: selectedDate?.toISOString(),
           selectedTime,
+          deliveryDate: deliveryDate?.toISOString(),
+          deliveryTime,
           specialInstructions,
           appliedCoupon,
           timestamp: Date.now(),
