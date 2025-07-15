@@ -622,7 +622,7 @@ Services: ${services.length} items
 ${services.map((s) => `• ${s.name} x${s.quantity} - ₹${s.price * s.quantity}`).join("\n")}
 
 Pickup: ${selectedDate.toLocaleDateString()} at ${selectedTime}
-Delivery: ${deliveryDate.toLocaleDateString()} at ${deliveryTimeString}
+Delivery: ${finalDeliveryDate.toLocaleDateString()} at ${finalDeliveryTime}
 
 Total Amount: ₹${finalTotal}
 
