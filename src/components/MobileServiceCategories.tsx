@@ -51,6 +51,9 @@ const MobileServiceCategories: React.FC<ServiceCategoriesProps> = ({
       console.log("🧹 MobileServiceCategories: Received cart clear event");
       setCart([]);
       localStorage.removeItem("mobile_service_cart");
+      localStorage.removeItem("laundry_cart");
+      localStorage.removeItem("service_cart");
+      localStorage.removeItem("cleancare_cart");
     };
 
     window.addEventListener("clearCart", handleClearCart);
