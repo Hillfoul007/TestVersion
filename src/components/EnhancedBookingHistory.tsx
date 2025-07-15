@@ -961,22 +961,42 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 Array.isArray(booking.item_prices) &&
                                 booking.item_prices.length > 0
                               ) {
-                                const matchingPrice = booking.item_prices.find(
+                                // Try to find exact match first
+                                let matchingPrice = booking.item_prices.find(
                                   (item: any) => {
-                                    const itemServiceName =
+                                    const itemServiceName = (
                                       item.service_name ||
                                       item.serviceName ||
-                                      "";
+                                      ""
+                                    ).toLowerCase();
                                     return (
-                                      itemServiceName
-                                        .toLowerCase()
-                                        .includes(serviceName.toLowerCase()) ||
-                                      serviceName
-                                        .toLowerCase()
-                                        .includes(itemServiceName.toLowerCase())
+                                      itemServiceName ===
+                                      serviceName.toLowerCase()
                                     );
                                   },
                                 );
+
+                                // If no exact match, try partial match
+                                if (!matchingPrice) {
+                                  matchingPrice = booking.item_prices.find(
+                                    (item: any) => {
+                                      const itemServiceName = (
+                                        item.service_name ||
+                                        item.serviceName ||
+                                        ""
+                                      ).toLowerCase();
+                                      return (
+                                        itemServiceName.includes(
+                                          serviceName.toLowerCase(),
+                                        ) ||
+                                        serviceName
+                                          .toLowerCase()
+                                          .includes(itemServiceName)
+                                      );
+                                    },
+                                  );
+                                }
+
                                 if (matchingPrice) {
                                   price =
                                     matchingPrice.unit_price ||
@@ -988,7 +1008,12 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                     matchingPrice.totalPrice ||
                                     price * quantity;
                                   console.log(
-                                    `Using database price for ${serviceName}: ₹${price} x ${quantity} = ₹${totalServicePrice}`,
+                                    `✅ Using saved database price for "${serviceName}": ₹${price} x ${quantity} = ₹${totalServicePrice}`,
+                                  );
+                                } else {
+                                  console.log(
+                                    `⚠️ No matching item_price found for "${serviceName}" in:`,
+                                    booking.item_prices,
                                   );
                                 }
                               }
