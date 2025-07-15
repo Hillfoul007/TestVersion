@@ -1041,63 +1041,10 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                   } else {
                                     price = 50; // Default fallback
                                   }
-                                  totalServicePrice = price * quantity;
-                                  saree: 100,
-                                  shirt: 90,
-                                  trouser: 120,
-                                  jeans: 120,
-                                  coat: 220,
-                                  jacket: 300,
-                                  sweater: 200,
-                                  sweatshirt: 200,
-                                  lehenga: 330,
-                                  dress: 330,
-                                  "home service": 100,
-                                };
-
-                                const lowerServiceName =
-                                  serviceName.toLowerCase();
-
-                                // Find exact match first
-                                if (servicePriceMap[lowerServiceName]) {
-                                  price = servicePriceMap[lowerServiceName];
-                                  console.log(
-                                    `Exact match found for ${serviceName}: ₹${price}`,
-                                  );
-                                } else {
-                                  // Find more specific matches before general partial matches
-                                  let matched = false;
-
-                                  // Check for specific patterns first
-                                  if (
-                                    lowerServiceName.includes("men's suit") ||
-                                    lowerServiceName.includes("men suit")
-                                  ) {
-                                    price = 150;
-                                    matched = true;
-                                  } else if (
-                                    lowerServiceName.includes("steam iron") &&
-                                    (lowerServiceName.includes("men") ||
-                                      lowerServiceName.includes("suit"))
-                                  ) {
-                                    price = 150;
-                                    matched = true;
-                                  } else if (
-                                    lowerServiceName.includes("coal iron")
-                                  ) {
-                                    price = 20;
-                                    matched = true;
-                                  } else if (
-                                    lowerServiceName.includes("steam iron") &&
-                                    (lowerServiceName.includes("ladies") ||
-                                      lowerServiceName.includes("kurta"))
-                                  ) {
-                                    price = 100;
-                                    matched = true;
-                                  } else if (
-                                    lowerServiceName.includes("steam iron")
-                                  ) {
-                                    price = 40; // Other steam iron items
+                                                                    totalServicePrice = price * quantity;
+                                  console.log(`🔄 Using default fallback price for "${serviceName}": ��${price}`);
+                                }
+                              }
                                     matched = true;
                                   }
 
