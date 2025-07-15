@@ -67,6 +67,8 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState<Date>();
+  const [deliveryTime, setDeliveryTime] = useState("");
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<{
     code: string;
