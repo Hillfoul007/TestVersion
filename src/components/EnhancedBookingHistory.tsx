@@ -1018,26 +1018,30 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 }
                               }
 
-                              // Fallback pricing if no database price found
+                                                            // Fallback pricing if no database price found (should rarely be needed now)
                               if (totalServicePrice === 0) {
-                                const servicePriceMap: {
-                                  [key: string]: number;
-                                } = {
-                                  // Exact service name matches
-                                  "coal iron": 20,
-                                  "steam iron - men's suit / heavy dresses": 150,
-                                  "steam iron - ladies suit / kurta & pyjama / saree": 100,
-                                  "steam iron - other items": 40,
-                                  "laundry and fold": 70,
-                                  "laundry and iron": 120,
+                                // Log when fallback is needed - this indicates item_prices weren't saved properly
+                                console.warn(`⚠️ Using fallback pricing for "${serviceName}" - item_prices should have been saved in database`);
 
-                                  // Generic item prices for individual pieces
-                                  "men's suit": 150, // Per SET
-                                  "men's suit 3 pc": 150, // Per SET
-                                  "men suit": 150,
-                                  "heavy dresses": 150,
-                                  "ladies suit": 100,
-                                  kurta: 100,
+                                // Simple fallback based on total amount divided by service count if available
+                                if (booking.totalAmount && services.length > 0) {
+                                  const avgPricePerService = Math.round(booking.totalAmount / services.length);
+                                  price = avgPricePerService;
+                                  totalServicePrice = price * quantity;
+                                  console.log(`📊 Using calculated average price: ₹${price} (total: ₹${booking.totalAmount} / ${services.length} services)`);
+                                } else {
+                                  // Last resort - simple defaults
+                                  const lowerServiceName = serviceName.toLowerCase();
+                                  if (lowerServiceName.includes("coal iron")) {
+                                    price = 20;
+                                  } else if (lowerServiceName.includes("steam iron") || lowerServiceName.includes("men's suit") || lowerServiceName.includes("suit")) {
+                                    price = 150;
+                                  } else if (lowerServiceName.includes("laundry")) {
+                                    price = 70;
+                                  } else {
+                                    price = 50; // Default fallback
+                                  }
+                                  totalServicePrice = price * quantity;
                                   saree: 100,
                                   shirt: 90,
                                   trouser: 120,
