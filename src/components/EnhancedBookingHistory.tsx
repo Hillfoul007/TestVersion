@@ -990,23 +990,31 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 const servicePriceMap: {
                                   [key: string]: number;
                                 } = {
+                                  // Exact service name matches
                                   "coal iron": 20,
-                                  "steam iron": 150,
-                                  "men's suit": 150,
+                                  "steam iron - men's suit / heavy dresses": 150,
+                                  "steam iron - ladies suit / kurta & pyjama / saree": 100,
+                                  "steam iron - other items": 40,
+                                  "laundry and fold": 70,
+                                  "laundry and iron": 120,
+
+                                  // Generic item prices for individual pieces
+                                  "men's suit": 150, // Per SET
+                                  "men's suit 3 pc": 150, // Per SET
+                                  "men suit": 150,
                                   "heavy dresses": 150,
-                                  kurta: 140,
-                                  jacket: 300,
+                                  "ladies suit": 100,
+                                  kurta: 100,
+                                  saree: 100,
                                   shirt: 90,
                                   trouser: 120,
                                   jeans: 120,
                                   coat: 220,
+                                  jacket: 300,
                                   sweater: 200,
                                   sweatshirt: 200,
-                                  saree: 210,
                                   lehenga: 330,
                                   dress: 330,
-                                  "laundry and fold": 70,
-                                  "laundry and iron": 120,
                                   "home service": 100,
                                 };
 
@@ -1016,24 +1024,68 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 // Find exact match first
                                 if (servicePriceMap[lowerServiceName]) {
                                   price = servicePriceMap[lowerServiceName];
+                                  console.log(
+                                    `Exact match found for ${serviceName}: ₹${price}`,
+                                  );
                                 } else {
-                                  // Find partial match
-                                  for (const [key, value] of Object.entries(
-                                    servicePriceMap,
-                                  )) {
-                                    if (
-                                      lowerServiceName.includes(key) ||
-                                      key.includes(lowerServiceName)
-                                    ) {
-                                      price = value;
-                                      break;
+                                  // Find more specific matches before general partial matches
+                                  let matched = false;
+
+                                  // Check for specific patterns first
+                                  if (
+                                    lowerServiceName.includes("men's suit") ||
+                                    lowerServiceName.includes("men suit")
+                                  ) {
+                                    price = 150;
+                                    matched = true;
+                                  } else if (
+                                    lowerServiceName.includes("steam iron") &&
+                                    (lowerServiceName.includes("men") ||
+                                      lowerServiceName.includes("suit"))
+                                  ) {
+                                    price = 150;
+                                    matched = true;
+                                  } else if (
+                                    lowerServiceName.includes("coal iron")
+                                  ) {
+                                    price = 20;
+                                    matched = true;
+                                  } else if (
+                                    lowerServiceName.includes("steam iron") &&
+                                    (lowerServiceName.includes("ladies") ||
+                                      lowerServiceName.includes("kurta"))
+                                  ) {
+                                    price = 100;
+                                    matched = true;
+                                  } else if (
+                                    lowerServiceName.includes("steam iron")
+                                  ) {
+                                    price = 40; // Other steam iron items
+                                    matched = true;
+                                  }
+
+                                  // If no specific pattern matched, try general partial matching
+                                  if (!matched) {
+                                    for (const [key, value] of Object.entries(
+                                      servicePriceMap,
+                                    )) {
+                                      if (
+                                        lowerServiceName.includes(key) ||
+                                        key.includes(lowerServiceName)
+                                      ) {
+                                        price = value;
+                                        matched = true;
+                                        break;
+                                      }
                                     }
                                   }
+
+                                  console.log(
+                                    `${matched ? "Pattern/Partial" : "Default"} match for ${serviceName}: ₹${price}`,
+                                  );
                                 }
+
                                 totalServicePrice = price * quantity;
-                                console.log(
-                                  `Using fallback price for ${serviceName}: ₹${price}`,
-                                );
                               }
 
                               // Use calculated total or calculate from unit price
