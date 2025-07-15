@@ -204,6 +204,9 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
             if (state.selectedDate)
               setSelectedDate(new Date(state.selectedDate));
             if (state.selectedTime) setSelectedTime(state.selectedTime);
+            if (state.deliveryDate)
+              setDeliveryDate(new Date(state.deliveryDate));
+            if (state.deliveryTime) setDeliveryTime(state.deliveryTime);
             if (state.specialInstructions)
               setSpecialInstructions(state.specialInstructions);
             if (state.appliedCoupon) setAppliedCoupon(state.appliedCoupon);
