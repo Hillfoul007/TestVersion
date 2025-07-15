@@ -670,6 +670,8 @@ const LaundryIndex = () => {
             instructions: cartData.instructions,
           },
           paymentStatus: "pending" as const,
+          // Add item prices for accurate history display
+          item_prices: itemPrices,
         };
 
         const localResult =
