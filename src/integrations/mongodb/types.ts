@@ -24,6 +24,8 @@ export interface Booking {
   services: string[];
   scheduled_date: string;
   scheduled_time: string;
+  delivery_date?: string;
+  delivery_time?: string;
   provider_name: string;
   address: string;
   coordinates?: {

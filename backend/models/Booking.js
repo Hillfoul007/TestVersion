@@ -54,6 +54,14 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: [true, "Scheduled time is required"],
     },
+    delivery_date: {
+      type: String,
+      required: false,
+    },
+    delivery_time: {
+      type: String,
+      required: false,
+    },
     provider_name: {
       type: String,
       required: [true, "Provider name is required"],

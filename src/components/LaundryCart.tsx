@@ -40,6 +40,7 @@ import {
 } from "@/utils/formPersistence";
 import SimplifiedAddressForm from "./SimplifiedAddressForm";
 import ProfessionalDateTimePicker from "./ProfessionalDateTimePicker";
+import DeliveryDateTimePicker from "./DeliveryDateTimePicker";
 import { FormValidation, validateCheckoutForm } from "./FormValidation";
 import SavedAddressesModal from "./SavedAddressesModal";
 import ZomatoAddressSelector from "./ZomatoAddressSelector";
@@ -66,6 +67,8 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState<Date>();
+  const [deliveryTime, setDeliveryTime] = useState("");
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<{
     code: string;
@@ -83,6 +86,9 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
 
     // Don't autofill date - let user select fresh
     if (savedFormData.selectedTime) setSelectedTime(savedFormData.selectedTime);
+    if (savedFormData.deliveryDate)
+      setDeliveryDate(new Date(savedFormData.deliveryDate));
+    if (savedFormData.deliveryTime) setDeliveryTime(savedFormData.deliveryTime);
     if (savedFormData.additionalDetails)
       setSpecialInstructions(savedFormData.additionalDetails);
     if (savedFormData.couponCode) setCouponCode(savedFormData.couponCode);
@@ -95,6 +101,8 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
     saveBookingFormData({
       selectedDate,
       selectedTime,
+      deliveryDate,
+      deliveryTime,
       additionalDetails: specialInstructions,
       couponCode,
       appliedCoupon,
@@ -102,6 +110,8 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
   }, [
     selectedDate,
     selectedTime,
+    deliveryDate,
+    deliveryTime,
     specialInstructions,
     couponCode,
     appliedCoupon,
@@ -126,6 +136,8 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
       setSpecialInstructions("");
       setSelectedDate(undefined);
       setSelectedTime("");
+      setDeliveryDate(undefined);
+      setDeliveryTime("");
       setCouponCode("");
       setAppliedCoupon(null);
       setSelectedSavedAddress(null);
@@ -164,6 +176,9 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
             if (state.selectedDate)
               setSelectedDate(new Date(state.selectedDate));
             if (state.selectedTime) setSelectedTime(state.selectedTime);
+            if (state.deliveryDate)
+              setDeliveryDate(new Date(state.deliveryDate));
+            if (state.deliveryTime) setDeliveryTime(state.deliveryTime);
             if (state.specialInstructions)
               setSpecialInstructions(state.specialInstructions);
             if (state.appliedCoupon) setAppliedCoupon(state.appliedCoupon);
@@ -189,6 +204,9 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
             if (state.selectedDate)
               setSelectedDate(new Date(state.selectedDate));
             if (state.selectedTime) setSelectedTime(state.selectedTime);
+            if (state.deliveryDate)
+              setDeliveryDate(new Date(state.deliveryDate));
+            if (state.deliveryTime) setDeliveryTime(state.deliveryTime);
             if (state.specialInstructions)
               setSpecialInstructions(state.specialInstructions);
             if (state.appliedCoupon) setAppliedCoupon(state.appliedCoupon);
@@ -420,7 +438,9 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
   const handleProceedToCheckout = async () => {
     // Prevent multiple submissions
     if (isProcessingCheckout) {
-      console.log("⚠️ Checkout already in progress, ignoring duplicate click");
+      console.log(
+        "⚠��� Checkout already in progress, ignoring duplicate click",
+      );
       return;
     }
 
@@ -456,6 +476,8 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
           phoneNumber,
           selectedDate: selectedDate?.toISOString(),
           selectedTime,
+          deliveryDate: deliveryDate?.toISOString(),
+          deliveryTime,
           specialInstructions,
           appliedCoupon,
           timestamp: Date.now(),
@@ -551,12 +573,15 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
 
       console.log("Formatted services:", services);
 
-      // Calculate delivery time (2 days after pickup)
-      const deliveryDate = new Date(selectedDate);
-      deliveryDate.setDate(deliveryDate.getDate() + 2); // Add 2 days
-
-      // Delivery time same as pickup time
-      const deliveryTimeString = selectedTime;
+      // Use selected delivery date/time or calculate defaults
+      const finalDeliveryDate =
+        deliveryDate ||
+        (() => {
+          const defaultDeliveryDate = new Date(selectedDate);
+          defaultDeliveryDate.setDate(defaultDeliveryDate.getDate() + 2);
+          return defaultDeliveryDate;
+        })();
+      const finalDeliveryTime = deliveryTime || selectedTime;
 
       // Calculate total from services to ensure consistency
       const serviceTotal = services.reduce((total, service) => {
@@ -583,9 +608,9 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
         services,
         totalAmount: finalTotal,
         pickupDate: selectedDate.toISOString().split("T")[0],
-        deliveryDate: deliveryDate.toISOString().split("T")[0],
+        deliveryDate: finalDeliveryDate.toISOString().split("T")[0],
         pickupTime: selectedTime,
-        deliveryTime: deliveryTimeString,
+        deliveryTime: finalDeliveryTime,
         address: addressData,
         phone: phoneNumber || currentUser?.phone,
         instructions: specialInstructions,
@@ -607,7 +632,7 @@ Services: ${services.length} items
 ${services.map((s) => `• ${s.name} x${s.quantity} - ₹${s.price * s.quantity}`).join("\n")}
 
 Pickup: ${selectedDate.toLocaleDateString()} at ${selectedTime}
-Delivery: ${deliveryDate.toLocaleDateString()} at ${deliveryTimeString}
+Delivery: ${finalDeliveryDate.toLocaleDateString()} at ${finalDeliveryTime}
 
 Total Amount: ₹${finalTotal}
 
@@ -968,6 +993,8 @@ Confirm this booking?`;
                         phoneNumber,
                         selectedDate: selectedDate?.toISOString(),
                         selectedTime,
+                        deliveryDate: deliveryDate?.toISOString(),
+                        deliveryTime,
                         specialInstructions,
                         appliedCoupon,
                         timestamp: Date.now(),
@@ -1033,6 +1060,19 @@ Confirm this booking?`;
                 selectedTime={selectedTime}
                 onDateChange={setSelectedDate}
                 onTimeChange={setSelectedTime}
+              />
+            </div>
+
+            {/* Delivery Date/Time Selection */}
+            <div className="space-y-1">
+              <DeliveryDateTimePicker
+                cartItems={getCartItems()}
+                pickupDate={selectedDate}
+                pickupTime={selectedTime}
+                selectedDeliveryDate={deliveryDate}
+                selectedDeliveryTime={deliveryTime}
+                onDeliveryDateChange={setDeliveryDate}
+                onDeliveryTimeChange={setDeliveryTime}
               />
             </div>
 
