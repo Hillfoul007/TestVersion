@@ -86,6 +86,9 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
 
     // Don't autofill date - let user select fresh
     if (savedFormData.selectedTime) setSelectedTime(savedFormData.selectedTime);
+    if (savedFormData.deliveryDate)
+      setDeliveryDate(new Date(savedFormData.deliveryDate));
+    if (savedFormData.deliveryTime) setDeliveryTime(savedFormData.deliveryTime);
     if (savedFormData.additionalDetails)
       setSpecialInstructions(savedFormData.additionalDetails);
     if (savedFormData.couponCode) setCouponCode(savedFormData.couponCode);
@@ -813,7 +816,7 @@ Confirm this booking?`;
         </div>
 
         <div className="flex flex-col items-center justify-center h-96">
-          <div className="text-6xl mb-4">🛍️</div>
+          <div className="text-6xl mb-4">��️</div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Your cart is empty
           </h2>
