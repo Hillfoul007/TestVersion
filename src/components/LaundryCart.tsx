@@ -563,12 +563,15 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
 
       console.log("Formatted services:", services);
 
-      // Calculate delivery time (2 days after pickup)
-      const deliveryDate = new Date(selectedDate);
-      deliveryDate.setDate(deliveryDate.getDate() + 2); // Add 2 days
-
-      // Delivery time same as pickup time
-      const deliveryTimeString = selectedTime;
+      // Use selected delivery date/time or calculate defaults
+      const finalDeliveryDate =
+        deliveryDate ||
+        (() => {
+          const defaultDeliveryDate = new Date(selectedDate);
+          defaultDeliveryDate.setDate(defaultDeliveryDate.getDate() + 2);
+          return defaultDeliveryDate;
+        })();
+      const finalDeliveryTime = deliveryTime || selectedTime;
 
       // Calculate total from services to ensure consistency
       const serviceTotal = services.reduce((total, service) => {
