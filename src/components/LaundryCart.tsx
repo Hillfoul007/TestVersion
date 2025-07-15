@@ -1048,6 +1048,19 @@ Confirm this booking?`;
               />
             </div>
 
+            {/* Delivery Date/Time Selection */}
+            <div className="space-y-1">
+              <DeliveryDateTimePicker
+                cartItems={getCartItems()}
+                pickupDate={selectedDate}
+                pickupTime={selectedTime}
+                selectedDeliveryDate={deliveryDate}
+                selectedDeliveryTime={deliveryTime}
+                onDeliveryDateChange={setDeliveryDate}
+                onDeliveryTimeChange={setDeliveryTime}
+              />
+            </div>
+
             <div>
               <Label htmlFor="instructions" className="text-xs">
                 Instructions (Optional)
