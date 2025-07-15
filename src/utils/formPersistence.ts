@@ -3,6 +3,8 @@
 export interface BookingFormData {
   selectedDate?: Date;
   selectedTime?: string;
+  deliveryDate?: Date;
+  deliveryTime?: string;
   address?: {
     flatNo: string;
     landmark: string;
