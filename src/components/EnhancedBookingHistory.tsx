@@ -1018,58 +1018,50 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 }
                               }
 
-                                                            // Fallback pricing if no database price found (should rarely be needed now)
+                              // Fallback pricing if no database price found (should rarely be needed now)
                               if (totalServicePrice === 0) {
                                 // Log when fallback is needed - this indicates item_prices weren't saved properly
-                                console.warn(`⚠️ Using fallback pricing for "${serviceName}" - item_prices should have been saved in database`);
+                                console.warn(
+                                  `⚠️ Using fallback pricing for "${serviceName}" - item_prices should have been saved in database`,
+                                );
 
                                 // Simple fallback based on total amount divided by service count if available
-                                if (booking.totalAmount && services.length > 0) {
-                                  const avgPricePerService = Math.round(booking.totalAmount / services.length);
+                                if (
+                                  booking.totalAmount &&
+                                  services.length > 0
+                                ) {
+                                  const avgPricePerService = Math.round(
+                                    booking.totalAmount / services.length,
+                                  );
                                   price = avgPricePerService;
                                   totalServicePrice = price * quantity;
-                                  console.log(`📊 Using calculated average price: ₹${price} (total: ₹${booking.totalAmount} / ${services.length} services)`);
+                                  console.log(
+                                    `📊 Using calculated average price: ₹${price} (total: ₹${booking.totalAmount} / ${services.length} services)`,
+                                  );
                                 } else {
                                   // Last resort - simple defaults
-                                  const lowerServiceName = serviceName.toLowerCase();
+                                  const lowerServiceName =
+                                    serviceName.toLowerCase();
                                   if (lowerServiceName.includes("coal iron")) {
                                     price = 20;
-                                  } else if (lowerServiceName.includes("steam iron") || lowerServiceName.includes("men's suit") || lowerServiceName.includes("suit")) {
+                                  } else if (
+                                    lowerServiceName.includes("steam iron") ||
+                                    lowerServiceName.includes("men's suit") ||
+                                    lowerServiceName.includes("suit")
+                                  ) {
                                     price = 150;
-                                  } else if (lowerServiceName.includes("laundry")) {
+                                  } else if (
+                                    lowerServiceName.includes("laundry")
+                                  ) {
                                     price = 70;
                                   } else {
                                     price = 50; // Default fallback
                                   }
-                                                                    totalServicePrice = price * quantity;
-                                  console.log(`🔄 Using default fallback price for "${serviceName}": ��${price}`);
-                                }
-                              }
-                                    matched = true;
-                                  }
-
-                                  // If no specific pattern matched, try general partial matching
-                                  if (!matched) {
-                                    for (const [key, value] of Object.entries(
-                                      servicePriceMap,
-                                    )) {
-                                      if (
-                                        lowerServiceName.includes(key) ||
-                                        key.includes(lowerServiceName)
-                                      ) {
-                                        price = value;
-                                        matched = true;
-                                        break;
-                                      }
-                                    }
-                                  }
-
+                                  totalServicePrice = price * quantity;
                                   console.log(
-                                    `${matched ? "Pattern/Partial" : "Default"} match for ${serviceName}: ₹${price}`,
+                                    `🔄 Using default fallback price for "${serviceName}": ��${price}`,
                                   );
                                 }
-
-                                totalServicePrice = price * quantity;
                               }
 
                               // Use calculated total or calculate from unit price
