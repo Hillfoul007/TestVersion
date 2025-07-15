@@ -520,6 +520,14 @@ const LaundryIndex = () => {
           price: typeof service === "object" ? service.price || 0 : 0,
         })) || [];
 
+      // Prepare item prices for accurate booking history
+      const itemPrices = detailedServices.map((service) => ({
+        service_name: service.name,
+        quantity: service.quantity,
+        unit_price: service.price,
+        total_price: service.price * service.quantity,
+      }));
+
       // Create booking data for MongoDB backend
       const mongoBookingData = {
         customer_id: currentUser._id || currentUser.id,
@@ -545,6 +553,8 @@ const LaundryIndex = () => {
           service_fee: 0,
           discount: 0,
         },
+        // Save item prices for accurate booking history display
+        item_prices: itemPrices,
       };
 
       // Save to MongoDB backend first
