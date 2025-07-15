@@ -915,17 +915,45 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                               Services:
                             </p>
                             {services.map((service: any, idx: number) => {
-                              const serviceName =
-                                typeof service === "object"
-                                  ? service.name || service.service
-                                  : service;
-                              const quantity =
-                                typeof service === "object"
-                                  ? service.quantity || 1
-                                  : 1;
-                              // Get actual service price - prioritize database item_prices
+                              let serviceName = "";
+                              let quantity = 1;
                               let price = 50; // Default price
                               let totalServicePrice = 0;
+
+                              // Extract service information based on data structure
+                              if (
+                                typeof service === "object" &&
+                                service !== null
+                              ) {
+                                serviceName =
+                                  service.name ||
+                                  service.service ||
+                                  service.serviceName ||
+                                  "Unknown Service";
+                                quantity =
+                                  parseInt(service.quantity) ||
+                                  parseInt(service.qty) ||
+                                  1;
+
+                                // If service object has price, use it
+                                if (service.price && service.price > 0) {
+                                  price = service.price;
+                                  totalServicePrice = price * quantity;
+                                  console.log(
+                                    `✅ Service object has price: ${serviceName} = ₹${price} x ${quantity} = ₹${totalServicePrice}`,
+                                  );
+                                }
+                              } else {
+                                serviceName = String(
+                                  service || "Unknown Service",
+                                );
+                                quantity = 1;
+                              }
+
+                              console.log(
+                                `🔍 Processing service: "${serviceName}", quantity: ${quantity}, booking has item_prices:`,
+                                !!booking.item_prices,
+                              );
 
                               // First priority: Use stored item_prices from database
                               if (
@@ -933,85 +961,107 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 Array.isArray(booking.item_prices) &&
                                 booking.item_prices.length > 0
                               ) {
-                                const matchingPrice = booking.item_prices.find(
-                                  (item: any) =>
-                                    item.service_name === serviceName ||
-                                    item.service_name.toLowerCase() ===
-                                      serviceName.toLowerCase(),
+                                // Try to find exact match first
+                                let matchingPrice = booking.item_prices.find(
+                                  (item: any) => {
+                                    const itemServiceName = (
+                                      item.service_name ||
+                                      item.serviceName ||
+                                      ""
+                                    ).toLowerCase();
+                                    return (
+                                      itemServiceName ===
+                                      serviceName.toLowerCase()
+                                    );
+                                  },
                                 );
+
+                                // If no exact match, try partial match
+                                if (!matchingPrice) {
+                                  matchingPrice = booking.item_prices.find(
+                                    (item: any) => {
+                                      const itemServiceName = (
+                                        item.service_name ||
+                                        item.serviceName ||
+                                        ""
+                                      ).toLowerCase();
+                                      return (
+                                        itemServiceName.includes(
+                                          serviceName.toLowerCase(),
+                                        ) ||
+                                        serviceName
+                                          .toLowerCase()
+                                          .includes(itemServiceName)
+                                      );
+                                    },
+                                  );
+                                }
+
                                 if (matchingPrice) {
-                                  price = matchingPrice.unit_price;
+                                  price =
+                                    matchingPrice.unit_price ||
+                                    matchingPrice.price ||
+                                    price;
+                                  quantity = matchingPrice.quantity || quantity;
                                   totalServicePrice =
                                     matchingPrice.total_price ||
+                                    matchingPrice.totalPrice ||
                                     price * quantity;
                                   console.log(
-                                    `Using database price for ${serviceName}: ₹${price}`,
+                                    `✅ Using saved database price for "${serviceName}": ₹${price} x ${quantity} = ₹${totalServicePrice}`,
+                                  );
+                                } else {
+                                  console.log(
+                                    `⚠️ No matching item_price found for "${serviceName}" in:`,
+                                    booking.item_prices,
                                   );
                                 }
                               }
 
-                              // Second priority: Service object has price
-                              else if (
-                                typeof service === "object" &&
-                                service.price &&
-                                service.price > 0
-                              ) {
-                                price = service.price;
-                                totalServicePrice = price * quantity;
-                                console.log(
-                                  `Using service object price for ${serviceName}: ₹${price}`,
+                              // Fallback pricing if no database price found (should rarely be needed now)
+                              if (totalServicePrice === 0) {
+                                // Log when fallback is needed - this indicates item_prices weren't saved properly
+                                console.warn(
+                                  `⚠️ Using fallback pricing for "${serviceName}" - item_prices should have been saved in database`,
                                 );
-                              }
 
-                              // Third priority: Use known service prices as fallback
-                              else {
-                                const servicePriceMap: {
-                                  [key: string]: number;
-                                } = {
-                                  kurta: 140,
-                                  "kurta qty: 1": 140,
-                                  jacket: 300,
-                                  "jacket (full/half sleeves)": 300,
-                                  "jacket (full/half sleeves) qty: 1": 300,
-                                  shirt: 90,
-                                  trouser: 120,
-                                  jeans: 120,
-                                  coat: 220,
-                                  sweater: 200,
-                                  sweatshirt: 200,
-                                  saree: 210,
-                                  lehenga: 330,
-                                  dress: 330,
-                                  "laundry and fold": 70,
-                                  "laundry and iron": 120,
-                                  "steam iron": 30,
-                                  "home service": 100,
-                                };
-
-                                const lowerServiceName =
-                                  serviceName.toLowerCase();
-
-                                // Find exact match first
-                                if (servicePriceMap[lowerServiceName]) {
-                                  price = servicePriceMap[lowerServiceName];
+                                // Simple fallback based on total amount divided by service count if available
+                                if (
+                                  booking.totalAmount &&
+                                  services.length > 0
+                                ) {
+                                  const avgPricePerService = Math.round(
+                                    booking.totalAmount / services.length,
+                                  );
+                                  price = avgPricePerService;
+                                  totalServicePrice = price * quantity;
+                                  console.log(
+                                    `📊 Using calculated average price: ₹${price} (total: ₹${booking.totalAmount} / ${services.length} services)`,
+                                  );
                                 } else {
-                                  // Find partial match
-                                  for (const [key, value] of Object.entries(
-                                    servicePriceMap,
-                                  )) {
-                                    if (
-                                      lowerServiceName.includes(key) ||
-                                      key.includes(lowerServiceName)
-                                    ) {
-                                      price = value;
-                                      break;
-                                    }
+                                  // Last resort - simple defaults
+                                  const lowerServiceName =
+                                    serviceName.toLowerCase();
+                                  if (lowerServiceName.includes("coal iron")) {
+                                    price = 20;
+                                  } else if (
+                                    lowerServiceName.includes("steam iron") ||
+                                    lowerServiceName.includes("men's suit") ||
+                                    lowerServiceName.includes("suit")
+                                  ) {
+                                    price = 150;
+                                  } else if (
+                                    lowerServiceName.includes("laundry")
+                                  ) {
+                                    price = 70;
+                                  } else {
+                                    price = 50; // Default fallback
                                   }
+                                  totalServicePrice = price * quantity;
+                                  console.log(
+                                    `🔄 Using default fallback price for "${serviceName}": ��${price}`,
+                                  );
                                 }
-                                totalServicePrice = price * quantity;
-                                console.log(
-                                  `Using fallback price for ${serviceName}: ₹${price}`,
-                                );
                               }
 
                               // Use calculated total or calculate from unit price
@@ -1023,16 +1073,21 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                               return (
                                 <div
                                   key={idx}
-                                  className="flex justify-between items-center bg-white p-2 rounded text-xs"
+                                  className="flex justify-between items-center bg-white p-3 rounded text-xs border border-gray-100"
                                 >
-                                  <span className="font-medium">
-                                    {serviceName}
-                                  </span>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-gray-600">
+                                  <div className="flex-1">
+                                    <span className="font-medium text-gray-900">
+                                      {serviceName}
+                                    </span>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      ₹{price} per piece
+                                    </div>
+                                  </div>
+                                  <div className="flex flex-col items-end gap-1">
+                                    <span className="text-gray-600 text-xs">
                                       Qty: {quantity}
                                     </span>
-                                    <span className="font-semibold text-green-600">
+                                    <span className="font-semibold text-green-600 text-sm">
                                       ₹{displayPrice}
                                     </span>
                                   </div>

@@ -37,6 +37,12 @@ export interface BookingDetails {
   updatedAt: string;
   additional_details?: string;
   discount_amount?: number;
+  item_prices?: Array<{
+    service_name: string;
+    quantity: number;
+    unit_price: number;
+    total_price: number;
+  }>;
 }
 
 export interface BookingResponse {
