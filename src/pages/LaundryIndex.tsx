@@ -672,6 +672,9 @@ const LaundryIndex = () => {
           // Store booking data for confirmation screen
           const confirmationData = {
             bookingId: `local_${Date.now()}`,
+            custom_order_id:
+              localResult.data?.custom_order_id ||
+              `CC${Date.now().toString().slice(-6)}`, // Add custom_order_id for local bookings
             services: detailedServices, // Use detailed services with quantities
             totalAmount: cartData.totalAmount,
             pickupDate: cartData.pickupDate,
