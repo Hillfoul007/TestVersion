@@ -48,6 +48,7 @@ function App() {
             </Routes>
             <Toaster />
             <InstallPrompt />
+            <PWAUpdateNotification />
           </div>
         </Router>
       </NotificationProvider>
