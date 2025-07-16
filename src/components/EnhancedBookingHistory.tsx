@@ -1018,8 +1018,8 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 }
                               }
 
-                              // Fallback pricing if no database price found (should rarely be needed now)
-                              if (totalServicePrice === 0) {
+                              // Fallback pricing if no database price found
+                              if (totalServicePrice === 0 && price === 0) {
                                 // Log when fallback is needed - this indicates item_prices weren't saved properly
                                 console.warn(
                                   `⚠️ Using fallback pricing for "${serviceName}" - item_prices should have been saved in database`,
