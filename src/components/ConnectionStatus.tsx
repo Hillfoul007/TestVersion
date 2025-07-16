@@ -18,7 +18,11 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      checkBackendStatus();
+      if (config.isBackendAvailable) {
+        checkBackendStatus();
+      } else {
+        setBackendStatus("offline");
+      }
     };
 
     const handleOffline = () => {
