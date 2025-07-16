@@ -551,7 +551,7 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                           ? service.price
                           : typeof service.amount === "number"
                             ? service.amount
-                            : defaultPrice,
+                            : 0, // Will be calculated below if no price available
                       id: service.id || `service_${index}`,
                     };
                   }
