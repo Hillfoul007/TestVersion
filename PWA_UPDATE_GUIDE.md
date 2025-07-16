@@ -6,12 +6,12 @@ Your Vite app now has **complete PWA cache-busting** to ensure home-screen apps 
 
 ## ✅ What's Been Implemented
 
-### 1. **vite-plugin-pwa** Configuration
+### 1. **vite-plugin-pwa** Configuration (Graceful Fallback)\*\*
 
-- ✅ Installed and configured `vite-plugin-pwa`
-- ✅ Set `registerType: 'autoUpdate'` for automatic updates
-- ✅ Enabled `cleanupOutdatedCaches`, `clientsClaim`, and `skipWaiting`
-- ✅ Added image caching for Builder.io CDN assets
+- ✅ Installed `vite-plugin-pwa` as production dependency
+- ✅ Conditional loading to prevent build failures
+- ✅ Graceful fallback when PWA plugin is unavailable
+- ✅ Basic service worker update detection without virtual modules
 
 ### 2. **Update Notification Component**
 
