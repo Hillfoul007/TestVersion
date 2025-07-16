@@ -183,5 +183,11 @@
     body {
       background-color: #22c55e;
     }
+
+    /* Ensure proper viewport handling in PWA */
+    #root {
+      min-height: 100vh;
+      min-height: 100dvh; /* Dynamic viewport height for mobile */
+    }
   }
 }
