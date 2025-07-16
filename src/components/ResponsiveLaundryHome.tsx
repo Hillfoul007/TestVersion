@@ -547,56 +547,56 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           )}
         </div>
 
-        {/* Sticky Mobile Controls */}
-        <div
-          className="sticky bg-gradient-to-b from-green-500 to-green-600 z-30"
-          style={{ top: "calc(env(safe-area-inset-top, 0px) + 80px)" }}
-        >
-          <div className="p-4 space-y-4">
-            {/* Delivery Time & Location */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">
-                  🕐 Delivery in {deliveryTime}
-                </span>
-                <Badge className="bg-white/20 text-white">Available</Badge>
-              </div>
-              <div
-                className={`flex items-center gap-2 text-sm ${
+        {/* Non-sticky delivery/location section */}
+        <div className="p-4">
+          {/* Delivery Time & Location */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">
+                🕐 Delivery in {deliveryTime}
+              </span>
+              <Badge className="bg-white/20 text-white">Available</Badge>
+            </div>
+            <div
+              className={`flex items-center gap-2 text-sm ${
+                userLocation?.includes("denied") ||
+                userLocation?.includes("access denied")
+                  ? "cursor-pointer hover:text-white/80 transition-colors"
+                  : ""
+              }`}
+              onClick={
+                userLocation?.includes("denied") ||
+                userLocation?.includes("access denied")
+                  ? requestLocationPermission
+                  : undefined
+              }
+              title={
+                userLocation?.includes("denied") ||
+                userLocation?.includes("access denied")
+                  ? "Click to request location permission again"
+                  : undefined
+              }
+            >
+              <MapPin
+                className={`h-4 w-4 ${
                   userLocation?.includes("denied") ||
                   userLocation?.includes("access denied")
-                    ? "cursor-pointer hover:text-white/80 transition-colors"
+                    ? "animate-pulse"
                     : ""
                 }`}
-                onClick={
-                  userLocation?.includes("denied") ||
-                  userLocation?.includes("access denied")
-                    ? requestLocationPermission
-                    : undefined
-                }
-                title={
-                  userLocation?.includes("denied") ||
-                  userLocation?.includes("access denied")
-                    ? "Click to request location permission again"
-                    : undefined
-                }
-              >
-                <MapPin
-                  className={`h-4 w-4 ${
-                    userLocation?.includes("denied") ||
-                    userLocation?.includes("access denied")
-                      ? "animate-pulse"
-                      : ""
-                  }`}
-                />
-                <span>
-                  {isRequestingLocation
-                    ? "Requesting location..."
-                    : userLocation || "Detect Location"}
-                </span>
-              </div>
+              />
+              <span>
+                {isRequestingLocation
+                  ? "Requesting location..."
+                  : userLocation || "Detect Location"}
+              </span>
             </div>
+          </div>
+        </div>
 
+        {/* Sticky Search and Categories Only */}
+        <div className="sticky top-0 bg-gradient-to-b from-green-500 to-green-600 z-50 shadow-lg">
+          <div className="px-4 pt-4 pb-2 space-y-3">
             {/* Search Bar */}
             <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search">
               <Search className="h-5 w-5 text-gray-400 mr-3" />
