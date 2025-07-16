@@ -250,7 +250,7 @@ export const laundryServices: LaundryService[] = [
     category: "womens-dry-clean",
     estimatedTime: "48 hours",
     image:
-      "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2F3a5480ed186e482dbc6e1adb3253c827?format=webp&width=800",
+      "https://cdn.builder.io/api/v1/image/assets%2F25d4228f5ce14a258f3a9d44d3b5703f%2F4c74c4136c6448e0a35d0787dadb7f10?format=webp&width=800",
   },
   {
     id: "dry-clean-skirt-heavy",
