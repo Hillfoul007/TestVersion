@@ -546,78 +546,74 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           )}
         </div>
 
-                {/* Mobile Content */}
-        <div className="space-y-4">
-          {/* Delivery Time & Location - Scrollable */}
-          <div className="p-4">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">
-                  🕐 Delivery in {deliveryTime}
-                </span>
-                <Badge className="bg-white/20 text-white">Available</Badge>
-              </div>
-              <div
-                className={`flex items-center gap-2 text-sm ${
+        {/* Mobile Content */}
+        <div className="p-4 space-y-4">
+          {/* Delivery Time & Location */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">
+                🕐 Delivery in {deliveryTime}
+              </span>
+              <Badge className="bg-white/20 text-white">Available</Badge>
+            </div>
+            <div
+              className={`flex items-center gap-2 text-sm ${
+                userLocation?.includes("denied") ||
+                userLocation?.includes("access denied")
+                  ? "cursor-pointer hover:text-white/80 transition-colors"
+                  : ""
+              }`}
+              onClick={
+                userLocation?.includes("denied") ||
+                userLocation?.includes("access denied")
+                  ? requestLocationPermission
+                  : undefined
+              }
+              title={
+                userLocation?.includes("denied") ||
+                userLocation?.includes("access denied")
+                  ? "Click to request location permission again"
+                  : undefined
+              }
+            >
+              <MapPin
+                className={`h-4 w-4 ${
                   userLocation?.includes("denied") ||
                   userLocation?.includes("access denied")
-                    ? "cursor-pointer hover:text-white/80 transition-colors"
+                    ? "animate-pulse"
                     : ""
                 }`}
-                onClick={
-                  userLocation?.includes("denied") ||
-                  userLocation?.includes("access denied")
-                    ? requestLocationPermission
-                    : undefined
-                }
-                title={
-                  userLocation?.includes("denied") ||
-                  userLocation?.includes("access denied")
-                    ? "Click to request location permission again"
-                    : undefined
-                }
-              >
-                <MapPin
-                  className={`h-4 w-4 ${
-                    userLocation?.includes("denied") ||
-                    userLocation?.includes("access denied")
-                      ? "animate-pulse"
-                      : ""
-                  }`}
-                />
-                <span>
-                  {isRequestingLocation
-                    ? "Requesting location..."
-                    : userLocation || "Detect Location"}
-                </span>
-              </div>
+              />
+              <span>
+                {isRequestingLocation
+                  ? "Requesting location..."
+                  : userLocation || "Detect Location"}
+              </span>
             </div>
           </div>
 
-          {/* Sticky Search & Categories Section */}
-          <div className="sticky top-[88px] z-40 bg-gradient-to-r from-green-500 to-green-600 px-4 py-3 space-y-3 shadow-lg">
-            {/* Search Bar */}
-            <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3">
-              <Search className="h-5 w-5 text-gray-400 mr-3" />
-              <Input
-                placeholder="Search laundry services"
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="bg-transparent border-none text-white placeholder-gray-400 focus:ring-0 p-0 text-sm"
-              />
-              <VoiceSearch
-                onResult={(transcript) => {
-                  handleSearch(transcript);
-                }}
-                onError={(error) => {
-                  console.error("Voice search error:", error);
-                }}
-                className="ml-3 text-gray-400 hover:text-white"
-              />
-            </div>
+          {/* Search Bar */}
+          <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3">
+            <Search className="h-5 w-5 text-gray-400 mr-3" />
+            <Input
+              placeholder="Search laundry services"
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="bg-transparent border-none text-white placeholder-gray-400 focus:ring-0 p-0 text-sm"
+            />
+            <VoiceSearch
+              onResult={(transcript) => {
+                handleSearch(transcript);
+              }}
+              onError={(error) => {
+                console.error("Voice search error:", error);
+              }}
+              className="ml-3 text-gray-400 hover:text-white"
+            />
+          </div>
 
-            {/* Categories */}
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {/* Categories */}
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             <Button
               variant={selectedCategory === "all" ? "default" : "ghost"}
               onClick={() => setSelectedCategory("all")}
