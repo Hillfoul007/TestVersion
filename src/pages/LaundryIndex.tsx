@@ -676,8 +676,10 @@ const LaundryIndex = () => {
           item_prices: itemPrices,
         };
 
-        const localResult =
-          await bookingService.createBooking(localBookingData);
+        const localResult = await bookingService.createBooking(
+          localBookingData,
+          itemPrices,
+        );
         console.log("📝 Fallback local booking result:", localResult);
 
         if (localResult.success) {
