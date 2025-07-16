@@ -592,28 +592,30 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3">
-            <Search className="h-5 w-5 text-gray-400 mr-3" />
-            <Input
-              placeholder="Search laundry services"
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="bg-transparent border-none text-white placeholder-gray-400 focus:ring-0 p-0 text-sm"
-            />
-            <VoiceSearch
-              onResult={(transcript) => {
-                handleSearch(transcript);
-              }}
-              onError={(error) => {
-                console.error("Voice search error:", error);
-              }}
-              className="ml-3 text-gray-400 hover:text-white"
-            />
-          </div>
+                    {/* Sticky Search and Categories Container */}
+          <div className="sticky top-[88px] z-40 bg-gradient-to-r from-green-500 to-green-600 p-4 -mx-4 shadow-lg space-y-4">
+            {/* Search Bar */}
+            <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3">
+              <Search className="h-5 w-5 text-gray-400 mr-3" />
+              <Input
+                placeholder="Search laundry services"
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="bg-transparent border-none text-white placeholder-gray-400 focus:ring-0 p-0 text-sm"
+              />
+              <VoiceSearch
+                onResult={(transcript) => {
+                  handleSearch(transcript);
+                }}
+                onError={(error) => {
+                  console.error("Voice search error:", error);
+                }}
+                className="ml-3 text-gray-400 hover:text-white"
+              />
+            </div>
 
-          {/* Categories */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {/* Categories */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             <Button
               variant={selectedCategory === "all" ? "default" : "ghost"}
               onClick={() => setSelectedCategory("all")}
