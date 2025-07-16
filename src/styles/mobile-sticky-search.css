@@ -2,31 +2,51 @@
 @media (max-width: 768px) {
   .mobile-sticky-search {
     position: sticky;
-    top: 88px; /* Below the mobile header */
+    top: calc(
+      var(--safe-area-inset-top, 0px) + 88px
+    ); /* Below the mobile header + safe area */
     z-index: 40;
-    background: linear-gradient(to right, rgb(34, 197, 94), rgb(22, 163, 74));
+    background: rgba(31, 41, 55, 0.95); /* Semi-transparent dark background */
+    backdrop-filter: blur(8px);
+    margin: -16px;
     padding: 16px;
-    margin: 0 -16px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
   }
 
   .mobile-sticky-categories {
     position: sticky;
-    top: calc(88px + 80px); /* Below header + search bar */
-    z-index: 35;
+    top: calc(
+      var(--safe-area-inset-top, 0px) + 168px
+    ); /* Below header + search bar */
+    z-index: 39;
     background: linear-gradient(to right, rgb(34, 197, 94), rgb(22, 163, 74));
-    padding: 0 16px 16px 16px;
-    margin: 0 -16px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(8px);
+    margin: -16px -16px 0 -16px;
+    padding: 8px 16px 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
-  /* Ensure proper spacing for scrollable content */
+  /* Ensure scrollable content has proper spacing */
   .mobile-services-content {
-    margin-top: 8px;
+    margin-top: 16px;
+    padding-top: 8px;
   }
 
-  /* Better scroll behavior */
+  /* Improve scrolling performance */
   .mobile-content-container {
     scroll-behavior: smooth;
+    transform: translateZ(0); /* Hardware acceleration */
+  }
+
+  /* Better visual separation */
+  .mobile-sticky-search::before {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
   }
 }
