@@ -11,6 +11,7 @@ import {
   initializeAuthPersistence,
   restoreAuthState,
 } from "@/utils/authPersistence";
+import { initializePWAUpdates } from "@/utils/swCleanup";
 import "./App.css";
 import "./styles/mobile-fixes.css";
 import "./styles/mobile-touch-fixes.css";
