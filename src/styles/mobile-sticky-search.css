@@ -1,14 +1,15 @@
-/* Mobile Sticky Controls Container */
+/* Mobile Sticky Controls at Top */
 @media (max-width: 768px) {
   .mobile-sticky-search {
-    /* Individual search styling - no position sticky needed since container handles it */
+    /* Search bar styling within sticky container */
     background: rgba(31, 41, 55, 0.95);
     backdrop-filter: blur(8px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
   }
 
   .mobile-sticky-categories {
-    /* Individual category styling - no position sticky needed since container handles it */
+    /* Category buttons styling within sticky container */
     background: transparent;
     backdrop-filter: blur(8px);
   }
