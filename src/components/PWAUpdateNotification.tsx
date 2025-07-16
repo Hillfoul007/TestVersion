@@ -2,38 +2,56 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RefreshCw, X } from "lucide-react";
-import { useRegisterSW } from "virtual:pwa-register/react";
 
 const PWAUpdateNotification: React.FC = () => {
   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
-
-  const {
-    offlineReady: [offlineReady, setOfflineReady],
-    needRefresh: [needRefresh, setNeedRefresh],
-    updateServiceWorker,
-  } = useRegisterSW({
-    onRegistered(r) {
-      console.log("SW Registered: " + r);
-    },
-    onRegisterError(error) {
-      console.log("SW registration error", error);
-    },
-  });
+  const [updateAvailable, setUpdateAvailable] = useState(false);
 
   useEffect(() => {
-    if (needRefresh) {
-      setShowUpdatePrompt(true);
+    // Simple service worker update detection
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        setUpdateAvailable(true);
+        setShowUpdatePrompt(true);
+      });
+
+      // Check for updates periodically
+      const checkForUpdates = () => {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          registrations.forEach((registration) => {
+            if (registration.waiting) {
+              setUpdateAvailable(true);
+              setShowUpdatePrompt(true);
+            }
+            registration.update();
+          });
+        });
+      };
+
+      // Check on load and every 30 seconds
+      checkForUpdates();
+      const interval = setInterval(checkForUpdates, 30000);
+
+      return () => clearInterval(interval);
     }
-  }, [needRefresh]);
+  }, []);
 
   const handleUpdate = () => {
-    updateServiceWorker(true);
-    setShowUpdatePrompt(false);
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => {
+          if (registration.waiting) {
+            registration.waiting.postMessage({ type: "SKIP_WAITING" });
+          }
+        });
+      });
+    }
+    window.location.reload();
   };
 
   const handleDismiss = () => {
     setShowUpdatePrompt(false);
-    setNeedRefresh(false);
+    setUpdateAvailable(false);
   };
 
   if (!showUpdatePrompt) return null;
