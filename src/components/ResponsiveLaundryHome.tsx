@@ -613,7 +613,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           </div>
 
           {/* Categories */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mobile-sticky-categories">
             <Button
               variant={selectedCategory === "all" ? "default" : "ghost"}
               onClick={() => setSelectedCategory("all")}
