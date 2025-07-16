@@ -10,7 +10,7 @@
     margin: 0;
     padding: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.05);
   }
 
   /* Sticky container for categories */
@@ -23,7 +23,7 @@
     margin: 0;
     padding: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.05);
   }
 
   /* Perfect alignment for inner elements */
@@ -33,7 +33,7 @@
     background: rgba(0, 0, 0, 0.4) !important;
     backdrop-filter: none !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 12px;
   }
 
