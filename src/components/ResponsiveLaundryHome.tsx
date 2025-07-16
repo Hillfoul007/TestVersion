@@ -547,108 +547,110 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           )}
         </div>
 
-        {/* Mobile Content */}
-        <div className="p-4 space-y-4">
-          {/* Delivery Time & Location */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">
-                🕐 Delivery in {deliveryTime}
-              </span>
-              <Badge className="bg-white/20 text-white">Available</Badge>
-            </div>
-            <div
-              className={`flex items-center gap-2 text-sm ${
-                userLocation?.includes("denied") ||
-                userLocation?.includes("access denied")
-                  ? "cursor-pointer hover:text-white/80 transition-colors"
-                  : ""
-              }`}
-              onClick={
-                userLocation?.includes("denied") ||
-                userLocation?.includes("access denied")
-                  ? requestLocationPermission
-                  : undefined
-              }
-              title={
-                userLocation?.includes("denied") ||
-                userLocation?.includes("access denied")
-                  ? "Click to request location permission again"
-                  : undefined
-              }
-            >
-              <MapPin
-                className={`h-4 w-4 ${
+        {/* Sticky Mobile Controls */}
+        <div className="sticky top-[72px] bg-gradient-to-b from-green-500 to-green-600 z-30">
+          <div className="p-4 space-y-4">
+            {/* Delivery Time & Location */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">
+                  🕐 Delivery in {deliveryTime}
+                </span>
+                <Badge className="bg-white/20 text-white">Available</Badge>
+              </div>
+              <div
+                className={`flex items-center gap-2 text-sm ${
                   userLocation?.includes("denied") ||
                   userLocation?.includes("access denied")
-                    ? "animate-pulse"
+                    ? "cursor-pointer hover:text-white/80 transition-colors"
                     : ""
                 }`}
-              />
-              <span>
-                {isRequestingLocation
-                  ? "Requesting location..."
-                  : userLocation || "Detect Location"}
-              </span>
-            </div>
-          </div>
-
-          {/* Search Bar */}
-          <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search">
-            <Search className="h-5 w-5 text-gray-400 mr-3" />
-            <Input
-              placeholder="Search laundry services"
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="bg-transparent border-none text-white placeholder-gray-400 focus:ring-0 p-0 text-sm"
-            />
-            <VoiceSearch
-              onResult={(transcript) => {
-                handleSearch(transcript);
-              }}
-              onError={(error) => {
-                console.error("Voice search error:", error);
-              }}
-              className="ml-3 text-gray-400 hover:text-white"
-            />
-          </div>
-
-          {/* Categories */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mobile-sticky-categories">
-            <Button
-              variant={selectedCategory === "all" ? "default" : "ghost"}
-              onClick={() => setSelectedCategory("all")}
-              className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 ${
-                selectedCategory === "all"
-                  ? "bg-white text-green-600"
-                  : "bg-white/10 text-white hover:bg-white/20"
-              }`}
-            >
-              All
-            </Button>
-
-            {(useStaticFallback
-              ? (serviceCategories || []).slice(1)
-              : dynamicServices || []
-            )
-              .filter((category) => category.enabled !== false)
-              .map((category) => (
-                <Button
-                  key={category.id}
-                  variant={
-                    selectedCategory === category.id ? "default" : "ghost"
-                  }
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 ${
-                    selectedCategory === category.id
-                      ? "bg-white text-green-600"
-                      : "bg-white/10 text-white hover:bg-white/20"
+                onClick={
+                  userLocation?.includes("denied") ||
+                  userLocation?.includes("access denied")
+                    ? requestLocationPermission
+                    : undefined
+                }
+                title={
+                  userLocation?.includes("denied") ||
+                  userLocation?.includes("access denied")
+                    ? "Click to request location permission again"
+                    : undefined
+                }
+              >
+                <MapPin
+                  className={`h-4 w-4 ${
+                    userLocation?.includes("denied") ||
+                    userLocation?.includes("access denied")
+                      ? "animate-pulse"
+                      : ""
                   }`}
-                >
-                  <span className="mr-1">{category.icon}</span>
-                  <span className="whitespace-nowrap">{category.name}</span>
-                </Button>
-              ))}
+                />
+                <span>
+                  {isRequestingLocation
+                    ? "Requesting location..."
+                    : userLocation || "Detect Location"}
+                </span>
+              </div>
+            </div>
+
+            {/* Search Bar */}
+            <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search">
+              <Search className="h-5 w-5 text-gray-400 mr-3" />
+              <Input
+                placeholder="Search laundry services"
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="bg-transparent border-none text-white placeholder-gray-400 focus:ring-0 p-0 text-sm"
+              />
+              <VoiceSearch
+                onResult={(transcript) => {
+                  handleSearch(transcript);
+                }}
+                onError={(error) => {
+                  console.error("Voice search error:", error);
+                }}
+                className="ml-3 text-gray-400 hover:text-white"
+              />
+            </div>
+
+            {/* Categories */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mobile-sticky-categories">
+              <Button
+                variant={selectedCategory === "all" ? "default" : "ghost"}
+                onClick={() => setSelectedCategory("all")}
+                className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 ${
+                  selectedCategory === "all"
+                    ? "bg-white text-green-600"
+                    : "bg-white/10 text-white hover:bg-white/20"
+                }`}
+              >
+                All
+              </Button>
+
+              {(useStaticFallback
+                ? (serviceCategories || []).slice(1)
+                : dynamicServices || []
+              )
+                .filter((category) => category.enabled !== false)
+                .map((category) => (
+                  <Button
+                    key={category.id}
+                    variant={
+                      selectedCategory === category.id ? "default" : "ghost"
+                    }
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 ${
+                      selectedCategory === category.id
+                        ? "bg-white text-green-600"
+                        : "bg-white/10 text-white hover:bg-white/20"
+                    }`}
+                  >
+                    <span className="mr-1">{category.icon}</span>
+                    <span className="whitespace-nowrap">{category.name}</span>
+                  </Button>
+                ))}
+            </div>
           </div>
         </div>
 
