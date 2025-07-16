@@ -524,8 +524,8 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
               const sanitizeServices = (services: any) => {
                 if (!Array.isArray(services)) return [];
 
-                // Use default price instead of dividing total
-                const defaultPrice = 50; // Standard default price per service
+                // Calculate price based on booking data instead of fixed default
+                const defaultPrice = 0; // Will calculate from booking data
 
                 return services.map((service, index) => {
                   if (typeof service === "string") {
