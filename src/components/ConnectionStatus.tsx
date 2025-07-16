@@ -42,22 +42,26 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
 
   const checkBackendStatus = async () => {
     try {
+      // If no backend is configured, don't attempt to connect
+      if (!config.isBackendAvailable || !config.apiBaseUrl) {
+        setBackendStatus("offline");
+        return;
+      }
+
       setBackendStatus("checking");
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/health`,
-        {
-          signal: controller.signal,
-          method: "GET",
-        },
-      );
+      const response = await fetch(`${config.apiBaseUrl}/health`, {
+        signal: controller.signal,
+        method: "GET",
+      });
 
       clearTimeout(timeoutId);
       setBackendStatus(response.ok ? "online" : "offline");
     } catch (error) {
+      console.warn("Backend connection failed:", error);
       setBackendStatus("offline");
     }
   };
