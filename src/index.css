@@ -172,4 +172,16 @@
     padding-right: calc(1rem + env(safe-area-inset-right, 0));
     padding-bottom: 0.5rem;
   }
+
+  /* PWA specific adjustments */
+  @media (display-mode: standalone) {
+    .mobile-header-safe {
+      padding-top: calc(0.25rem + env(safe-area-inset-top, 0));
+    }
+
+    /* Prevent status bar overlay issues */
+    body {
+      background-color: #22c55e;
+    }
+  }
 }
