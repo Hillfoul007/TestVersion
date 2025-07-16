@@ -657,7 +657,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         {/* Services Grid */}
         <div
           id="services-section"
-          className="bg-white rounded-t-3xl min-h-screen p-4"
+          className="bg-white rounded-t-3xl min-h-screen p-4 relative"
         >
           {getFilteredServices().length === 0 ? (
             <EmptyStateCard />
