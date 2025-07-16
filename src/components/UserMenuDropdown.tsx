@@ -147,7 +147,7 @@ const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 
           <DropdownMenuSeparator className="my-0" />
 
-          <div className="p-2 space-y-1">
+          <div className="p-2 space-y-1 sm:space-y-1 max-sm:flex max-sm:flex-col">
             <DropdownMenuItem
               onClick={() =>
                 handleItemClick("bookings", () => {
@@ -183,7 +183,7 @@ const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
               userId={currentUser.id}
               currentUser={currentUser}
               variant="menu-item"
-              className="w-full justify-start p-3 h-auto font-medium hover:bg-green-50 hover:text-green-700 rounded-xl transition-all duration-200 group transform hover:scale-[1.02] cursor-pointer mx-2"
+              className="w-full justify-start p-3 h-auto font-medium hover:bg-green-50 hover:text-green-700 rounded-xl transition-all duration-200 group transform hover:scale-[1.02] cursor-pointer mx-2 max-sm:ml-auto"
             />
 
             <DropdownMenuItem
