@@ -3,11 +3,14 @@
   /* Search bar sticky positioning - sticks right after header */
   .mobile-sticky-search {
     position: sticky;
-    top: 80px; /* Stick right after the mobile header */
+    top: 88px; /* Stick right after the mobile header (header height + safe area) */
     z-index: 40;
     background: rgba(31, 41, 55, 0.98);
     backdrop-filter: blur(12px);
-    margin: -16px;
+    margin-left: -16px;
+    margin-right: -16px;
+    margin-top: 0;
+    margin-bottom: 16px;
     padding: 16px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -17,7 +20,7 @@
   /* Categories sticky positioning - sticks right after search */
   .mobile-sticky-categories {
     position: sticky;
-    top: 160px; /* Stick right after the search bar */
+    top: 168px; /* Stick right after the search bar */
     z-index: 39;
     background: linear-gradient(
       to right,
@@ -25,7 +28,10 @@
       rgba(22, 163, 74, 0.98)
     );
     backdrop-filter: blur(12px);
-    margin: -16px -16px 0 -16px;
+    margin-left: -16px;
+    margin-right: -16px;
+    margin-top: 0;
+    margin-bottom: 16px;
     padding: 8px 16px 16px 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
