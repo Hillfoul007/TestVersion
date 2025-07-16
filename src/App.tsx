@@ -30,6 +30,9 @@ function App() {
       // Initialize auth persistence handlers (storage events, page lifecycle, etc.)
       initializeAuthPersistence();
 
+      // Initialize PWA updates and service worker cleanup
+      initializePWAUpdates();
+
       // Restore authentication state from localStorage
       await restoreAuthState();
     };
