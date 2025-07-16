@@ -596,7 +596,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         </div>
 
         {/* Sticky Search Bar */}
-        <div className="px-4 mb-4">
+        <div className="mobile-sticky-search-container mb-4">
           <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search">
             <Search className="h-5 w-5 text-gray-400 mr-3" />
             <Input
@@ -618,7 +618,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         </div>
 
         {/* Sticky Categories */}
-        <div className="px-4 mb-4">
+        <div className="mobile-sticky-categories-container mb-4">
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mobile-sticky-categories">
             <Button
               variant={selectedCategory === "all" ? "default" : "ghost"}
