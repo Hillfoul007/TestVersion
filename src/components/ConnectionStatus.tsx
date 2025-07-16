@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Wifi, WifiOff, Cloud, CloudOff } from "lucide-react";
+import { config } from "@/config/env";
 
 interface ConnectionStatusProps {
   className?: string;
@@ -39,28 +40,27 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
     };
   }, []);
 
- const checkBackendStatus = async () => {
-  try {
-    setBackendStatus("checking");
+  const checkBackendStatus = async () => {
+    try {
+      setBackendStatus("checking");
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-    const response = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/health`,
-      {
-        signal: controller.signal,
-        method: "GET",
-      }
-    );
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/health`,
+        {
+          signal: controller.signal,
+          method: "GET",
+        },
+      );
 
-    clearTimeout(timeoutId);
-    setBackendStatus(response.ok ? "online" : "offline");
-  } catch (error) {
-    setBackendStatus("offline");
-  }
-};
-
+      clearTimeout(timeoutId);
+      setBackendStatus(response.ok ? "online" : "offline");
+    } catch (error) {
+      setBackendStatus("offline");
+    }
+  };
 
   // Don't show anything if everything is working normally
   if (isOnline && backendStatus === "online") {
