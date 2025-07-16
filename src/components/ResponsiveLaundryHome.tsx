@@ -548,7 +548,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         </div>
 
         {/* Sticky Mobile Controls */}
-        <div className="sticky top-[72px] bg-gradient-to-b from-green-500 to-green-600 z-30">
+        <div className="sticky top-[80px] bg-gradient-to-b from-green-500 to-green-600 z-30">
           <div className="p-4 space-y-4">
             {/* Delivery Time & Location */}
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
