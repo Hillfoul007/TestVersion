@@ -598,8 +598,10 @@ const LaundryIndex = () => {
           paymentStatus: "pending" as const,
         };
 
-        const localResult =
-          await bookingService.createBooking(localBookingData);
+        const localResult = await bookingService.createBooking(
+          localBookingData,
+          itemPrices,
+        );
         console.log("📝 Local booking result:", localResult);
 
         // Store booking data for confirmation screen
@@ -674,8 +676,10 @@ const LaundryIndex = () => {
           item_prices: itemPrices,
         };
 
-        const localResult =
-          await bookingService.createBooking(localBookingData);
+        const localResult = await bookingService.createBooking(
+          localBookingData,
+          itemPrices,
+        );
         console.log("📝 Fallback local booking result:", localResult);
 
         if (localResult.success) {

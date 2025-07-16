@@ -8,19 +8,21 @@
     "dev:backend": "cd backend && node server-laundry.js",
     "dev:full": "concurrently \"npm run dev\" \"npm run dev:backend\"",
     "build": "vite build && node scripts/optimize-build.js",
+    "build:pwa": "node scripts/pwa-build.cjs && vite build && node scripts/optimize-build.js",
     "build:check": "tsc -b && vite build && node scripts/optimize-build.js",
     "build:analyze": "vite build --mode production && node scripts/bundle-analyzer.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "npm run start:prod",
-    "start:prod": "npm run build && cd backend && npm install --production && NODE_ENV=production node server-laundry.js",
+    "start:prod": "npm run build:pwa && cd backend && npm install --production && NODE_ENV=production node server-laundry.js",
     "start:backend": "NODE_ENV=production node backend/server-laundry.js",
     "start:frontend": "npx serve -s dist -p 8080",
     "deploy": "chmod +x deploy.sh && ./deploy.sh",
-    "render:build": "npm install && npm run build && cd backend && npm install --production && echo 'Build completed successfully'",
+    "deploy:pwa": "npm run build:pwa && chmod +x deploy.sh && ./deploy.sh",
+    "render:build": "npm install && npm run build:pwa && cd backend && npm install --production && echo 'Build completed successfully'",
     "render:start": "NODE_ENV=production node backend/server-laundry.js",
     "install:all": "npm install && cd backend && npm install",
-    "build:production": "npm run install:all && npm run build"
+    "build:production": "npm run install:all && npm run build:pwa"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.10",
@@ -81,7 +83,8 @@
     "sonner": "^2.0.5",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "vaul": "^1.1.2"
+    "vaul": "^1.1.2",
+    "vite-plugin-pwa": "^1.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

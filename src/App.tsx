@@ -5,11 +5,13 @@ import { NotificationProvider } from "@/contexts/NotificationContext";
 import LaundryIndex from "@/pages/LaundryIndex";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import InstallPrompt from "@/components/InstallPrompt";
+import PWAUpdateNotification from "@/components/PWAUpdateNotification";
 import AddressSearchDemo from "@/components/AddressSearchDemo";
 import {
   initializeAuthPersistence,
   restoreAuthState,
 } from "@/utils/authPersistence";
+import { initializePWAUpdates } from "@/utils/swCleanup";
 import "./App.css";
 import "./styles/mobile-fixes.css";
 import "./styles/mobile-touch-fixes.css";
@@ -27,6 +29,9 @@ function App() {
 
       // Initialize auth persistence handlers (storage events, page lifecycle, etc.)
       initializeAuthPersistence();
+
+      // Initialize PWA updates and service worker cleanup
+      initializePWAUpdates();
 
       // Restore authentication state from localStorage
       await restoreAuthState();
@@ -47,6 +52,7 @@ function App() {
             </Routes>
             <Toaster />
             <InstallPrompt />
+            <PWAUpdateNotification />
           </div>
         </Router>
       </NotificationProvider>

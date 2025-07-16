@@ -48,6 +48,7 @@ import VoiceSearch from "./VoiceSearch";
 import AdminServicesManager from "./AdminServicesManager";
 import { DVHostingSmsService } from "@/services/dvhostingSmsService";
 import { saveCartData, getCartData } from "@/utils/formPersistence";
+import "@/styles/mobile-sticky-search.css";
 import { preloadCriticalImages } from "@/utils/imagePreloader";
 
 interface ResponsiveLaundryHomeProps {
@@ -442,7 +443,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
       <div className="min-h-screen bg-gradient-to-br from-green-400 via-green-500 to-green-600">
         {/* Mobile Header */}
         <div className="bg-gradient-to-r from-green-500 to-green-600 text-white sticky top-0 z-50">
-          <div className="flex items-center justify-between p-4">
+          <div className="flex items-center justify-between mobile-header-safe">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-3">
                 {currentUser && (
@@ -593,7 +594,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           </div>
 
           {/* Search Bar */}
-          <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3">
+          <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search">
             <Search className="h-5 w-5 text-gray-400 mr-3" />
             <Input
               placeholder="Search laundry services"
@@ -613,7 +614,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           </div>
 
           {/* Categories */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mobile-sticky-categories">
             <Button
               variant={selectedCategory === "all" ? "default" : "ghost"}
               onClick={() => setSelectedCategory("all")}
