@@ -1055,7 +1055,12 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                   ) {
                                     price = 70;
                                   } else {
-                                    price = 50; // Default fallback
+                                    // Only use 50 as absolute last resort when no other info is available
+                                    price =
+                                      Math.round(
+                                        (booking.totalAmount || 0) /
+                                          Math.max(services.length, 1),
+                                      ) || 50;
                                   }
                                   totalServicePrice = price * quantity;
                                   console.log(
