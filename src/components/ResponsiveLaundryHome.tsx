@@ -21,7 +21,7 @@ import {
   Monitor,
   Bell,
 } from "lucide-react";
-import { useScrollDirection } from "@/hooks/useScrollDirection";
+import { useScrollPosition } from "@/hooks/useScrollPosition";
 import {
   laundryServices,
   serviceCategories,
@@ -146,8 +146,8 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   const [useStaticFallback, setUseStaticFallback] = useState(false);
   const dynamicServicesService = DynamicServicesService.getInstance();
 
-  // Hook for scroll direction detection
-  const { scrollDirection, isAtTop } = useScrollDirection({ threshold: 20 });
+  // Hook for sticky positioning
+  const { isSticky, searchRef, categoriesRef } = useScrollPosition();
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
@@ -599,9 +599,10 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
           {/* Search Bar */}
           <div
+            ref={searchRef}
             className={`bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search ${
-              !isAtTop && scrollDirection === "up" ? "sticky" : ""
-            } ${!isAtTop && scrollDirection === "down" ? "hidden" : ""}`}
+              isSticky ? "sticky" : ""
+            }`}
           >
             <Search className="h-5 w-5 text-gray-400 mr-3" />
             <Input
@@ -623,9 +624,10 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
           {/* Categories */}
           <div
+            ref={categoriesRef}
             className={`flex gap-2 overflow-x-auto pb-2 scrollbar-hide mobile-sticky-categories ${
-              !isAtTop && scrollDirection === "up" ? "sticky" : ""
-            } ${!isAtTop && scrollDirection === "down" ? "hidden" : ""}`}
+              isSticky ? "sticky" : ""
+            }`}
           >
             <Button
               variant={selectedCategory === "all" ? "default" : "ghost"}
