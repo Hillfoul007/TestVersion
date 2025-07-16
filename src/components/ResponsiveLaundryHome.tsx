@@ -21,7 +21,7 @@ import {
   Monitor,
   Bell,
 } from "lucide-react";
-import { useScrollPosition } from "@/hooks/useScrollPosition";
+
 import {
   laundryServices,
   serviceCategories,
@@ -145,9 +145,6 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   const [isLoadingServices, setIsLoadingServices] = useState(true);
   const [useStaticFallback, setUseStaticFallback] = useState(false);
   const dynamicServicesService = DynamicServicesService.getInstance();
-
-  // Hook for sticky positioning
-  const { isSticky, searchRef, categoriesRef } = useScrollPosition();
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
@@ -598,12 +595,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           </div>
 
           {/* Search Bar */}
-          <div
-            ref={searchRef}
-            className={`bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search ${
-              isSticky ? "sticky" : ""
-            }`}
-          >
+          <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search">
             <Search className="h-5 w-5 text-gray-400 mr-3" />
             <Input
               placeholder="Search laundry services"
@@ -623,12 +615,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           </div>
 
           {/* Categories */}
-          <div
-            ref={categoriesRef}
-            className={`flex gap-2 overflow-x-auto pb-2 scrollbar-hide mobile-sticky-categories ${
-              isSticky ? "sticky" : ""
-            }`}
-          >
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mobile-sticky-categories">
             <Button
               variant={selectedCategory === "all" ? "default" : "ghost"}
               onClick={() => setSelectedCategory("all")}
