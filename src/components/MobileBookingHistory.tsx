@@ -527,12 +527,12 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                 // Calculate price based on booking data instead of fixed default
                 const defaultPrice = 0; // Will calculate from booking data
 
-                return services.map((service, index) => {
+                const mappedServices = services.map((service, index) => {
                   if (typeof service === "string") {
                     return {
                       name: service,
                       quantity: 1,
-                      price: defaultPrice,
+                      price: 0, // Will be calculated below
                       id: `service_${index}`,
                     };
                   }
@@ -560,6 +560,61 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                     quantity: 1,
                     price: 0, // Will be calculated below
                     id: `service_${index}`,
+                  };
+                });
+
+                // Now calculate prices for services that don't have them
+                const totalAmount =
+                  booking.totalAmount ||
+                  booking.total_price ||
+                  booking.final_amount ||
+                  0;
+                const totalQuantity = mappedServices.reduce(
+                  (sum, s) => sum + s.quantity,
+                  0,
+                );
+
+                return mappedServices.map((service) => {
+                  if (service.price > 0) {
+                    return service; // Already has a price
+                  }
+
+                  // Calculate price based on total amount and service proportions
+                  let calculatedPrice = 0;
+                  if (totalAmount > 0 && totalQuantity > 0) {
+                    calculatedPrice =
+                      Math.round(
+                        (totalAmount / totalQuantity) * service.quantity,
+                      ) / service.quantity;
+                  } else {
+                    // Fallback to intelligent defaults based on service name
+                    const lowerServiceName = service.name.toLowerCase();
+                    if (
+                      lowerServiceName.includes("coal iron") ||
+                      lowerServiceName.includes("iron")
+                    ) {
+                      calculatedPrice = 20;
+                    } else if (
+                      lowerServiceName.includes("steam iron") ||
+                      lowerServiceName.includes("men's suit") ||
+                      lowerServiceName.includes("suit") ||
+                      lowerServiceName.includes("dry clean")
+                    ) {
+                      calculatedPrice = 150;
+                    } else if (
+                      lowerServiceName.includes("laundry") ||
+                      lowerServiceName.includes("wash") ||
+                      lowerServiceName.includes("fold")
+                    ) {
+                      calculatedPrice = 70;
+                    } else {
+                      calculatedPrice = 50; // Last resort
+                    }
+                  }
+
+                  return {
+                    ...service,
+                    price: calculatedPrice,
                   };
                 });
               };
