@@ -29,9 +29,11 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    // Initial backend check
-    if (isOnline) {
+    // Initial backend check only if backend is available
+    if (isOnline && config.isBackendAvailable) {
       checkBackendStatus();
+    } else if (!config.isBackendAvailable) {
+      setBackendStatus("offline");
     }
 
     return () => {
