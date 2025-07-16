@@ -16,7 +16,7 @@
   /* Sticky container for categories */
   .mobile-sticky-categories-container {
     position: sticky;
-    top: 200px;
+    top: 240px;
     z-index: 39;
     background: linear-gradient(to right, rgb(34, 197, 94), rgb(22, 163, 74));
     backdrop-filter: blur(20px);
