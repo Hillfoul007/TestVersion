@@ -167,9 +167,9 @@
 
   /* Mobile header with safe area */
   .mobile-header-safe {
-    padding-top: calc(1rem + env(safe-area-inset-top, 0));
+    padding-top: calc(0.5rem + env(safe-area-inset-top, 0));
     padding-left: calc(1rem + env(safe-area-inset-left, 0));
     padding-right: calc(1rem + env(safe-area-inset-right, 0));
-    padding-bottom: 1rem;
+    padding-bottom: 0.5rem;
   }
 }
