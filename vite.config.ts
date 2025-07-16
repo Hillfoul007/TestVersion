@@ -4,6 +4,17 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
+  const isPWAEnabled = process.env.ENABLE_PWA !== "false";
+
+  // Dynamically import PWA plugin
+  let VitePWA;
+  if (isPWAEnabled) {
+    try {
+      VitePWA = require("vite-plugin-pwa").VitePWA;
+    } catch (e) {
+      console.warn("vite-plugin-pwa not available, PWA features disabled");
+    }
+  }
   return {
     server: {
       host: "::",
