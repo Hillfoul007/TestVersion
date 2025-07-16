@@ -1,47 +1,48 @@
 /* Mobile Sticky Search and Categories */
 @media (max-width: 768px) {
-  /* Container for sticky search */
-  .mobile-sticky-search {
+  /* Sticky container for search */
+  .mobile-sticky-search-container {
     position: sticky;
-    top: 88px; /* Stick right after the mobile header */
+    top: 88px;
     z-index: 40;
-  }
-
-  /* Container for sticky categories */
-  .mobile-sticky-categories {
-    position: sticky;
-    top: 168px; /* Stick right after the search bar */
-    z-index: 39;
-  }
-
-  /* Enhanced styling when sticky */
-  .mobile-sticky-search:before {
-    content: "";
-    position: absolute;
-    top: -10px;
-    left: -20px;
-    right: -20px;
-    bottom: -10px;
-    background: rgba(31, 41, 55, 0.95);
-    backdrop-filter: blur(8px);
+    background: rgba(31, 41, 55, 0.98);
+    backdrop-filter: blur(12px);
+    margin: 0 16px;
     border-radius: 12px;
-    z-index: -1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
-  .mobile-sticky-categories:before {
-    content: "";
-    position: absolute;
-    top: -10px;
-    left: -20px;
-    right: -20px;
-    bottom: -10px;
+  /* Sticky container for categories */
+  .mobile-sticky-categories-container {
+    position: sticky;
+    top: 168px;
+    z-index: 39;
     background: linear-gradient(
       to right,
-      rgba(34, 197, 94, 0.95),
-      rgba(22, 163, 74, 0.95)
+      rgba(34, 197, 94, 0.98),
+      rgba(22, 163, 74, 0.98)
     );
-    backdrop-filter: blur(8px);
-    z-index: -1;
+    backdrop-filter: blur(12px);
+    margin: 0 16px;
+    padding: 8px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Remove margins from inner elements */
+  .mobile-sticky-search {
+    margin: 0;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .mobile-sticky-categories {
+    margin: 0;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    padding: 8px 16px;
   }
 
   /* Ensure scrollable content has proper spacing */
