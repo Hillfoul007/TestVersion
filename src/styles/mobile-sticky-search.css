@@ -1,50 +1,28 @@
 /* Mobile Sticky Search and Categories */
 @media (max-width: 768px) {
-  /* Default state - normal positioning */
+  /* Search bar sticky positioning */
   .mobile-sticky-search {
-    transition: all 0.3s ease-in-out;
+    position: sticky;
+    top: calc(var(--safe-area-inset-top, 0px) + 88px);
     z-index: 40;
     background: rgba(31, 41, 55, 0.95);
     backdrop-filter: blur(8px);
     margin: -16px;
     padding: 16px;
     border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
+  /* Categories sticky positioning */
   .mobile-sticky-categories {
-    transition: all 0.3s ease-in-out;
+    position: sticky;
+    top: calc(var(--safe-area-inset-top, 0px) + 168px);
     z-index: 39;
     background: linear-gradient(to right, rgb(34, 197, 94), rgb(22, 163, 74));
     backdrop-filter: blur(8px);
     margin: -16px -16px 0 -16px;
     padding: 8px 16px 16px 16px;
-  }
-
-  /* Sticky state when elements reach the top */
-  .mobile-sticky-search.sticky {
-    position: fixed;
-    top: calc(var(--safe-area-inset-top, 0px) + 88px);
-    left: 16px;
-    right: 16px;
-    width: calc(100% - 32px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    background: rgba(31, 41, 55, 0.98);
-    backdrop-filter: blur(12px);
-  }
-
-  .mobile-sticky-categories.sticky {
-    position: fixed;
-    top: calc(var(--safe-area-inset-top, 0px) + 168px);
-    left: 0;
-    right: 0;
-    width: 100%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    background: linear-gradient(
-      to right,
-      rgba(34, 197, 94, 0.98),
-      rgba(22, 163, 74, 0.98)
-    );
-    backdrop-filter: blur(12px);
   }
 
   /* Ensure scrollable content has proper spacing */
