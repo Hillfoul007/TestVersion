@@ -1,30 +1,55 @@
 /* Mobile Sticky Search and Categories */
 @media (max-width: 768px) {
+  /* Default state - not sticky */
   .mobile-sticky-search {
-    position: sticky;
-    top: calc(
-      var(--safe-area-inset-top, 0px) + 88px
-    ); /* Below the mobile header + safe area */
+    transition: all 0.3s ease-in-out;
     z-index: 40;
-    background: rgba(31, 41, 55, 0.95); /* Semi-transparent dark background */
+    background: rgba(31, 41, 55, 0.95);
     backdrop-filter: blur(8px);
     margin: -16px;
     padding: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border-radius: 12px;
   }
 
   .mobile-sticky-categories {
-    position: sticky;
-    top: calc(
-      var(--safe-area-inset-top, 0px) + 168px
-    ); /* Below header + search bar */
+    transition: all 0.3s ease-in-out;
     z-index: 39;
     background: linear-gradient(to right, rgb(34, 197, 94), rgb(22, 163, 74));
     backdrop-filter: blur(8px);
     margin: -16px -16px 0 -16px;
     padding: 8px 16px 16px 16px;
+  }
+
+  /* Sticky state when scrolling up */
+  .mobile-sticky-search.sticky {
+    position: fixed;
+    top: calc(var(--safe-area-inset-top, 0px) + 88px);
+    left: 16px;
+    right: 16px;
+    width: calc(100% - 32px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(0);
+  }
+
+  .mobile-sticky-categories.sticky {
+    position: fixed;
+    top: calc(var(--safe-area-inset-top, 0px) + 168px);
+    left: 0;
+    right: 0;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(0);
+  }
+
+  /* Hidden state when scrolling down */
+  .mobile-sticky-search.hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  .mobile-sticky-categories.hidden {
+    transform: translateY(-100%);
+    opacity: 0;
   }
 
   /* Ensure scrollable content has proper spacing */
