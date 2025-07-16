@@ -558,7 +558,7 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                   return {
                     name: String(service) || "Unknown Service",
                     quantity: 1,
-                    price: defaultPrice,
+                    price: 0, // Will be calculated below
                     id: `service_${index}`,
                   };
                 });
