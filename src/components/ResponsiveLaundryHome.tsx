@@ -442,7 +442,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
       <div className="min-h-screen bg-gradient-to-br from-green-400 via-green-500 to-green-600">
         {/* Mobile Header */}
         <div className="bg-gradient-to-r from-green-500 to-green-600 text-white sticky top-0 z-50">
-          <div className="flex items-center justify-between p-4">
+          <div className="flex items-center justify-between mobile-header-safe">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-3">
                 {currentUser && (
