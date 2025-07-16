@@ -549,9 +549,9 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         </div>
 
         {/* Mobile Content */}
-        <div className="p-4 space-y-4">
+        <div className="p-4">
           {/* Delivery Time & Location */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white mb-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">
                 🕐 Delivery in {deliveryTime}
@@ -593,8 +593,10 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
               </span>
             </div>
           </div>
+        </div>
 
-          {/* Search Bar */}
+        {/* Sticky Search Bar */}
+        <div className="px-4 mb-4">
           <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search">
             <Search className="h-5 w-5 text-gray-400 mr-3" />
             <Input
@@ -613,8 +615,10 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
               className="ml-3 text-gray-400 hover:text-white"
             />
           </div>
+        </div>
 
-          {/* Categories */}
+        {/* Sticky Categories */}
+        <div className="px-4 mb-4">
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mobile-sticky-categories">
             <Button
               variant={selectedCategory === "all" ? "default" : "ghost"}
