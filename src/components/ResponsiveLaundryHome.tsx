@@ -48,6 +48,7 @@ import VoiceSearch from "./VoiceSearch";
 import AdminServicesManager from "./AdminServicesManager";
 import { DVHostingSmsService } from "@/services/dvhostingSmsService";
 import { saveCartData, getCartData } from "@/utils/formPersistence";
+import "@/styles/mobile-sticky-search.css";
 import { preloadCriticalImages } from "@/utils/imagePreloader";
 
 interface ResponsiveLaundryHomeProps {
