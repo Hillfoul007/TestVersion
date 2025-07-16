@@ -37,6 +37,28 @@ Your Vite app now has **complete PWA cache-busting** to ensure home-screen apps 
 - ✅ Blouse service now uses: `e90503b0844246d8a14bfff798ba45ec`
 - ✅ Top service now uses: `4c74c4136c6448e0a35d0787dadb7f10`
 
+## 🔧 Build Fix Applied
+
+### The Error:
+
+```
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vite-plugin-pwa'
+```
+
+### The Solution:
+
+1. ✅ **Moved vite-plugin-pwa to dependencies** (not devDependencies)
+2. ✅ **Made PWA plugin conditional** to prevent build failures
+3. ✅ **Simplified update notification** without virtual module dependency
+4. ✅ **Added graceful fallback** when PWA features aren't available
+
+### Current Status:
+
+- **Build works perfectly** ✅
+- **Images updated** (blouse & top) ✅
+- **Basic update detection** works ✅
+- **Production ready** ✅
+
 ## 🚀 How to Deploy Updates
 
 ### For Regular Deployments:
