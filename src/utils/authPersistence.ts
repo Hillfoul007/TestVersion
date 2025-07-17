@@ -90,7 +90,29 @@ export const initializeAuthPersistence = () => {
 
   window.addEventListener("pagehide", handlePageHide);
 
-  console.log("✅ Authentication persistence initialized");
+  // Add session heartbeat to keep auth alive
+  const sessionHeartbeat = setInterval(
+    () => {
+      const user = authService.getCurrentUser();
+      if (user) {
+        // Update localStorage timestamp to show session is active
+        localStorage.setItem("auth_last_active", Date.now().toString());
+
+        // Sync auth storage to ensure consistency
+        syncAuthStorage();
+      }
+    },
+    5 * 60 * 1000,
+  ); // Every 5 minutes
+
+  // Clear heartbeat on page unload
+  window.addEventListener("beforeunload", () => {
+    clearInterval(sessionHeartbeat);
+  });
+
+  console.log(
+    "✅ Authentication persistence initialized with session heartbeat",
+  );
 };
 
 /**
