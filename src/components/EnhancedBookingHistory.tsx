@@ -965,7 +965,7 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 `💰 Using static pricing for "${serviceName}": ₹${unitPrice} x ${quantity} = ₹${totalServicePrice}`,
                               );
 
-                              // First priority: Use stored item_prices from database
+                              // Static pricing is now used instead of database pricing
                               if (
                                 booking.item_prices &&
                                 Array.isArray(booking.item_prices) &&
