@@ -115,6 +115,12 @@ export const initializeAuthPersistence = () => {
     clearInterval(sessionHeartbeat);
   });
 
+  // Initialize iPhone-specific auth persistence
+  if (isIosDevice()) {
+    preventIosAutoLogout();
+    console.log("🍎 iPhone-specific auth persistence enabled");
+  }
+
   console.log(
     "✅ Authentication persistence initialized with session heartbeat",
   );
