@@ -116,7 +116,7 @@ export const laundryServices: LaundryService[] = [
     category: "mens-dry-clean",
     estimatedTime: "48-72 hours",
     image:
-      "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2F85560ebfcaaa46bba67b1b09dfa0998e?format=webp&width=800",
+      "https://cdn.builder.io/api/v1/image/assets%2F50ebbc6d69b0454bada929bd0fcbafdc%2F22d2132feed74fe9b81d9566f08e2558?format=webp&width=800",
   },
   {
     id: "dry-clean-mens-coat",
