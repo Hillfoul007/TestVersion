@@ -133,6 +133,14 @@ export const restoreAuthState = async (): Promise<boolean> => {
   try {
     const authService = DVHostingSmsService.getInstance();
 
+    // First try iPhone-specific restoration if on iOS
+    if (isIosDevice()) {
+      const iosRestored = restoreIosAuth();
+      if (iosRestored) {
+        console.log("🍎 iPhone auth restored from backup");
+      }
+    }
+
     // Check multiple storage locations for auth data
     const token =
       localStorage.getItem("auth_token") ||
