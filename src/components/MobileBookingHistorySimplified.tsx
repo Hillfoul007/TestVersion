@@ -40,6 +40,7 @@ import {
   mapBookingsData,
   type MappedBookingData,
 } from "@/utils/bookingDataMapper";
+import { laundryServices } from "@/data/laundryServices";
 
 interface MobileBookingHistoryProps {
   currentUser?: any;
