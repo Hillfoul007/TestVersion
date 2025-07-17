@@ -1095,7 +1095,8 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                       {serviceName}
                                     </span>
                                     <div className="text-xs text-gray-500 mt-1">
-                                      ₹{price} per piece
+                                      ₹{unitPrice} per{" "}
+                                      {serviceInfo.unit.toLowerCase()}
                                     </div>
                                   </div>
                                   <div className="flex flex-col items-end gap-1">
@@ -1103,7 +1104,7 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                       Qty: {quantity}
                                     </span>
                                     <span className="font-semibold text-green-600 text-sm">
-                                      ₹{displayPrice}
+                                      ₹{totalServicePrice}
                                     </span>
                                   </div>
                                 </div>
