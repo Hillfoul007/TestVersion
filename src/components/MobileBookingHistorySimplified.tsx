@@ -419,7 +419,11 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                               {service.quantity > 1 && `x${service.quantity}`}
                             </span>
                             <span className="font-medium">
-                              ₹{service.total_price}
+                              ₹
+                              {service.total_price ||
+                                service.price ||
+                                service.unit_price ||
+                                0}
                             </span>
                           </div>
                         ))}
