@@ -658,6 +658,11 @@ export class BookingService {
         scheduled_date:
           booking.pickupDate || new Date().toISOString().split("T")[0],
         scheduled_time: booking.pickupTime || "10:00",
+        delivery_date:
+          booking.deliveryDate ||
+          booking.pickupDate ||
+          new Date().toISOString().split("T")[0],
+        delivery_time: booking.deliveryTime || "18:00",
         provider_name: "CleanCare Pro",
         address: addressString,
         coordinates: coordinates,
