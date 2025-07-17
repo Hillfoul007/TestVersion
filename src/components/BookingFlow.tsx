@@ -176,12 +176,17 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
 
       // Prepare item prices for accurate booking history
       const itemPrices = isMultipleServices
-        ? services.map((service) => ({
-            service_name: service.name,
-            quantity: service.quantity || 1,
-            unit_price: service.price || 50,
-            total_price: (service.price || 50) * (service.quantity || 1),
-          }))
+        ? services.map((service) => {
+            const serviceInfo = getServicePriceWithFallback(service.name);
+            const unitPrice = service.price || serviceInfo.unitPrice;
+            const quantity = service.quantity || 1;
+            return {
+              service_name: service.name,
+              quantity: quantity,
+              unit_price: unitPrice,
+              total_price: unitPrice * quantity,
+            };
+          })
         : [
             {
               service_name: provider?.name || "Service",
