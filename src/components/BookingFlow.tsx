@@ -191,8 +191,14 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
             {
               service_name: provider?.name || "Service",
               quantity: 1,
-              unit_price: provider?.price || 80,
-              total_price: provider?.price || 80,
+              unit_price:
+                provider?.price ||
+                getServicePriceWithFallback(provider?.name || "Service")
+                  .unitPrice,
+              total_price:
+                provider?.price ||
+                getServicePriceWithFallback(provider?.name || "Service")
+                  .unitPrice,
             },
           ];
 
