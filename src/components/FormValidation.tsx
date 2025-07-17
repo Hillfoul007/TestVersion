@@ -50,6 +50,8 @@ export const validateCheckoutForm = (
   phoneNumber: string,
   selectedDate: Date | null,
   selectedTime: string,
+  deliveryDate?: Date | null,
+  deliveryTime?: string,
 ): ValidationError[] => {
   const errors: ValidationError[] = [];
 
