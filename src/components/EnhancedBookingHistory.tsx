@@ -50,6 +50,10 @@ import {
 import { BookingService } from "@/services/bookingService";
 import EditBookingModal from "./EditBookingModal";
 import { filterProductionBookings } from "@/utils/bookingFilters";
+import {
+  getServicePriceWithFallback,
+  calculateServiceTotal,
+} from "@/utils/servicePricing";
 
 interface EnhancedBookingHistoryProps {
   currentUser?: any;
