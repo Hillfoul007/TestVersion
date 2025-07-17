@@ -50,10 +50,6 @@ import {
 import { BookingService } from "@/services/bookingService";
 import EditBookingModal from "./EditBookingModal";
 import { filterProductionBookings } from "@/utils/bookingFilters";
-import {
-  getServicePriceWithFallback,
-  calculateServiceTotal,
-} from "@/utils/servicePricing";
 
 interface EnhancedBookingHistoryProps {
   currentUser?: any;
@@ -79,7 +75,6 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
       null,
     );
 
-    // ... (keeping all the existing methods unchanged) ...
     const loadBookings = async (forceRefresh = false) => {
       if (!currentUser?.id && !currentUser?._id && !currentUser?.phone) {
         console.log("No user ID found for loading bookings");
@@ -260,6 +255,45 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
         window.removeEventListener("bookingCreated", handleBookingCreated);
       };
     }, [currentUser]);
+
+    // Disabled auto-refresh to prevent logout issues
+    // Users can manually refresh using the refresh button if needed
+    /*
+    useEffect(() => {
+      if (!currentUser) return;
+
+      const interval = setInterval(() => {
+        console.log(
+          "🔄 Auto-refreshing bookings while preserving local data...",
+        );
+        refreshBookings();
+      }, 120000); // Refresh every 2 minutes to prevent overwriting local changes
+
+      return () => clearInterval(interval);
+    }, [currentUser]);
+    */
+
+    // Disabled visibility change refresh to prevent logout issues
+    // Users can manually refresh if needed
+    /*
+    useEffect(() => {
+      const handleVisibilityChange = () => {
+        if (!document.hidden && currentUser) {
+          console.log(
+            "👁️ Page visible, refreshing bookings while preserving local data...",
+          );
+          refreshBookings();
+        }
+      };
+
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+      return () =>
+        document.removeEventListener(
+          "visibilitychange",
+          handleVisibilityChange,
+        );
+    }, [currentUser]);
+    */
 
     const getStatusColor = (status: string) => {
       switch (status?.toLowerCase()) {
@@ -872,7 +906,7 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                             <div className="flex justify-between items-center text-xs">
                               <span className="text-gray-600">Order Value</span>
                               <span className="font-bold text-green-600">
-                                ₹{total}
+                                ���{total}
                               </span>
                             </div>
                           </div>
@@ -883,6 +917,8 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                             {services.map((service: any, idx: number) => {
                               let serviceName = "";
                               let quantity = 1;
+                              let price = 0; // Will be calculated from item_prices or service data
+                              let totalServicePrice = 0;
 
                               // Extract service information based on data structure
                               if (
@@ -898,6 +934,15 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                   parseInt(service.quantity) ||
                                   parseInt(service.qty) ||
                                   1;
+
+                                // If service object has price, use it
+                                if (service.price && service.price > 0) {
+                                  price = service.price;
+                                  totalServicePrice = price * quantity;
+                                  console.log(
+                                    `✅ Service object has price: ${serviceName} = ₹${price} x ${quantity} = ₹${totalServicePrice}`,
+                                  );
+                                }
                               } else {
                                 serviceName = String(
                                   service || "Unknown Service",
@@ -905,18 +950,130 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 quantity = 1;
                               }
 
-                              // Get pricing from static service data instead of database
-                              const serviceInfo =
-                                getServicePriceWithFallback(serviceName);
-                              const unitPrice = serviceInfo.unitPrice;
-                              const totalServicePrice = calculateServiceTotal(
-                                serviceName,
-                                quantity,
+                              console.log(
+                                `🔍 Processing service: "${serviceName}", quantity: ${quantity}, booking has item_prices:`,
+                                !!booking.item_prices,
                               );
 
-                              console.log(
-                                `💰 Using static pricing for "${serviceName}": ₹${unitPrice} x ${quantity} = ₹${totalServicePrice}`,
-                              );
+                              // First priority: Use stored item_prices from database
+                              if (
+                                booking.item_prices &&
+                                Array.isArray(booking.item_prices) &&
+                                booking.item_prices.length > 0
+                              ) {
+                                // Try to find exact match first
+                                let matchingPrice = booking.item_prices.find(
+                                  (item: any) => {
+                                    const itemServiceName = (
+                                      item.service_name ||
+                                      item.serviceName ||
+                                      ""
+                                    ).toLowerCase();
+                                    return (
+                                      itemServiceName ===
+                                      serviceName.toLowerCase()
+                                    );
+                                  },
+                                );
+
+                                // If no exact match, try partial match
+                                if (!matchingPrice) {
+                                  matchingPrice = booking.item_prices.find(
+                                    (item: any) => {
+                                      const itemServiceName = (
+                                        item.service_name ||
+                                        item.serviceName ||
+                                        ""
+                                      ).toLowerCase();
+                                      return (
+                                        itemServiceName.includes(
+                                          serviceName.toLowerCase(),
+                                        ) ||
+                                        serviceName
+                                          .toLowerCase()
+                                          .includes(itemServiceName)
+                                      );
+                                    },
+                                  );
+                                }
+
+                                if (matchingPrice) {
+                                  price =
+                                    matchingPrice.unit_price ||
+                                    matchingPrice.price ||
+                                    price;
+                                  quantity = matchingPrice.quantity || quantity;
+                                  totalServicePrice =
+                                    matchingPrice.total_price ||
+                                    matchingPrice.totalPrice ||
+                                    price * quantity;
+                                  console.log(
+                                    `✅ Using saved database price for "${serviceName}": ₹${price} x ${quantity} = ₹${totalServicePrice}`,
+                                  );
+                                } else {
+                                  console.log(
+                                    `⚠️ No matching item_price found for "${serviceName}" in:`,
+                                    booking.item_prices,
+                                  );
+                                }
+                              }
+
+                              // Fallback pricing if no database price found
+                              if (totalServicePrice === 0 && price === 0) {
+                                // Log when fallback is needed - this indicates item_prices weren't saved properly
+                                console.warn(
+                                  `⚠️ Using fallback pricing for "${serviceName}" - item_prices should have been saved in database`,
+                                );
+
+                                // Simple fallback based on total amount divided by service count if available
+                                if (
+                                  booking.totalAmount &&
+                                  services.length > 0
+                                ) {
+                                  const avgPricePerService = Math.round(
+                                    booking.totalAmount / services.length,
+                                  );
+                                  price = avgPricePerService;
+                                  totalServicePrice = price * quantity;
+                                  console.log(
+                                    `📊 Using calculated average price: ₹${price} (total: ₹${booking.totalAmount} / ${services.length} services)`,
+                                  );
+                                } else {
+                                  // Last resort - simple defaults
+                                  const lowerServiceName =
+                                    serviceName.toLowerCase();
+                                  if (lowerServiceName.includes("coal iron")) {
+                                    price = 20;
+                                  } else if (
+                                    lowerServiceName.includes("steam iron") ||
+                                    lowerServiceName.includes("men's suit") ||
+                                    lowerServiceName.includes("suit")
+                                  ) {
+                                    price = 150;
+                                  } else if (
+                                    lowerServiceName.includes("laundry")
+                                  ) {
+                                    price = 70;
+                                  } else {
+                                    // Only use 50 as absolute last resort when no other info is available
+                                    price =
+                                      Math.round(
+                                        (booking.totalAmount || 0) /
+                                          Math.max(services.length, 1),
+                                      ) || 50;
+                                  }
+                                  totalServicePrice = price * quantity;
+                                  console.log(
+                                    `🔄 Using default fallback price for "${serviceName}": ��${price}`,
+                                  );
+                                }
+                              }
+
+                              // Use calculated total or calculate from unit price
+                              const displayPrice =
+                                totalServicePrice > 0
+                                  ? totalServicePrice
+                                  : price * quantity;
 
                               return (
                                 <div
@@ -928,8 +1085,7 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                       {serviceName}
                                     </span>
                                     <div className="text-xs text-gray-500 mt-1">
-                                      ₹{unitPrice} per{" "}
-                                      {serviceInfo.unit.toLowerCase()}
+                                      ₹{price} per piece
                                     </div>
                                   </div>
                                   <div className="flex flex-col items-end gap-1">
@@ -937,7 +1093,7 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                       Qty: {quantity}
                                     </span>
                                     <span className="font-semibold text-green-600 text-sm">
-                                      ₹{totalServicePrice}
+                                      ₹{displayPrice}
                                     </span>
                                   </div>
                                 </div>
@@ -1081,7 +1237,7 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                     Discount
                                   </span>
                                   <span className="font-medium text-green-600">
-                                    -₹{booking.discount_amount}
+                                    -���{booking.discount_amount}
                                   </span>
                                 </div>
                               )}

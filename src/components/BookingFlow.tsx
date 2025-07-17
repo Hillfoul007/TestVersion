@@ -22,6 +22,7 @@ import BookingSuccessAlert from "./BookingSuccessAlert";
 import { adaptiveBookingHelpers } from "@/integrations/adaptive/bookingHelpers";
 import { userValidation } from "@/utils/userValidation";
 import { bookingTestHelper } from "@/utils/bookingTestHelper";
+import { getServicePriceWithFallback } from "@/utils/servicePricing";
 
 interface BookingFlowProps {
   provider?: any;
@@ -175,18 +176,29 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
 
       // Prepare item prices for accurate booking history
       const itemPrices = isMultipleServices
-        ? services.map((service) => ({
-            service_name: service.name,
-            quantity: service.quantity || 1,
-            unit_price: service.price || 50,
-            total_price: (service.price || 50) * (service.quantity || 1),
-          }))
+        ? services.map((service) => {
+            const serviceInfo = getServicePriceWithFallback(service.name);
+            const unitPrice = service.price || serviceInfo.unitPrice;
+            const quantity = service.quantity || 1;
+            return {
+              service_name: service.name,
+              quantity: quantity,
+              unit_price: unitPrice,
+              total_price: unitPrice * quantity,
+            };
+          })
         : [
             {
               service_name: provider?.name || "Service",
               quantity: 1,
-              unit_price: provider?.price || 80,
-              total_price: provider?.price || 80,
+              unit_price:
+                provider?.price ||
+                getServicePriceWithFallback(provider?.name || "Service")
+                  .unitPrice,
+              total_price:
+                provider?.price ||
+                getServicePriceWithFallback(provider?.name || "Service")
+                  .unitPrice,
             },
           ];
 

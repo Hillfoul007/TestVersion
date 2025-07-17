@@ -41,6 +41,10 @@ import { adaptiveBookingHelpers } from "@/integrations/adaptive/bookingHelpers";
 import EditBookingModal from "./EditBookingModal";
 import { clearAllUserData } from "@/utils/clearStorage";
 import { filterProductionBookings } from "@/utils/bookingFilters";
+import {
+  getServicePriceWithFallback,
+  calculateServiceTotal,
+} from "@/utils/servicePricing";
 import { debugBookingsStorage } from "@/utils/debugBookings";
 import {
   mapBookingsData,
@@ -592,115 +596,16 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                     return service; // Already has a price
                   }
 
-                  // Calculate price based on total amount and service proportions
-                  let calculatedPrice = 0;
-                  if (totalAmount > 0 && totalQuantity > 0) {
-                    calculatedPrice =
-                      Math.round(
-                        (totalAmount / totalQuantity) * service.quantity,
-                      ) / service.quantity;
-                  } else {
-                    // Fallback to intelligent defaults based on service name - improved logic
-                    const lowerServiceName = service.name.toLowerCase();
+                  // Use static pricing from service data instead of complex calculations
+                  const serviceInfo = getServicePriceWithFallback(service.name);
 
-                    // Iron services
-                    if (lowerServiceName.includes("coal iron")) {
-                      calculatedPrice = 20;
-                    } else if (lowerServiceName.includes("steam iron")) {
-                      if (
-                        lowerServiceName.includes("suit") ||
-                        lowerServiceName.includes("heavy")
-                      ) {
-                        calculatedPrice = 150;
-                      } else if (
-                        lowerServiceName.includes("ladies") ||
-                        lowerServiceName.includes("kurta")
-                      ) {
-                        calculatedPrice = 100;
-                      } else {
-                        calculatedPrice = 40;
-                      }
-                    }
-                    // Dry clean services
-                    else if (
-                      lowerServiceName.includes("dry clean") ||
-                      lowerServiceName.includes("dry")
-                    ) {
-                      if (lowerServiceName.includes("suit")) {
-                        calculatedPrice = lowerServiceName.includes("3")
-                          ? 540
-                          : 360;
-                      } else if (lowerServiceName.includes("lehenga")) {
-                        if (lowerServiceName.includes("luxury")) {
-                          calculatedPrice = 1000;
-                        } else if (lowerServiceName.includes("heavy")) {
-                          calculatedPrice = 700;
-                        } else if (lowerServiceName.includes("2")) {
-                          calculatedPrice = 600;
-                        } else {
-                          calculatedPrice = 400;
-                        }
-                      } else if (lowerServiceName.includes("saree")) {
-                        calculatedPrice = lowerServiceName.includes("heavy")
-                          ? 300
-                          : 240;
-                      } else if (lowerServiceName.includes("coat")) {
-                        calculatedPrice = lowerServiceName.includes("long")
-                          ? 300
-                          : 240;
-                      } else if (lowerServiceName.includes("jacket")) {
-                        calculatedPrice = lowerServiceName.includes("leather")
-                          ? 480
-                          : 240;
-                      } else if (
-                        lowerServiceName.includes("kurta") ||
-                        lowerServiceName.includes("achkan") ||
-                        lowerServiceName.includes("sherwani")
-                      ) {
-                        calculatedPrice = lowerServiceName.includes("pyjama")
-                          ? 220
-                          : 300;
-                      } else if (
-                        lowerServiceName.includes("dress") ||
-                        lowerServiceName.includes("top")
-                      ) {
-                        calculatedPrice = lowerServiceName.includes("dress")
-                          ? 240
-                          : 140;
-                      } else {
-                        calculatedPrice = 120; // Default for other dry clean items
-                      }
-                    }
-                    // Laundry services
-                    else if (
-                      lowerServiceName.includes("laundry") ||
-                      lowerServiceName.includes("wash") ||
-                      lowerServiceName.includes("fold")
-                    ) {
-                      if (lowerServiceName.includes("iron")) {
-                        calculatedPrice = 120;
-                      } else {
-                        calculatedPrice = 70;
-                      }
-                    }
-                    // Woolen items
-                    else if (
-                      lowerServiceName.includes("sweater") ||
-                      lowerServiceName.includes("shawl")
-                    ) {
-                      calculatedPrice = 180;
-                    } else if (lowerServiceName.includes("pashmina")) {
-                      calculatedPrice = 300;
-                    }
-                    // Default fallback
-                    else {
-                      calculatedPrice = 100; // Better default than 50
-                    }
-                  }
+                  console.log(
+                    `💰 Mobile: Using static pricing for "${service.name}": ₹${serviceInfo.unitPrice}`,
+                  );
 
                   return {
                     ...service,
-                    price: calculatedPrice,
+                    price: serviceInfo.unitPrice,
                   };
                 });
               };
