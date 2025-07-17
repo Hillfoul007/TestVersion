@@ -917,7 +917,7 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                             {services.map((service: any, idx: number) => {
                               let serviceName = "";
                               let quantity = 1;
-                              let price = 50; // Default price
+                              let price = 0; // Will be calculated from item_prices or service data
                               let totalServicePrice = 0;
 
                               // Extract service information based on data structure
@@ -1018,8 +1018,8 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 }
                               }
 
-                              // Fallback pricing if no database price found (should rarely be needed now)
-                              if (totalServicePrice === 0) {
+                              // Fallback pricing if no database price found
+                              if (totalServicePrice === 0 && price === 0) {
                                 // Log when fallback is needed - this indicates item_prices weren't saved properly
                                 console.warn(
                                   `⚠️ Using fallback pricing for "${serviceName}" - item_prices should have been saved in database`,
@@ -1055,7 +1055,12 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                   ) {
                                     price = 70;
                                   } else {
-                                    price = 50; // Default fallback
+                                    // Only use 50 as absolute last resort when no other info is available
+                                    price =
+                                      Math.round(
+                                        (booking.totalAmount || 0) /
+                                          Math.max(services.length, 1),
+                                      ) || 50;
                                   }
                                   totalServicePrice = price * quantity;
                                   console.log(

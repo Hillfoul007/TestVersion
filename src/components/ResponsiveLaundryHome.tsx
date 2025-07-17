@@ -442,7 +442,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-400 via-green-500 to-green-600">
         {/* Mobile Header */}
-        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white sticky top-0 z-50">
+        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white relative z-40">
           <div className="flex items-center justify-between mobile-header-safe">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-3">
@@ -547,8 +547,8 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           )}
         </div>
 
-        {/* Mobile Content */}
-        <div className="p-4 space-y-4">
+        {/* Non-sticky delivery/location section */}
+        <div className="p-4">
           {/* Delivery Time & Location */}
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
             <div className="flex items-center justify-between mb-2">
@@ -592,70 +592,75 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
               </span>
             </div>
           </div>
+        </div>
 
-          {/* Search Bar */}
-          <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search">
-            <Search className="h-5 w-5 text-gray-400 mr-3" />
-            <Input
-              placeholder="Search laundry services"
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="bg-transparent border-none text-white placeholder-gray-400 focus:ring-0 p-0 text-sm"
-            />
-            <VoiceSearch
-              onResult={(transcript) => {
-                handleSearch(transcript);
-              }}
-              onError={(error) => {
-                console.error("Voice search error:", error);
-              }}
-              className="ml-3 text-gray-400 hover:text-white"
-            />
-          </div>
+        {/* Sticky Search and Categories Only */}
+        <div className="sticky top-0 bg-gradient-to-b from-green-500 to-green-600 z-50 shadow-lg">
+          <div className="px-4 pt-4 pb-2 space-y-3">
+            {/* Search Bar */}
+            <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search">
+              <Search className="h-5 w-5 text-gray-400 mr-3" />
+              <Input
+                placeholder="Search laundry services"
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="bg-transparent border-none text-white placeholder-gray-400 focus:ring-0 p-0 text-sm"
+              />
+              <VoiceSearch
+                onResult={(transcript) => {
+                  handleSearch(transcript);
+                }}
+                onError={(error) => {
+                  console.error("Voice search error:", error);
+                }}
+                className="ml-3 text-gray-400 hover:text-white"
+              />
+            </div>
 
-          {/* Categories */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mobile-sticky-categories">
-            <Button
-              variant={selectedCategory === "all" ? "default" : "ghost"}
-              onClick={() => setSelectedCategory("all")}
-              className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 ${
-                selectedCategory === "all"
-                  ? "bg-white text-green-600"
-                  : "bg-white/10 text-white hover:bg-white/20"
-              }`}
-            >
-              All
-            </Button>
+            {/* Categories */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mobile-sticky-categories">
+              <Button
+                variant={selectedCategory === "all" ? "default" : "ghost"}
+                onClick={() => setSelectedCategory("all")}
+                className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 ${
+                  selectedCategory === "all"
+                    ? "bg-white text-green-600"
+                    : "bg-white/10 text-white hover:bg-white/20"
+                }`}
+              >
+                All
+              </Button>
 
-            {(useStaticFallback
-              ? (serviceCategories || []).slice(1)
-              : dynamicServices || []
-            )
-              .filter((category) => category.enabled !== false)
-              .map((category) => (
-                <Button
-                  key={category.id}
-                  variant={
-                    selectedCategory === category.id ? "default" : "ghost"
-                  }
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 ${
-                    selectedCategory === category.id
-                      ? "bg-white text-green-600"
-                      : "bg-white/10 text-white hover:bg-white/20"
-                  }`}
-                >
-                  <span className="mr-1">{category.icon}</span>
-                  <span className="whitespace-nowrap">{category.name}</span>
-                </Button>
-              ))}
+              {(useStaticFallback
+                ? (serviceCategories || []).slice(1)
+                : dynamicServices || []
+              )
+                .filter((category) => category.enabled !== false)
+                .map((category) => (
+                  <Button
+                    key={category.id}
+                    variant={
+                      selectedCategory === category.id ? "default" : "ghost"
+                    }
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 ${
+                      selectedCategory === category.id
+                        ? "bg-white text-green-600"
+                        : "bg-white/10 text-white hover:bg-white/20"
+                    }`}
+                  >
+                    <span className="mr-1">{category.icon}</span>
+                    <span className="whitespace-nowrap">{category.name}</span>
+                  </Button>
+                ))}
+            </div>
           </div>
         </div>
 
         {/* Services Grid */}
         <div
           id="services-section"
-          className="bg-white rounded-t-3xl min-h-screen p-4"
+          className="bg-white rounded-t-3xl min-h-screen p-4 relative"
         >
           {getFilteredServices().length === 0 ? (
             <EmptyStateCard />
