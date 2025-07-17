@@ -5,6 +5,11 @@
 
 import { DVHostingSmsService } from "@/services/dvhostingSmsService";
 import { validateAuthConsistency } from "@/utils/authDebug";
+import {
+  preventIosAutoLogout,
+  restoreIosAuth,
+  isIosDevice,
+} from "@/utils/iosAuthFix";
 
 let authCheckInitialized = false;
 
