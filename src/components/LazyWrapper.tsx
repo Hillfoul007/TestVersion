@@ -24,7 +24,7 @@ export const LazyEnhancedBookingHistory = lazy(
   () => import("./EnhancedBookingHistory"),
 );
 export const LazyMobileBookingHistory = lazy(
-  () => import("./MobileBookingHistory"),
+  () => import("./MobileBookingHistorySimplified"),
 );
 export const LazyLaundryCart = lazy(() => import("./LaundryCart"));
 export const LazyServiceEditor = lazy(() => import("./ServiceEditor"));
