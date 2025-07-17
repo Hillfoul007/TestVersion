@@ -486,10 +486,12 @@ export class BookingService {
       totalAmount:
         backendBooking.total_price || backendBooking.final_amount || 0,
       status: backendBooking.status || "pending",
-            pickupDate: backendBooking.scheduled_date,
-      deliveryDate: backendBooking.delivery_date || this.calculateDeliveryDate(backendBooking.scheduled_date),
+      pickupDate: backendBooking.scheduled_date,
+      deliveryDate:
+        backendBooking.delivery_date ||
+        this.calculateDeliveryDate(backendBooking.scheduled_date),
       pickupTime: backendBooking.scheduled_time || "10:00",
-      deliveryTime: backendBooking.delivery_time || "18:00"
+      deliveryTime: backendBooking.delivery_time || "18:00",
       address: backendBooking.address || "Address not provided",
       contactDetails: {
         phone: backendBooking.customer_id?.phone || "",
