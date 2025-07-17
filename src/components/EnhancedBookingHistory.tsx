@@ -921,8 +921,6 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                             {services.map((service: any, idx: number) => {
                               let serviceName = "";
                               let quantity = 1;
-                              let price = 0; // Will be calculated from item_prices or service data
-                              let totalServicePrice = 0;
 
                               // Extract service information based on data structure
                               if (
