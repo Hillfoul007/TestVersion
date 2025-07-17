@@ -952,9 +952,17 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 quantity = 1;
                               }
 
+                              // Get pricing from static service data instead of database
+                              const serviceInfo =
+                                getServicePriceWithFallback(serviceName);
+                              const unitPrice = serviceInfo.unitPrice;
+                              const totalServicePrice = calculateServiceTotal(
+                                serviceName,
+                                quantity,
+                              );
+
                               console.log(
-                                `🔍 Processing service: "${serviceName}", quantity: ${quantity}, booking has item_prices:`,
-                                !!booking.item_prices,
+                                `💰 Using static pricing for "${serviceName}": ₹${unitPrice} x ${quantity} = ₹${totalServicePrice}`,
                               );
 
                               // First priority: Use stored item_prices from database
