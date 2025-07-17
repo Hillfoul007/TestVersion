@@ -103,6 +103,20 @@ export const validateCheckoutForm = (
     });
   }
 
+  if (!deliveryDate) {
+    errors.push({
+      field: "deliveryDate",
+      message: "Delivery date is required",
+    });
+  }
+
+  if (!deliveryTime) {
+    errors.push({
+      field: "deliveryTime",
+      message: "Delivery time is required",
+    });
+  }
+
   // Validate address type is selected
   if (
     addressData &&
