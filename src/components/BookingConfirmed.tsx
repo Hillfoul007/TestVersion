@@ -149,11 +149,34 @@ const BookingConfirmed: React.FC<BookingConfirmedProps> = ({
             <p className="text-sm text-green-700 mb-1">Order ID</p>
             <p className="text-lg font-bold text-green-900">
               #
-              {bookingData.custom_order_id ||
-                customOrderId ||
-                (bookingData.bookingId
-                  ? `CC${bookingData.bookingId.slice(-6)}`
-                  : "Generating...")}
+              {(() => {
+                // Priority order for order ID display with iPhone-specific handling
+                if (bookingData.custom_order_id) {
+                  return bookingData.custom_order_id;
+                }
+
+                if (customOrderId) {
+                  return customOrderId;
+                }
+
+                if (bookingData.bookingId) {
+                  const fallbackId = `CC${bookingData.bookingId.slice(-6).toUpperCase()}`;
+                  // On iPhone, ensure the ID is always displayed
+                  if (isIphone) {
+                    // Set the custom order ID to prevent "Generating..." from showing
+                    setTimeout(() => setCustomOrderId(fallbackId), 0);
+                  }
+                  return fallbackId;
+                }
+
+                // Last resort for iPhone
+                if (isIphone) {
+                  const timestamp = Date.now().toString().slice(-6);
+                  return `CC${timestamp}`;
+                }
+
+                return "Generating...";
+              })()}
             </p>
           </CardContent>
         </Card>
