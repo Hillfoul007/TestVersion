@@ -455,10 +455,12 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                           </span>
                         </div>
                         <p className="text-xs text-gray-900">
-                          {formatDate(booking.delivery_date)}
+                          {booking.delivery_date
+                            ? formatDate(booking.delivery_date)
+                            : "TBD"}
                         </p>
                         <p className="text-xs text-emerald-600">
-                          {booking.delivery_time}
+                          {booking.delivery_time || "TBD"}
                         </p>
                       </div>
                     </div>
