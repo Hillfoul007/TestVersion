@@ -284,6 +284,18 @@ export const bookingHelpers = {
             new Date().toISOString().split("T")[0],
           scheduled_time:
             bookingData.pickupTime || bookingData.scheduled_time || "10:00",
+          delivery_date:
+            bookingData.deliveryDate ||
+            bookingData.delivery_date ||
+            bookingData.pickupDate ||
+            bookingData.scheduled_date ||
+            new Date().toISOString().split("T")[0],
+          delivery_time:
+            bookingData.deliveryTime ||
+            bookingData.delivery_time ||
+            bookingData.pickupTime ||
+            bookingData.scheduled_time ||
+            "18:00",
           provider_name: bookingData.provider_name || "CleanCare Pro",
           address: addressString,
           coordinates: (typeof bookingData.address === "object" &&

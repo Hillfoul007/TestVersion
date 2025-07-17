@@ -42,6 +42,10 @@ import EditBookingModal from "./EditBookingModal";
 import { clearAllUserData } from "@/utils/clearStorage";
 import { filterProductionBookings } from "@/utils/bookingFilters";
 import { debugBookingsStorage } from "@/utils/debugBookings";
+import {
+  mapBookingsData,
+  type MappedBookingData,
+} from "@/utils/bookingDataMapper";
 
 interface MobileBookingHistoryProps {
   currentUser?: any;
@@ -53,7 +57,7 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
   onBack,
 }) => {
   const { addNotification } = useNotifications();
-  const [bookings, setBookings] = useState([]);
+  const [bookings, setBookings] = useState<MappedBookingData[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [editingBooking, setEditingBooking] = useState(null);
@@ -100,12 +104,16 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
       if (response.success && response.bookings) {
         // Filter out demo bookings for production
         const productionBookings = filterProductionBookings(response.bookings);
+
+        // Map bookings data with correct prices and delivery dates
+        const mappedBookings = mapBookingsData(productionBookings);
+
         console.log(
-          "✅ Bookings loaded successfully (filtered):",
-          productionBookings.length,
+          "✅ Bookings loaded and mapped successfully:",
+          mappedBookings.length,
         );
-        console.log("📊 Sample bookings:", productionBookings.slice(0, 2));
-        setBookings(productionBookings);
+        console.log("📊 Sample mapped bookings:", mappedBookings.slice(0, 2));
+        setBookings(mappedBookings);
       } else {
         console.log("⚠️ No bookings found or error:", response.error);
         setBookings([]);
@@ -142,24 +150,29 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
       );
       const newBooking = event.detail.booking;
       setBookings((prevBookings) => {
+        // Map the new booking data
+        const mappedNewBooking = mapBookingsData([newBooking])[0];
+
         // Check if booking already exists
         const existingIndex = prevBookings.findIndex(
-          (b) => b.id === newBooking.id || (b as any)._id === newBooking.id,
+          (b) => b.id === mappedNewBooking.id,
         );
 
         if (existingIndex >= 0) {
           // Update existing booking
           const updated = [...prevBookings];
-          updated[existingIndex] = newBooking;
+          updated[existingIndex] = mappedNewBooking;
           return updated.sort(
             (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime(),
           );
         } else {
           // Add new booking and sort by creation date
-          return [newBooking, ...prevBookings].sort(
+          return [mappedNewBooking, ...prevBookings].sort(
             (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime(),
           );
         }
       });
@@ -587,28 +600,101 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                         (totalAmount / totalQuantity) * service.quantity,
                       ) / service.quantity;
                   } else {
-                    // Fallback to intelligent defaults based on service name
+                    // Fallback to intelligent defaults based on service name - improved logic
                     const lowerServiceName = service.name.toLowerCase();
-                    if (
-                      lowerServiceName.includes("coal iron") ||
-                      lowerServiceName.includes("iron")
-                    ) {
+
+                    // Iron services
+                    if (lowerServiceName.includes("coal iron")) {
                       calculatedPrice = 20;
-                    } else if (
-                      lowerServiceName.includes("steam iron") ||
-                      lowerServiceName.includes("men's suit") ||
-                      lowerServiceName.includes("suit") ||
-                      lowerServiceName.includes("dry clean")
+                    } else if (lowerServiceName.includes("steam iron")) {
+                      if (
+                        lowerServiceName.includes("suit") ||
+                        lowerServiceName.includes("heavy")
+                      ) {
+                        calculatedPrice = 150;
+                      } else if (
+                        lowerServiceName.includes("ladies") ||
+                        lowerServiceName.includes("kurta")
+                      ) {
+                        calculatedPrice = 100;
+                      } else {
+                        calculatedPrice = 40;
+                      }
+                    }
+                    // Dry clean services
+                    else if (
+                      lowerServiceName.includes("dry clean") ||
+                      lowerServiceName.includes("dry")
                     ) {
-                      calculatedPrice = 150;
-                    } else if (
+                      if (lowerServiceName.includes("suit")) {
+                        calculatedPrice = lowerServiceName.includes("3")
+                          ? 540
+                          : 360;
+                      } else if (lowerServiceName.includes("lehenga")) {
+                        if (lowerServiceName.includes("luxury")) {
+                          calculatedPrice = 1000;
+                        } else if (lowerServiceName.includes("heavy")) {
+                          calculatedPrice = 700;
+                        } else if (lowerServiceName.includes("2")) {
+                          calculatedPrice = 600;
+                        } else {
+                          calculatedPrice = 400;
+                        }
+                      } else if (lowerServiceName.includes("saree")) {
+                        calculatedPrice = lowerServiceName.includes("heavy")
+                          ? 300
+                          : 240;
+                      } else if (lowerServiceName.includes("coat")) {
+                        calculatedPrice = lowerServiceName.includes("long")
+                          ? 300
+                          : 240;
+                      } else if (lowerServiceName.includes("jacket")) {
+                        calculatedPrice = lowerServiceName.includes("leather")
+                          ? 480
+                          : 240;
+                      } else if (
+                        lowerServiceName.includes("kurta") ||
+                        lowerServiceName.includes("achkan") ||
+                        lowerServiceName.includes("sherwani")
+                      ) {
+                        calculatedPrice = lowerServiceName.includes("pyjama")
+                          ? 220
+                          : 300;
+                      } else if (
+                        lowerServiceName.includes("dress") ||
+                        lowerServiceName.includes("top")
+                      ) {
+                        calculatedPrice = lowerServiceName.includes("dress")
+                          ? 240
+                          : 140;
+                      } else {
+                        calculatedPrice = 120; // Default for other dry clean items
+                      }
+                    }
+                    // Laundry services
+                    else if (
                       lowerServiceName.includes("laundry") ||
                       lowerServiceName.includes("wash") ||
                       lowerServiceName.includes("fold")
                     ) {
-                      calculatedPrice = 70;
-                    } else {
-                      calculatedPrice = 50; // Last resort
+                      if (lowerServiceName.includes("iron")) {
+                        calculatedPrice = 120;
+                      } else {
+                        calculatedPrice = 70;
+                      }
+                    }
+                    // Woolen items
+                    else if (
+                      lowerServiceName.includes("sweater") ||
+                      lowerServiceName.includes("shawl")
+                    ) {
+                      calculatedPrice = 180;
+                    } else if (lowerServiceName.includes("pashmina")) {
+                      calculatedPrice = 300;
+                    }
+                    // Default fallback
+                    else {
+                      calculatedPrice = 100; // Better default than 50
                     }
                   }
 
@@ -987,53 +1073,89 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                           </p>
                         </div>
 
-                        <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Calendar className="h-4 w-4 text-emerald-600" />
-                            <span className="font-medium text-gray-900 text-sm">
+                        <div className="p-2 bg-emerald-50 rounded-lg border border-emerald-100">
+                          <div className="flex items-center gap-1 mb-1">
+                            <Calendar className="h-3 w-3 text-emerald-600" />
+                            <span className="font-medium text-gray-900 text-xs">
                               Delivery
                             </span>
                           </div>
-                          <p className="text-sm text-gray-900">
-                            {safeBooking.deliveryDate
-                              ? new Date(
-                                  safeBooking.deliveryDate,
-                                ).toLocaleDateString("en-US", {
-                                  weekday: "short",
-                                  month: "short",
-                                  day: "numeric",
-                                })
-                              : safeBooking.scheduled_date
-                                ? (() => {
-                                    // Calculate delivery date (next day after pickup)
-                                    const dateStr = safeBooking.scheduled_date;
-                                    let date;
-
-                                    if (dateStr && dateStr.includes("-")) {
-                                      const [year, month, day] =
-                                        dateStr.split("-");
-                                      date = new Date(
-                                        parseInt(year),
-                                        parseInt(month) - 1,
-                                        parseInt(day) + 1,
-                                      );
-                                    } else if (dateStr) {
-                                      date = new Date(dateStr);
-                                      date.setDate(date.getDate() + 1);
-                                    } else {
-                                      return "Date TBD";
-                                    }
-
+                          <p className="text-xs text-gray-900">
+                            {(() => {
+                              // First check if deliveryDate is explicitly set
+                              if (safeBooking.deliveryDate) {
+                                try {
+                                  const date = new Date(
+                                    safeBooking.deliveryDate,
+                                  );
+                                  if (!isNaN(date.getTime())) {
                                     return date.toLocaleDateString("en-US", {
                                       weekday: "short",
                                       month: "short",
                                       day: "numeric",
                                     });
-                                  })()
-                                : "Date TBD"}
+                                  }
+                                } catch (error) {
+                                  console.error(
+                                    "Error parsing delivery date:",
+                                    error,
+                                  );
+                                }
+                              }
+
+                              // Calculate delivery date from pickup/scheduled date
+                              const dateStr =
+                                safeBooking.pickupDate ||
+                                safeBooking.scheduled_date;
+                              if (!dateStr) return "Date TBD";
+
+                              try {
+                                let pickupDate;
+
+                                // Handle YYYY-MM-DD format (local date)
+                                if (
+                                  dateStr.includes("-") &&
+                                  dateStr.split("-").length === 3
+                                ) {
+                                  const [year, month, day] = dateStr
+                                    .split("-")
+                                    .map(Number);
+                                  if (year && month && day) {
+                                    pickupDate = new Date(year, month - 1, day);
+                                  }
+                                } else {
+                                  pickupDate = new Date(dateStr);
+                                }
+
+                                if (isNaN(pickupDate.getTime())) {
+                                  return "Date TBD";
+                                }
+
+                                // Add 24-48 hours for delivery (default to 1 day)
+                                const deliveryDate = new Date(pickupDate);
+                                deliveryDate.setDate(
+                                  deliveryDate.getDate() + 1,
+                                );
+
+                                return deliveryDate.toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    weekday: "short",
+                                    month: "short",
+                                    day: "numeric",
+                                  },
+                                );
+                              } catch (error) {
+                                console.error(
+                                  "Error calculating delivery date:",
+                                  error,
+                                );
+                                return "Date TBD";
+                              }
+                            })()}
                           </p>
                           <p className="text-xs text-emerald-600">
-                            {safeBooking.deliveryTime || "Time TBD"}
+                            {safeBooking.deliveryTime || "18:00"}
                           </p>
                         </div>
                       </div>

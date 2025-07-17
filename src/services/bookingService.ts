@@ -98,7 +98,7 @@ export class BookingService {
       const customerId = currentUser.phone.startsWith("user_")
         ? currentUser.phone
         : `user_${currentUser.phone}`;
-      console.log("📞 Using phone-based customer ID:", customerId);
+      console.log("��� Using phone-based customer ID:", customerId);
       return customerId;
     }
 
@@ -487,9 +487,11 @@ export class BookingService {
         backendBooking.total_price || backendBooking.final_amount || 0,
       status: backendBooking.status || "pending",
       pickupDate: backendBooking.scheduled_date,
-      deliveryDate: this.calculateDeliveryDate(backendBooking.scheduled_date),
+      deliveryDate:
+        backendBooking.delivery_date ||
+        this.calculateDeliveryDate(backendBooking.scheduled_date),
       pickupTime: backendBooking.scheduled_time || "10:00",
-      deliveryTime: "18:00", // Default delivery time
+      deliveryTime: backendBooking.delivery_time || "18:00",
       address: backendBooking.address || "Address not provided",
       contactDetails: {
         phone: backendBooking.customer_id?.phone || "",
@@ -656,6 +658,11 @@ export class BookingService {
         scheduled_date:
           booking.pickupDate || new Date().toISOString().split("T")[0],
         scheduled_time: booking.pickupTime || "10:00",
+        delivery_date:
+          booking.deliveryDate ||
+          booking.pickupDate ||
+          new Date().toISOString().split("T")[0],
+        delivery_time: booking.deliveryTime || "18:00",
         provider_name: "CleanCare Pro",
         address: addressString,
         coordinates: coordinates,
