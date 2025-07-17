@@ -52,6 +52,69 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
   onBack,
 }) => {
   const { addNotification } = useNotifications();
+
+  // Function to get local service price as fallback
+  const getLocalServicePrice = (
+    serviceName: string,
+    quantity: number = 1,
+  ): number => {
+    if (!serviceName) return 0;
+
+    // Try to find exact match first
+    let service = laundryServices.find(
+      (s) => s.name.toLowerCase() === serviceName.toLowerCase(),
+    );
+
+    // If no exact match, try partial match
+    if (!service) {
+      service = laundryServices.find(
+        (s) =>
+          s.name.toLowerCase().includes(serviceName.toLowerCase()) ||
+          serviceName.toLowerCase().includes(s.name.toLowerCase()),
+      );
+    }
+
+    // If still no match, try common service name mappings
+    if (!service) {
+      const serviceMap: { [key: string]: string } = {
+        wash: "Laundry and Fold",
+        fold: "Laundry and Fold",
+        iron: "Traditional Iron",
+        "dry clean": "Men Shirt",
+        shirt: "Men Shirt",
+        pant: "Men Trouser",
+        trouser: "Men Trouser",
+        saree: "Saree Simple",
+        kurta: "Women Kurta",
+        suit: "Men 2PC Suit",
+        dress: "Women Dress",
+        jacket: "Jacket",
+        sweater: "Sweater",
+        coat: "Long Coat",
+      };
+
+      const normalizedName = serviceName.toLowerCase();
+      for (const [key, value] of Object.entries(serviceMap)) {
+        if (normalizedName.includes(key)) {
+          service = laundryServices.find((s) => s.name === value);
+          break;
+        }
+      }
+    }
+
+    if (service) {
+      return service.price * quantity;
+    }
+
+    // Default fallback price based on service type
+    if (serviceName.toLowerCase().includes("dry clean")) {
+      return 120 * quantity; // Average dry clean price
+    } else if (serviceName.toLowerCase().includes("iron")) {
+      return 40 * quantity; // Average iron price
+    } else {
+      return 70 * quantity; // Average laundry price
+    }
+  };
   const [bookings, setBookings] = useState<MappedBookingData[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
