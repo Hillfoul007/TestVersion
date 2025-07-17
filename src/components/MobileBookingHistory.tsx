@@ -42,6 +42,10 @@ import EditBookingModal from "./EditBookingModal";
 import { clearAllUserData } from "@/utils/clearStorage";
 import { filterProductionBookings } from "@/utils/bookingFilters";
 import { debugBookingsStorage } from "@/utils/debugBookings";
+import {
+  mapBookingsData,
+  type MappedBookingData,
+} from "@/utils/bookingDataMapper";
 
 interface MobileBookingHistoryProps {
   currentUser?: any;
@@ -53,7 +57,7 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
   onBack,
 }) => {
   const { addNotification } = useNotifications();
-  const [bookings, setBookings] = useState([]);
+  const [bookings, setBookings] = useState<MappedBookingData[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [editingBooking, setEditingBooking] = useState(null);
@@ -100,12 +104,16 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
       if (response.success && response.bookings) {
         // Filter out demo bookings for production
         const productionBookings = filterProductionBookings(response.bookings);
+
+        // Map bookings data with correct prices and delivery dates
+        const mappedBookings = mapBookingsData(productionBookings);
+
         console.log(
-          "✅ Bookings loaded successfully (filtered):",
-          productionBookings.length,
+          "✅ Bookings loaded and mapped successfully:",
+          mappedBookings.length,
         );
-        console.log("📊 Sample bookings:", productionBookings.slice(0, 2));
-        setBookings(productionBookings);
+        console.log("📊 Sample mapped bookings:", mappedBookings.slice(0, 2));
+        setBookings(mappedBookings);
       } else {
         console.log("⚠️ No bookings found or error:", response.error);
         setBookings([]);
@@ -142,24 +150,29 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
       );
       const newBooking = event.detail.booking;
       setBookings((prevBookings) => {
+        // Map the new booking data
+        const mappedNewBooking = mapBookingsData([newBooking])[0];
+
         // Check if booking already exists
         const existingIndex = prevBookings.findIndex(
-          (b) => b.id === newBooking.id || (b as any)._id === newBooking.id,
+          (b) => b.id === mappedNewBooking.id,
         );
 
         if (existingIndex >= 0) {
           // Update existing booking
           const updated = [...prevBookings];
-          updated[existingIndex] = newBooking;
+          updated[existingIndex] = mappedNewBooking;
           return updated.sort(
             (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime(),
           );
         } else {
           // Add new booking and sort by creation date
-          return [newBooking, ...prevBookings].sort(
+          return [mappedNewBooking, ...prevBookings].sort(
             (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime(),
           );
         }
       });
