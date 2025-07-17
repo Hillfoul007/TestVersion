@@ -39,28 +39,65 @@ const BookingConfirmed: React.FC<BookingConfirmedProps> = ({
   onViewBookings,
 }) => {
   const [customOrderId, setCustomOrderId] = useState<string | null>(null);
+  const [isIphone, setIsIphone] = useState(false);
+
+  useEffect(() => {
+    // Detect iPhone for specific handling
+    const isiOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    setIsIphone(isiOS);
+  }, []);
 
   useEffect(() => {
     // Only fetch if custom_order_id is not already present
     if (!bookingData.custom_order_id && bookingData.bookingId) {
-      // Replace this with your actual API/service call
-      bookingHelpers
-        .getBookingById(bookingData.bookingId)
-        .then((result) => {
-          if (result.data && result.data.custom_order_id) {
-            setCustomOrderId(result.data.custom_order_id);
-          } else {
-            console.log(
-              "Custom order ID not found in booking data:",
-              result.data,
-            );
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to fetch booking details:", error);
-        });
+      // Add delay for iPhone to ensure state is ready
+      const fetchDelay = isIphone ? 500 : 0;
+
+      setTimeout(() => {
+        bookingHelpers
+          .getBookingById(bookingData.bookingId)
+          .then((result) => {
+            if (result.data && result.data.custom_order_id) {
+              setCustomOrderId(result.data.custom_order_id);
+
+              // Force re-render on iPhone by triggering a state update
+              if (isIphone) {
+                setTimeout(() => {
+                  setCustomOrderId(result.data.custom_order_id);
+                }, 100);
+              }
+            } else {
+              console.log(
+                "Custom order ID not found in booking data:",
+                result.data,
+              );
+
+              // Generate a fallback order ID for iPhone
+              if (isIphone && bookingData.bookingId) {
+                const fallbackId = `CC${bookingData.bookingId.slice(-6).toUpperCase()}`;
+                setCustomOrderId(fallbackId);
+                console.log(
+                  "🍎 iPhone fallback order ID generated:",
+                  fallbackId,
+                );
+              }
+            }
+          })
+          .catch((error) => {
+            console.error("Failed to fetch booking details:", error);
+
+            // Always provide a fallback ID on iPhone
+            if (isIphone && bookingData.bookingId) {
+              const fallbackId = `CC${bookingData.bookingId.slice(-6).toUpperCase()}`;
+              setCustomOrderId(fallbackId);
+              console.log("🍎 iPhone error fallback order ID:", fallbackId);
+            }
+          });
+      }, fetchDelay);
     }
-  }, [bookingData.custom_order_id, bookingData.bookingId]);
+  }, [bookingData.custom_order_id, bookingData.bookingId, isIphone]);
 
   const formatDate = (dateStr: string) => {
     try {
@@ -112,11 +149,34 @@ const BookingConfirmed: React.FC<BookingConfirmedProps> = ({
             <p className="text-sm text-green-700 mb-1">Order ID</p>
             <p className="text-lg font-bold text-green-900">
               #
-              {bookingData.custom_order_id ||
-                customOrderId ||
-                (bookingData.bookingId
-                  ? `CC${bookingData.bookingId.slice(-6)}`
-                  : "Generating...")}
+              {(() => {
+                // Priority order for order ID display with iPhone-specific handling
+                if (bookingData.custom_order_id) {
+                  return bookingData.custom_order_id;
+                }
+
+                if (customOrderId) {
+                  return customOrderId;
+                }
+
+                if (bookingData.bookingId) {
+                  const fallbackId = `CC${bookingData.bookingId.slice(-6).toUpperCase()}`;
+                  // On iPhone, ensure the ID is always displayed
+                  if (isIphone) {
+                    // Set the custom order ID to prevent "Generating..." from showing
+                    setTimeout(() => setCustomOrderId(fallbackId), 0);
+                  }
+                  return fallbackId;
+                }
+
+                // Last resort for iPhone
+                if (isIphone) {
+                  const timestamp = Date.now().toString().slice(-6);
+                  return `CC${timestamp}`;
+                }
+
+                return "Generating...";
+              })()}
             </p>
           </CardContent>
         </Card>

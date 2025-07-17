@@ -70,3 +70,173 @@ export const addIosOtpDelay = async (): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, 2500));
   }
 };
+
+/**
+ * iPhone-specific session persistence to prevent auto logout
+ */
+export const preventIosAutoLogout = (): void => {
+  if (!isIosDevice()) return;
+
+  console.log("🍎 Initializing iPhone-specific auth persistence");
+
+  // Handle iOS PWA state changes that can clear localStorage
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      // User returned to the app - ensure auth is preserved
+      const user =
+        localStorage.getItem("current_user") ||
+        localStorage.getItem("cleancare_user");
+      const token =
+        localStorage.getItem("auth_token") ||
+        localStorage.getItem("cleancare_auth_token");
+
+      if (user && token) {
+        console.log("🍎 iPhone visibility change - auth preserved");
+        // Trigger a storage event to sync auth state
+        window.dispatchEvent(
+          new StorageEvent("storage", {
+            key: "auth_heartbeat",
+            newValue: Date.now().toString(),
+            storageArea: localStorage,
+          }),
+        );
+      }
+    }
+  });
+
+  // Handle iOS Safari memory pressure that can clear localStorage
+  window.addEventListener("pagehide", () => {
+    const user =
+      localStorage.getItem("current_user") ||
+      localStorage.getItem("cleancare_user");
+    const token =
+      localStorage.getItem("auth_token") ||
+      localStorage.getItem("cleancare_auth_token");
+
+    if (user && token) {
+      // Double-write auth data to multiple keys for redundancy
+      localStorage.setItem("ios_backup_user", user);
+      localStorage.setItem("ios_backup_token", token);
+      localStorage.setItem("ios_auth_timestamp", Date.now().toString());
+      console.log("🍎 iPhone pagehide - created auth backup");
+    }
+  });
+
+  // Handle iOS app resume/focus
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+      // Page was restored from cache - check auth state
+      const user =
+        localStorage.getItem("current_user") ||
+        localStorage.getItem("cleancare_user");
+      const token =
+        localStorage.getItem("auth_token") ||
+        localStorage.getItem("cleancare_auth_token");
+
+      if (!user || !token) {
+        // Try to restore from backup
+        const backupUser = localStorage.getItem("ios_backup_user");
+        const backupToken = localStorage.getItem("ios_backup_token");
+
+        if (backupUser && backupToken) {
+          localStorage.setItem("current_user", backupUser);
+          localStorage.setItem("cleancare_user", backupUser);
+          localStorage.setItem("auth_token", backupToken);
+          localStorage.setItem("cleancare_auth_token", backupToken);
+          console.log("🍎 iPhone pageshow - restored auth from backup");
+
+          // Trigger auth restoration event
+          window.dispatchEvent(
+            new CustomEvent("ios-auth-restored", {
+              detail: { user: JSON.parse(backupUser) },
+            }),
+          );
+        }
+      }
+    }
+  });
+
+  // Prevent iOS from clearing localStorage when memory is low
+  const preserveAuth = () => {
+    const user =
+      localStorage.getItem("current_user") ||
+      localStorage.getItem("cleancare_user");
+    const token =
+      localStorage.getItem("auth_token") ||
+      localStorage.getItem("cleancare_auth_token");
+
+    if (user && token) {
+      // Create multiple backup copies
+      sessionStorage.setItem("ios_session_user", user);
+      sessionStorage.setItem("ios_session_token", token);
+
+      // Use a more persistent storage method
+      try {
+        document.cookie = `ios_auth_backup=${encodeURIComponent(user)}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Strict`;
+      } catch (e) {
+        // Cookie storage failed, continue
+      }
+    }
+  };
+
+  // Run preservation every 30 seconds on iPhone
+  setInterval(preserveAuth, 30000);
+
+  // Run initial preservation
+  preserveAuth();
+};
+
+/**
+ * Restore auth from various iPhone backup locations
+ */
+export const restoreIosAuth = (): boolean => {
+  if (!isIosDevice()) return false;
+
+  const user =
+    localStorage.getItem("current_user") ||
+    localStorage.getItem("cleancare_user");
+  const token =
+    localStorage.getItem("auth_token") ||
+    localStorage.getItem("cleancare_auth_token");
+
+  if (user && token) {
+    return true; // Auth already exists
+  }
+
+  // Try to restore from backups
+  const backupUser =
+    localStorage.getItem("ios_backup_user") ||
+    sessionStorage.getItem("ios_session_user");
+  const backupToken =
+    localStorage.getItem("ios_backup_token") ||
+    sessionStorage.getItem("ios_session_token");
+
+  if (backupUser && backupToken) {
+    localStorage.setItem("current_user", backupUser);
+    localStorage.setItem("cleancare_user", backupUser);
+    localStorage.setItem("auth_token", backupToken);
+    localStorage.setItem("cleancare_auth_token", backupToken);
+    console.log("🍎 Restored iPhone auth from backup storage");
+    return true;
+  }
+
+  // Try to restore from cookie backup
+  try {
+    const cookies = document.cookie.split(";");
+    const authCookie = cookies.find((c) =>
+      c.trim().startsWith("ios_auth_backup="),
+    );
+
+    if (authCookie) {
+      const cookieUser = decodeURIComponent(authCookie.split("=")[1]);
+      localStorage.setItem("current_user", cookieUser);
+      localStorage.setItem("cleancare_user", cookieUser);
+      console.log("🍎 Restored iPhone auth from cookie backup");
+      return true;
+    }
+  } catch (e) {
+    // Cookie restore failed
+  }
+
+  return false;
+};

@@ -5,6 +5,11 @@
 
 import { DVHostingSmsService } from "@/services/dvhostingSmsService";
 import { validateAuthConsistency } from "@/utils/authDebug";
+import {
+  preventIosAutoLogout,
+  restoreIosAuth,
+  isIosDevice,
+} from "@/utils/iosAuthFix";
 
 let authCheckInitialized = false;
 
@@ -24,7 +29,7 @@ export const initializeAuthPersistence = () => {
     }
   });
 
-  // Handle storage events (syncing auth across tabs)
+  // Handle storage events (syncing auth across tabs) - with safeguards to prevent auto-logout
   window.addEventListener("storage", (event) => {
     if (
       event.key === "current_user" ||
@@ -36,9 +41,23 @@ export const initializeAuthPersistence = () => {
 
       // Auth change detected in another tab
       if (event.newValue === null) {
-        // User logged out in another tab
-        console.log("🚪 User logged out in another tab");
-        window.dispatchEvent(new CustomEvent("auth-logout"));
+        // Check if this was an intentional logout by checking all auth tokens
+        const hasAnyAuthData =
+          localStorage.getItem("current_user") ||
+          localStorage.getItem("cleancare_user") ||
+          localStorage.getItem("auth_token") ||
+          localStorage.getItem("cleancare_auth_token");
+
+        if (!hasAnyAuthData) {
+          // Only logout if ALL auth data is gone (intentional logout)
+          console.log(
+            "🚪 All auth data cleared - user logged out in another tab",
+          );
+          window.dispatchEvent(new CustomEvent("auth-logout"));
+        } else {
+          // Preserve session if any auth data remains
+          console.log("🔒 Preserving session - partial auth data still exists");
+        }
       } else if (event.oldValue === null && event.newValue) {
         // User logged in in another tab
         console.log("🎉 User logged in in another tab");
@@ -76,7 +95,35 @@ export const initializeAuthPersistence = () => {
 
   window.addEventListener("pagehide", handlePageHide);
 
-  console.log("✅ Authentication persistence initialized");
+  // Add session heartbeat to keep auth alive
+  const sessionHeartbeat = setInterval(
+    () => {
+      const user = authService.getCurrentUser();
+      if (user) {
+        // Update localStorage timestamp to show session is active
+        localStorage.setItem("auth_last_active", Date.now().toString());
+
+        // Sync auth storage to ensure consistency
+        syncAuthStorage();
+      }
+    },
+    5 * 60 * 1000,
+  ); // Every 5 minutes
+
+  // Clear heartbeat on page unload
+  window.addEventListener("beforeunload", () => {
+    clearInterval(sessionHeartbeat);
+  });
+
+  // Initialize iPhone-specific auth persistence
+  if (isIosDevice()) {
+    preventIosAutoLogout();
+    console.log("🍎 iPhone-specific auth persistence enabled");
+  }
+
+  console.log(
+    "✅ Authentication persistence initialized with session heartbeat",
+  );
 };
 
 /**
@@ -85,6 +132,14 @@ export const initializeAuthPersistence = () => {
 export const restoreAuthState = async (): Promise<boolean> => {
   try {
     const authService = DVHostingSmsService.getInstance();
+
+    // First try iPhone-specific restoration if on iOS
+    if (isIosDevice()) {
+      const iosRestored = restoreIosAuth();
+      if (iosRestored) {
+        console.log("🍎 iPhone auth restored from backup");
+      }
+    }
 
     // Check multiple storage locations for auth data
     const token =
@@ -110,6 +165,26 @@ export const restoreAuthState = async (): Promise<boolean> => {
 
     if (!user || (!user.phone && !user.id && !user._id)) {
       console.warn("⚠️ Invalid user data found - attempting recovery");
+
+      // Try to rebuild user data from available info
+      const phone = user?.phone || user?.mobile || "";
+      const name = user?.name || user?.full_name || user?.displayName || "User";
+
+      if (phone) {
+        // Rebuild minimal user object to prevent logout
+        const rebuiltUser = {
+          phone,
+          name,
+          id: user?.id || user?._id || phone,
+          _id: user?._id || user?.id || phone,
+          ...user,
+        };
+
+        authService.setCurrentUser(rebuiltUser, token);
+        console.log("🔧 Rebuilt user data to prevent logout:", { phone, name });
+        return true;
+      }
+
       // Don't auto-logout, try to preserve what we can
       return false;
     }

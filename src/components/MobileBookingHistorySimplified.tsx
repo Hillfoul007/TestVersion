@@ -40,6 +40,7 @@ import {
   mapBookingsData,
   type MappedBookingData,
 } from "@/utils/bookingDataMapper";
+import { laundryServices } from "@/data/laundryServices";
 
 interface MobileBookingHistoryProps {
   currentUser?: any;
@@ -51,6 +52,69 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
   onBack,
 }) => {
   const { addNotification } = useNotifications();
+
+  // Function to get local service price as fallback
+  const getLocalServicePrice = (
+    serviceName: string,
+    quantity: number = 1,
+  ): number => {
+    if (!serviceName) return 0;
+
+    // Try to find exact match first
+    let service = laundryServices.find(
+      (s) => s.name.toLowerCase() === serviceName.toLowerCase(),
+    );
+
+    // If no exact match, try partial match
+    if (!service) {
+      service = laundryServices.find(
+        (s) =>
+          s.name.toLowerCase().includes(serviceName.toLowerCase()) ||
+          serviceName.toLowerCase().includes(s.name.toLowerCase()),
+      );
+    }
+
+    // If still no match, try common service name mappings
+    if (!service) {
+      const serviceMap: { [key: string]: string } = {
+        wash: "Laundry and Fold",
+        fold: "Laundry and Fold",
+        iron: "Traditional Iron",
+        "dry clean": "Men Shirt",
+        shirt: "Men Shirt",
+        pant: "Men Trouser",
+        trouser: "Men Trouser",
+        saree: "Saree Simple",
+        kurta: "Women Kurta",
+        suit: "Men 2PC Suit",
+        dress: "Women Dress",
+        jacket: "Jacket",
+        sweater: "Sweater",
+        coat: "Long Coat",
+      };
+
+      const normalizedName = serviceName.toLowerCase();
+      for (const [key, value] of Object.entries(serviceMap)) {
+        if (normalizedName.includes(key)) {
+          service = laundryServices.find((s) => s.name === value);
+          break;
+        }
+      }
+    }
+
+    if (service) {
+      return service.price * quantity;
+    }
+
+    // Default fallback price based on service type
+    if (serviceName.toLowerCase().includes("dry clean")) {
+      return 120 * quantity; // Average dry clean price
+    } else if (serviceName.toLowerCase().includes("iron")) {
+      return 40 * quantity; // Average iron price
+    } else {
+      return 70 * quantity; // Average laundry price
+    }
+  };
   const [bookings, setBookings] = useState<MappedBookingData[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -358,7 +422,32 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                           <span>{booking.pickup_time}</span>
                         </div>
                         <div className="flex items-center gap-1 text-green-600 font-semibold">
-                          <span>₹{booking.pricing.final_amount}</span>
+                          <span>
+                            ₹
+                            {(() => {
+                              // Use database price if available, otherwise calculate locally
+                              if (booking.pricing.final_amount) {
+                                return booking.pricing.final_amount;
+                              }
+
+                              const localTotal = booking.services.reduce(
+                                (total, service) => {
+                                  const servicePrice =
+                                    service.total_price ||
+                                    service.price ||
+                                    service.unit_price ||
+                                    getLocalServicePrice(
+                                      service.name,
+                                      service.quantity || 1,
+                                    );
+                                  return total + servicePrice;
+                                },
+                                0,
+                              );
+
+                              return localTotal;
+                            })()}
+                          </span>
                         </div>
                       </div>
 
@@ -405,24 +494,68 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                           Services ({booking.services.length})
                         </h4>
                         <span className="text-xs text-blue-600 font-medium">
-                          ₹{booking.pricing.final_amount}
+                          ₹
+                          {(() => {
+                            // If we have final_amount from database, use it
+                            if (booking.pricing.final_amount) {
+                              return booking.pricing.final_amount;
+                            }
+
+                            // Otherwise calculate from individual services with local fallback
+                            const calculatedTotal = booking.services.reduce(
+                              (total, service) => {
+                                const servicePrice =
+                                  service.total_price ||
+                                  service.price ||
+                                  service.unit_price ||
+                                  getLocalServicePrice(
+                                    service.name,
+                                    service.quantity || 1,
+                                  );
+                                return total + servicePrice;
+                              },
+                              0,
+                            );
+
+                            return calculatedTotal;
+                          })()}
                         </span>
                       </div>
                       <div className="space-y-1">
-                        {booking.services.map((service, idx) => (
-                          <div
-                            key={idx}
-                            className="flex justify-between items-center text-xs"
-                          >
-                            <span>
-                              {service.name}{" "}
-                              {service.quantity > 1 && `x${service.quantity}`}
-                            </span>
-                            <span className="font-medium">
-                              ₹{service.total_price}
-                            </span>
-                          </div>
-                        ))}
+                        {booking.services.map((service, idx) => {
+                          // Get price with local fallback
+                          const displayPrice =
+                            service.total_price ||
+                            service.price ||
+                            service.unit_price ||
+                            getLocalServicePrice(
+                              service.name,
+                              service.quantity || 1,
+                            );
+
+                          return (
+                            <div
+                              key={idx}
+                              className="flex justify-between items-center text-xs"
+                            >
+                              <span>
+                                {service.name}{" "}
+                                {service.quantity > 1 && `x${service.quantity}`}
+                                {!service.total_price &&
+                                  !service.price &&
+                                  !service.unit_price && (
+                                    <span className="text-blue-600 text-[10px]">
+                                      {" "}
+                                      (local price)
+                                    </span>
+                                  )}
+                              </span>
+                              <span className="font-medium">
+                                ₹{displayPrice}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
 
@@ -451,10 +584,12 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                           </span>
                         </div>
                         <p className="text-xs text-gray-900">
-                          {formatDate(booking.delivery_date)}
+                          {booking.delivery_date
+                            ? formatDate(booking.delivery_date)
+                            : "TBD"}
                         </p>
                         <p className="text-xs text-emerald-600">
-                          {booking.delivery_time}
+                          {booking.delivery_time || "TBD"}
                         </p>
                       </div>
                     </div>
@@ -479,7 +614,31 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                           Services Total
                         </span>
                         <span className="font-medium">
-                          ₹{booking.pricing.base_amount}
+                          ₹
+                          {(() => {
+                            // Use database base_amount if available
+                            if (booking.pricing.base_amount) {
+                              return booking.pricing.base_amount;
+                            }
+
+                            // Calculate from services with local fallback
+                            return booking.services.reduce((total, service) => {
+                              const servicePrice =
+                                service.total_price ||
+                                service.price ||
+                                service.unit_price ||
+                                getLocalServicePrice(
+                                  service.name,
+                                  service.quantity || 1,
+                                );
+                              return total + servicePrice;
+                            }, 0);
+                          })()}
+                          {!booking.pricing.base_amount && (
+                            <span className="text-blue-600 text-[10px] ml-1">
+                              (local)
+                            </span>
+                          )}
                         </span>
                       </div>
 
@@ -509,7 +668,41 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                             Total Amount
                           </span>
                           <span className="text-xl font-bold text-green-600">
-                            ₹{booking.pricing.final_amount}
+                            ₹
+                            {(() => {
+                              // Use database final_amount if available
+                              if (booking.pricing.final_amount) {
+                                return booking.pricing.final_amount;
+                              }
+
+                              // Calculate total with local service prices
+                              const servicesTotal = booking.services.reduce(
+                                (total, service) => {
+                                  const servicePrice =
+                                    service.total_price ||
+                                    service.price ||
+                                    service.unit_price ||
+                                    getLocalServicePrice(
+                                      service.name,
+                                      service.quantity || 1,
+                                    );
+                                  return total + servicePrice;
+                                },
+                                0,
+                              );
+
+                              // Add tax and subtract discount if available
+                              const tax = booking.pricing.tax_amount || 0;
+                              const discount =
+                                booking.pricing.discount_amount || 0;
+
+                              return servicesTotal + tax - discount;
+                            })()}
+                            {!booking.pricing.final_amount && (
+                              <span className="text-blue-600 text-[10px] ml-1">
+                                (calculated)
+                              </span>
+                            )}
                           </span>
                         </div>
                         <div className="flex justify-between items-center mt-1">

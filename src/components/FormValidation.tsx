@@ -50,6 +50,8 @@ export const validateCheckoutForm = (
   phoneNumber: string,
   selectedDate: Date | null,
   selectedTime: string,
+  deliveryDate?: Date | null,
+  deliveryTime?: string,
 ): ValidationError[] => {
   const errors: ValidationError[] = [];
 
@@ -98,6 +100,20 @@ export const validateCheckoutForm = (
     errors.push({
       field: "time",
       message: "Pickup time is required",
+    });
+  }
+
+  if (!deliveryDate) {
+    errors.push({
+      field: "deliveryDate",
+      message: "Delivery date is required",
+    });
+  }
+
+  if (!deliveryTime) {
+    errors.push({
+      field: "deliveryTime",
+      message: "Delivery time is required",
     });
   }
 
