@@ -966,11 +966,8 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                               );
 
                               // Static pricing is now used instead of database pricing
-                              if (
-                                booking.item_prices &&
-                                Array.isArray(booking.item_prices) &&
-                                booking.item_prices.length > 0
-                              ) {
+                              // Old database pricing logic removed - now using static pricing
+                              if (false) {
                                 // Try to find exact match first
                                 let matchingPrice = booking.item_prices.find(
                                   (item: any) => {
