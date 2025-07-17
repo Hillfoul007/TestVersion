@@ -668,7 +668,41 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                             Total Amount
                           </span>
                           <span className="text-xl font-bold text-green-600">
-                            ₹{booking.pricing.final_amount}
+                            ₹
+                            {(() => {
+                              // Use database final_amount if available
+                              if (booking.pricing.final_amount) {
+                                return booking.pricing.final_amount;
+                              }
+
+                              // Calculate total with local service prices
+                              const servicesTotal = booking.services.reduce(
+                                (total, service) => {
+                                  const servicePrice =
+                                    service.total_price ||
+                                    service.price ||
+                                    service.unit_price ||
+                                    getLocalServicePrice(
+                                      service.name,
+                                      service.quantity || 1,
+                                    );
+                                  return total + servicePrice;
+                                },
+                                0,
+                              );
+
+                              // Add tax and subtract discount if available
+                              const tax = booking.pricing.tax_amount || 0;
+                              const discount =
+                                booking.pricing.discount_amount || 0;
+
+                              return servicesTotal + tax - discount;
+                            })()}
+                            {!booking.pricing.final_amount && (
+                              <span className="text-blue-600 text-[10px] ml-1">
+                                (calculated)
+                              </span>
+                            )}
                           </span>
                         </div>
                         <div className="flex justify-between items-center mt-1">
