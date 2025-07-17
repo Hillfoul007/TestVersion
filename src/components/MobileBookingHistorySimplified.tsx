@@ -422,7 +422,32 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                           <span>{booking.pickup_time}</span>
                         </div>
                         <div className="flex items-center gap-1 text-green-600 font-semibold">
-                          <span>₹{booking.pricing.final_amount}</span>
+                          <span>
+                            ₹
+                            {(() => {
+                              // Use database price if available, otherwise calculate locally
+                              if (booking.pricing.final_amount) {
+                                return booking.pricing.final_amount;
+                              }
+
+                              const localTotal = booking.services.reduce(
+                                (total, service) => {
+                                  const servicePrice =
+                                    service.total_price ||
+                                    service.price ||
+                                    service.unit_price ||
+                                    getLocalServicePrice(
+                                      service.name,
+                                      service.quantity || 1,
+                                    );
+                                  return total + servicePrice;
+                                },
+                                0,
+                              );
+
+                              return localTotal;
+                            })()}
+                          </span>
                         </div>
                       </div>
 
