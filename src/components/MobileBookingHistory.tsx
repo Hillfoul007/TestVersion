@@ -41,6 +41,10 @@ import { adaptiveBookingHelpers } from "@/integrations/adaptive/bookingHelpers";
 import EditBookingModal from "./EditBookingModal";
 import { clearAllUserData } from "@/utils/clearStorage";
 import { filterProductionBookings } from "@/utils/bookingFilters";
+import {
+  getServicePriceWithFallback,
+  calculateServiceTotal,
+} from "@/utils/servicePricing";
 import { debugBookingsStorage } from "@/utils/debugBookings";
 import {
   mapBookingsData,
