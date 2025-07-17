@@ -50,10 +50,6 @@ import {
 import { BookingService } from "@/services/bookingService";
 import EditBookingModal from "./EditBookingModal";
 import { filterProductionBookings } from "@/utils/bookingFilters";
-import {
-  getServicePriceWithFallback,
-  calculateServiceTotal,
-} from "@/utils/servicePricing";
 
 interface EnhancedBookingHistoryProps {
   currentUser?: any;
@@ -921,6 +917,8 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                             {services.map((service: any, idx: number) => {
                               let serviceName = "";
                               let quantity = 1;
+                              let price = 0; // Will be calculated from item_prices or service data
+                              let totalServicePrice = 0;
 
                               // Extract service information based on data structure
                               if (
@@ -952,21 +950,12 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 quantity = 1;
                               }
 
-                              // Get pricing from static service data instead of database
-                              const serviceInfo =
-                                getServicePriceWithFallback(serviceName);
-                              const unitPrice = serviceInfo.unitPrice;
-                              const totalServicePrice = calculateServiceTotal(
-                                serviceName,
-                                quantity,
-                              );
-
                               console.log(
-                                `💰 Using static pricing for "${serviceName}": ₹${unitPrice} x ${quantity} = ₹${totalServicePrice}`,
+                                `🔍 Processing service: "${serviceName}", quantity: ${quantity}, booking has item_prices:`,
+                                !!booking.item_prices,
                               );
 
-                                                            // OLD CODE: Previously used database pricing (now using static pricing instead)
-                              /*
+                              // First priority: Use stored item_prices from database
                               if (
                                 booking.item_prices &&
                                 Array.isArray(booking.item_prices) &&
@@ -1096,8 +1085,7 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                       {serviceName}
                                     </span>
                                     <div className="text-xs text-gray-500 mt-1">
-                                      ₹{unitPrice} per{" "}
-                                      {serviceInfo.unit.toLowerCase()}
+                                      ₹{price} per piece
                                     </div>
                                   </div>
                                   <div className="flex flex-col items-end gap-1">
@@ -1105,7 +1093,7 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                       Qty: {quantity}
                                     </span>
                                     <span className="font-semibold text-green-600 text-sm">
-                                      ₹{totalServicePrice}
+                                      ₹{displayPrice}
                                     </span>
                                   </div>
                                 </div>
