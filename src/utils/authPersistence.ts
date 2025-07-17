@@ -24,7 +24,7 @@ export const initializeAuthPersistence = () => {
     }
   });
 
-  // Handle storage events (syncing auth across tabs)
+  // Handle storage events (syncing auth across tabs) - with safeguards to prevent auto-logout
   window.addEventListener("storage", (event) => {
     if (
       event.key === "current_user" ||
@@ -36,9 +36,23 @@ export const initializeAuthPersistence = () => {
 
       // Auth change detected in another tab
       if (event.newValue === null) {
-        // User logged out in another tab
-        console.log("🚪 User logged out in another tab");
-        window.dispatchEvent(new CustomEvent("auth-logout"));
+        // Check if this was an intentional logout by checking all auth tokens
+        const hasAnyAuthData =
+          localStorage.getItem("current_user") ||
+          localStorage.getItem("cleancare_user") ||
+          localStorage.getItem("auth_token") ||
+          localStorage.getItem("cleancare_auth_token");
+
+        if (!hasAnyAuthData) {
+          // Only logout if ALL auth data is gone (intentional logout)
+          console.log(
+            "🚪 All auth data cleared - user logged out in another tab",
+          );
+          window.dispatchEvent(new CustomEvent("auth-logout"));
+        } else {
+          // Preserve session if any auth data remains
+          console.log("🔒 Preserving session - partial auth data still exists");
+        }
       } else if (event.oldValue === null && event.newValue) {
         // User logged in in another tab
         console.log("🎉 User logged in in another tab");
