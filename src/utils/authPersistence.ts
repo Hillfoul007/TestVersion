@@ -124,6 +124,26 @@ export const restoreAuthState = async (): Promise<boolean> => {
 
     if (!user || (!user.phone && !user.id && !user._id)) {
       console.warn("⚠️ Invalid user data found - attempting recovery");
+
+      // Try to rebuild user data from available info
+      const phone = user?.phone || user?.mobile || "";
+      const name = user?.name || user?.full_name || user?.displayName || "User";
+
+      if (phone) {
+        // Rebuild minimal user object to prevent logout
+        const rebuiltUser = {
+          phone,
+          name,
+          id: user?.id || user?._id || phone,
+          _id: user?._id || user?.id || phone,
+          ...user,
+        };
+
+        authService.setCurrentUser(rebuiltUser, token);
+        console.log("🔧 Rebuilt user data to prevent logout:", { phone, name });
+        return true;
+      }
+
       // Don't auto-logout, try to preserve what we can
       return false;
     }
