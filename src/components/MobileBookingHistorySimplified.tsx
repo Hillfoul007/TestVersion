@@ -473,24 +473,40 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                         </span>
                       </div>
                       <div className="space-y-1">
-                        {booking.services.map((service, idx) => (
-                          <div
-                            key={idx}
-                            className="flex justify-between items-center text-xs"
-                          >
-                            <span>
-                              {service.name}{" "}
-                              {service.quantity > 1 && `x${service.quantity}`}
-                            </span>
-                            <span className="font-medium">
-                              ₹
-                              {service.total_price ||
-                                service.price ||
-                                service.unit_price ||
-                                0}
-                            </span>
-                          </div>
-                        ))}
+                        {booking.services.map((service, idx) => {
+                          // Get price with local fallback
+                          const displayPrice =
+                            service.total_price ||
+                            service.price ||
+                            service.unit_price ||
+                            getLocalServicePrice(
+                              service.name,
+                              service.quantity || 1,
+                            );
+
+                          return (
+                            <div
+                              key={idx}
+                              className="flex justify-between items-center text-xs"
+                            >
+                              <span>
+                                {service.name}{" "}
+                                {service.quantity > 1 && `x${service.quantity}`}
+                                {!service.total_price &&
+                                  !service.price &&
+                                  !service.unit_price && (
+                                    <span className="text-blue-600 text-[10px]">
+                                      {" "}
+                                      (local price)
+                                    </span>
+                                  )}
+                              </span>
+                              <span className="font-medium">
+                                ₹{displayPrice}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
 
