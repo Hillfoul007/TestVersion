@@ -243,12 +243,23 @@ export const mapBookingData = (rawBooking: any): MappedBookingData => {
     });
   }
 
-  // Calculate delivery date
-  const deliveryInfo = calculateDeliveryDate(
-    rawBooking.scheduled_date,
-    rawBooking.service_type || rawBooking.service,
-    rawBooking.delivery_date,
-  );
+  // Use delivery date from database if available, otherwise calculate
+  const deliveryInfo = {
+    date:
+      rawBooking.delivery_date ||
+      calculateDeliveryDate(
+        rawBooking.scheduled_date,
+        rawBooking.service_type || rawBooking.service,
+        rawBooking.delivery_date,
+      ).date,
+    time:
+      rawBooking.delivery_time ||
+      calculateDeliveryDate(
+        rawBooking.scheduled_date,
+        rawBooking.service_type || rawBooking.service,
+        rawBooking.delivery_date,
+      ).time,
+  };
 
   // Map pricing information
   const pricing = {
