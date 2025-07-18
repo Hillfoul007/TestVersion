@@ -9,7 +9,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Edit, Save, X, LogOut, Gift, Copy, Calendar } from "lucide-react";
+import {
+  Edit,
+  Save,
+  X,
+  LogOut,
+  Gift,
+  Copy,
+  Calendar,
+  MapPin,
+} from "lucide-react";
 import { ReferralService } from "@/services/referralService";
 import { useToast } from "@/hooks/use-toast";
 import UserService from "@/services/userService";
