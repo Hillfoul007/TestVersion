@@ -1282,7 +1282,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!selectedLocation) return;
 
     // Build complete address from split fields
@@ -1297,6 +1297,37 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     ].filter(Boolean);
 
     const completeAddress = fullAddressParts.join(", ");
+
+    // Check location availability before saving
+    try {
+      console.log("🏠 Checking location availability before saving address:", {
+        area,
+        pincode,
+        completeAddress,
+      });
+
+      const locationService = LocationDetectionService.getInstance();
+      const availability = await locationService.checkLocationAvailability(
+        area, // city
+        pincode,
+        completeAddress,
+      );
+
+      console.log("🏠 Address availability result:", availability);
+
+      if (!availability.is_available) {
+        console.log("🚫 Address not available for service, showing popup");
+        setUnavailableAddressText(completeAddress || selectedLocation.address);
+        setShowLocationUnavailable(true);
+        return; // Don't save the address
+      }
+    } catch (error) {
+      console.error("❌ Error checking address availability:", error);
+      // Continue with saving if location check fails
+      console.warn(
+        "⚠️ Location check failed, allowing address save to proceed",
+      );
+    }
 
     const addressData: AddressData = {
       flatNo: flatNo,
