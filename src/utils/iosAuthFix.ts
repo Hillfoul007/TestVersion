@@ -255,3 +255,86 @@ export const restoreIosAuth = (): boolean => {
 
   return false;
 };
+
+/**
+ * IndexedDB persistence for iPhone auth (most persistent storage)
+ */
+const IOS_AUTH_DB = "ios_auth_backup";
+const IOS_AUTH_STORE = "auth_data";
+
+const openIosAuthDB = (): Promise<IDBDatabase> => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(IOS_AUTH_DB, 1);
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains(IOS_AUTH_STORE)) {
+        db.createObjectStore(IOS_AUTH_STORE, { keyPath: "id" });
+      }
+    };
+  });
+};
+
+export const saveIosAuthToIndexedDB = async (
+  user: any,
+  token: string,
+): Promise<void> => {
+  if (!isIosDevice()) return;
+
+  try {
+    const db = await openIosAuthDB();
+    const transaction = db.transaction([IOS_AUTH_STORE], "readwrite");
+    const store = transaction.objectStore(IOS_AUTH_STORE);
+
+    await store.put({
+      id: "ios_auth",
+      user: JSON.stringify(user),
+      token: token,
+      timestamp: Date.now(),
+    });
+
+    console.log("🍎📱 Saved iPhone auth to IndexedDB");
+  } catch (error) {
+    console.warn("🍎⚠️ Failed to save to IndexedDB:", error);
+  }
+};
+
+export const restoreIosAuthFromIndexedDB = async (): Promise<boolean> => {
+  if (!isIosDevice()) return false;
+
+  try {
+    const db = await openIosAuthDB();
+    const transaction = db.transaction([IOS_AUTH_STORE], "readonly");
+    const store = transaction.objectStore(IOS_AUTH_STORE);
+
+    return new Promise((resolve) => {
+      const request = store.get("ios_auth");
+
+      request.onsuccess = () => {
+        const result = request.result;
+        if (result && result.user && result.token) {
+          // Check if data is not too old (7 days max)
+          const age = Date.now() - result.timestamp;
+          if (age < 7 * 24 * 60 * 60 * 1000) {
+            localStorage.setItem("current_user", result.user);
+            localStorage.setItem("cleancare_user", result.user);
+            localStorage.setItem("auth_token", result.token);
+            localStorage.setItem("cleancare_auth_token", result.token);
+            console.log("🍎📱 Restored iPhone auth from IndexedDB");
+            resolve(true);
+            return;
+          }
+        }
+        resolve(false);
+      };
+
+      request.onerror = () => resolve(false);
+    });
+  } catch (error) {
+    console.warn("🍎⚠️ Failed to restore from IndexedDB:", error);
+    return false;
+  }
+};
