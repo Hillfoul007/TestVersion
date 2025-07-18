@@ -179,32 +179,17 @@ const SavedAddressesModal: React.FC<SavedAddressesModalProps> = React.memo(
       try {
         console.log("🗑️ Deleting address with ID:", id);
 
-        // Immediately remove from UI for better UX
-        const updatedAddresses = addresses.filter(
-          (addr) => addr.id !== id && addr._id !== id,
-        );
-
-        // Update localStorage first
-        saveAddresses(updatedAddresses);
-
-        // Try to delete from backend (don't await to avoid blocking UI)
+        console.log("🗑️ Deleting address with AddressService...");
         const addressService = AddressService.getInstance();
-        addressService
-          .deleteAddress(id)
-          .then((result) => {
-            if (result.success) {
-              console.log("✅ Address deleted from backend:", result.message);
-            } else {
-              console.warn(
-                "⚠️ Backend deletion failed, but local deletion succeeded:",
-                result.error,
-              );
-            }
-          })
-          .catch((error) => {
-            console.warn("❌ Backend deletion error:", error);
-            // Keep local deletion even if backend fails
-          });
+        const result = await addressService.deleteAddress(id);
+
+        if (result.success) {
+          console.log("✅ Address deleted successfully:", result.message);
+          await loadSavedAddresses(); // Reload addresses from backend
+        } else {
+          console.error("❌ Failed to delete address:", result.error);
+          // Show user-friendly error message here if needed
+        }
 
         console.log("✅ Address deleted from UI and localStorage");
       } catch (error) {
