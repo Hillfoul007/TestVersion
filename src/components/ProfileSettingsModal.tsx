@@ -22,6 +22,7 @@ import {
 import { ReferralService } from "@/services/referralService";
 import { useToast } from "@/hooks/use-toast";
 import UserService from "@/services/userService";
+import SavedAddressesModal from "./SavedAddressesModal";
 
 interface ProfileSettingsModalProps {
   isOpen: boolean;
