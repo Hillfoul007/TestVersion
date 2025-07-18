@@ -174,6 +174,16 @@ const DeliveryDateTimePicker: React.FC<DeliveryDateTimePickerProps> = ({
   const timeSlots = generateDeliveryTimeSlots();
   const earliestDateTime = getEarliestDeliveryDateTime();
 
+  // Clear delivery date and time when pickup date/time changes
+  useEffect(() => {
+    if (selectedDeliveryDate || selectedDeliveryTime) {
+      // Only clear if there was something selected before
+      onDeliveryDateChange(undefined);
+      onDeliveryTimeChange("");
+      console.log("🗓️ Cleared delivery date/time due to pickup date change");
+    }
+  }, [pickupDate, pickupTime]);
+
   // Don't auto-select delivery date - let user choose manually
   // This ensures user makes a conscious choice for delivery date
 
