@@ -1305,6 +1305,21 @@ Confirm this booking?`;
         }}
         currentUser={currentUser}
       />
+
+      {/* Location Unavailable Modal */}
+      <LocationUnavailableModal
+        isOpen={showLocationUnavailable}
+        onClose={() => setShowLocationUnavailable(false)}
+        detectedLocation={unavailableLocationText}
+        onExplore={() => {
+          console.log(
+            "🔍 User chose to explore available services instead of booking",
+          );
+          // Clear the problematic address to allow user to select a different one
+          setAddressData(null);
+          setValidationErrors([]);
+        }}
+      />
     </div>
   );
 };
