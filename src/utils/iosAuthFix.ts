@@ -136,7 +136,7 @@ export const preventIosAutoLogout = (): void => {
   });
 
   // Handle iOS app resume/focus
-  window.addEventListener("pageshow", (event) => {
+  window.addEventListener("pageshow", async (event) => {
     if (event.persisted) {
       // Page was restored from cache - check auth state
       const user =
@@ -147,27 +147,64 @@ export const preventIosAutoLogout = (): void => {
         localStorage.getItem("cleancare_auth_token");
 
       if (!user || !token) {
-        // Try to restore from backup
-        const backupUser = localStorage.getItem("ios_backup_user");
-        const backupToken = localStorage.getItem("ios_backup_token");
-
-        if (backupUser && backupToken) {
-          localStorage.setItem("current_user", backupUser);
-          localStorage.setItem("cleancare_user", backupUser);
-          localStorage.setItem("auth_token", backupToken);
-          localStorage.setItem("cleancare_auth_token", backupToken);
-          console.log("🍎 iPhone pageshow - restored auth from backup");
-
+        console.log(
+          `🍎 ${isPWAMode() ? "PWA" : "Safari"} pageshow - auth missing, attempting restoration`,
+        );
+        // Try comprehensive restoration for PWA mode
+        const restored = await restoreIosAuth();
+        if (restored) {
+          console.log(
+            `🍎 ${isPWAMode() ? "PWA" : "Safari"} pageshow - auth restored`,
+          );
           // Trigger auth restoration event
           window.dispatchEvent(
             new CustomEvent("ios-auth-restored", {
-              detail: { user: JSON.parse(backupUser) },
+              detail: {
+                user: JSON.parse(localStorage.getItem("current_user") || "{}"),
+                mode: isPWAMode() ? "pwa" : "safari",
+              },
             }),
           );
         }
       }
     }
   });
+
+  // PWA-specific: Handle app focus/blur events
+  if (isPWAMode()) {
+    window.addEventListener("focus", async () => {
+      console.log("🍎📱 PWA focus - checking auth state");
+      const user =
+        localStorage.getItem("current_user") ||
+        localStorage.getItem("cleancare_user");
+      const token =
+        localStorage.getItem("auth_token") ||
+        localStorage.getItem("cleancare_auth_token");
+
+      if (!user || !token) {
+        console.log("🍎📱 PWA focus - auth missing, attempting restoration");
+        const restored = await restoreIosAuth();
+        if (restored) {
+          console.log("🍎📱 PWA focus - auth restored");
+          window.dispatchEvent(
+            new CustomEvent("ios-session-restored", {
+              detail: {
+                user: JSON.parse(localStorage.getItem("current_user") || "{}"),
+                restored: true,
+                mode: "pwa",
+                trigger: "focus",
+              },
+            }),
+          );
+        }
+      }
+    });
+
+    window.addEventListener("blur", () => {
+      console.log("🍎📱 PWA blur - preserving auth state");
+      preserveAuth();
+    });
+  }
 
   // Prevent iOS from clearing localStorage when memory is low
   const preserveAuth = async () => {
