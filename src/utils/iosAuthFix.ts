@@ -157,7 +157,7 @@ export const preventIosAutoLogout = (): void => {
   });
 
   // Prevent iOS from clearing localStorage when memory is low
-  const preserveAuth = () => {
+  const preserveAuth = async () => {
     const user =
       localStorage.getItem("current_user") ||
       localStorage.getItem("cleancare_user");
@@ -175,6 +175,14 @@ export const preventIosAutoLogout = (): void => {
         document.cookie = `ios_auth_backup=${encodeURIComponent(user)}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Strict`;
       } catch (e) {
         // Cookie storage failed, continue
+      }
+
+      // Save to IndexedDB (most persistent)
+      try {
+        const userObj = JSON.parse(user);
+        await saveIosAuthToIndexedDB(userObj, token);
+      } catch (e) {
+        // IndexedDB save failed, continue
       }
     }
   };
