@@ -76,7 +76,10 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   const [showBookingDebugPanel, setShowBookingDebugPanel] = useState(false);
   const [showAdminServices, setShowAdminServices] = useState(false);
   const [isRequestingLocation, setIsRequestingLocation] = useState(false);
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [detectedLocationText, setDetectedLocationText] = useState("");
   const dvhostingSmsService = DVHostingSmsService.getInstance();
+  const locationDetectionService = LocationDetectionService.getInstance();
 
   // Function to request location permission again
   const requestLocationPermission = async () => {
