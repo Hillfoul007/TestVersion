@@ -396,6 +396,13 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({
           )}
         </div>
       </DialogContent>
+
+      {/* Address Management Modal */}
+      <SavedAddressesModal
+        isOpen={showAddressModal}
+        onClose={() => setShowAddressModal(false)}
+        currentUser={currentUser}
+      />
     </Dialog>
   );
 };
