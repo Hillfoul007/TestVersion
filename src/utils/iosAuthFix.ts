@@ -424,16 +424,25 @@ export const restoreIosAuthFromIndexedDB = async (): Promise<boolean> => {
       request.onsuccess = () => {
         const result = request.result;
         if (result && result.user && result.token) {
-          // Check if data is not too old (7 days max)
+          // Check if data is not too old (30 days for PWA, 7 days for Safari)
+          const maxAge = isPWAMode()
+            ? 30 * 24 * 60 * 60 * 1000
+            : 7 * 24 * 60 * 60 * 1000;
           const age = Date.now() - result.timestamp;
-          if (age < 7 * 24 * 60 * 60 * 1000) {
+          if (age < maxAge) {
             localStorage.setItem("current_user", result.user);
             localStorage.setItem("cleancare_user", result.user);
             localStorage.setItem("auth_token", result.token);
             localStorage.setItem("cleancare_auth_token", result.token);
-            console.log("🍎📱 Restored iPhone auth from IndexedDB");
+            console.log(
+              `🍎📱 Restored iPhone auth from IndexedDB (${isPWAMode() ? "PWA" : "Safari"} mode)`,
+            );
             resolve(true);
             return;
+          } else {
+            console.log(
+              `🍎⏰ IndexedDB auth data too old (${Math.round(age / (24 * 60 * 60 * 1000))} days), skipping restore`,
+            );
           }
         }
         resolve(false);
