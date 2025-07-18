@@ -223,7 +223,7 @@ const DeliveryDateTimePicker: React.FC<DeliveryDateTimePickerProps> = ({
           {availableDates.length > 0 && (
             <Button
               variant={
-                !selectedDeliveryDate ||
+                selectedDeliveryDate &&
                 isSameDay(selectedDeliveryDate, availableDates[0].date)
                   ? "default"
                   : "outline"
