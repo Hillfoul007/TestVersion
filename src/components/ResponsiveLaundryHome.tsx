@@ -1332,6 +1332,17 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         {/* Connection Status */}
         <ConnectionStatus />
 
+        {/* Location Unavailable Modal */}
+        <LocationUnavailableModal
+          isOpen={showLocationUnavailable}
+          onClose={() => setShowLocationUnavailable(false)}
+          detectedLocation={detectedLocationText}
+          onExplore={() => {
+            console.log("🔍 User chose to explore available services");
+            // You can add navigation logic here if needed
+          }}
+        />
+
         {/* Google Sheets integration removed */}
       </div>
     </div>
