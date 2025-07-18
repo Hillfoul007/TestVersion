@@ -174,18 +174,8 @@ const DeliveryDateTimePicker: React.FC<DeliveryDateTimePickerProps> = ({
   const timeSlots = generateDeliveryTimeSlots();
   const earliestDateTime = getEarliestDeliveryDateTime();
 
-  // Auto-select earliest date if none selected and pickup is scheduled
-  useEffect(() => {
-    if (pickupDate && pickupTime && !selectedDeliveryDate) {
-      onDeliveryDateChange(availableDates[0]?.date);
-    }
-  }, [
-    pickupDate,
-    pickupTime,
-    selectedDeliveryDate,
-    availableDates,
-    onDeliveryDateChange,
-  ]);
+  // Don't auto-select delivery date - let user choose manually
+  // This ensures user makes a conscious choice for delivery date
 
   // Show warning if no pickup is scheduled
   if (!pickupDate || !pickupTime) {
