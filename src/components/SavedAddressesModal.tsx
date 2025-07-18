@@ -84,21 +84,23 @@ const SavedAddressesModal: React.FC<SavedAddressesModalProps> = React.memo(
       }
     }, [isOpen, currentUser]);
 
-    const loadSavedAddresses = () => {
+    const loadSavedAddresses = async () => {
       if (!currentUser?.id && !currentUser?._id && !currentUser?.phone) return;
 
-      const userId = currentUser._id || currentUser.id || currentUser.phone;
-      const savedAddresses = localStorage.getItem(`addresses_${userId}`);
+      try {
+        console.log("📍 Loading saved addresses from AddressService...");
+        const addressService = AddressService.getInstance();
+        const result = await addressService.getUserAddresses();
 
-      if (savedAddresses) {
-        try {
-          const parsedAddresses = JSON.parse(savedAddresses);
-          setAddresses(Array.isArray(parsedAddresses) ? parsedAddresses : []);
-        } catch (error) {
-          console.error("Error parsing saved addresses:", error);
+        if (result.success && result.data) {
+          setAddresses(Array.isArray(result.data) ? result.data : []);
+          console.log(`✅ Loaded ${result.data.length} saved addresses`);
+        } else {
+          console.warn("⚠️ Failed to load addresses:", result.error);
           setAddresses([]);
         }
-      } else {
+      } catch (error) {
+        console.error("❌ Error loading saved addresses:", error);
         setAddresses([]);
       }
     };
