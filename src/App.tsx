@@ -49,6 +49,10 @@ function App() {
             <Routes>
               <Route path="/" element={<LaundryIndex />} />
               <Route path="/address-demo" element={<AddressSearchDemo />} />
+              <Route
+                path="/admin/location-config"
+                element={<LocationConfigPage />}
+              />
               <Route path="*" element={<LaundryIndex />} />
             </Routes>
             <Toaster />
