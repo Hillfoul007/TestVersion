@@ -189,7 +189,7 @@ export const preventIosAutoLogout = (): void => {
 /**
  * Restore auth from various iPhone backup locations
  */
-export const restoreIosAuth = (): boolean => {
+export const restoreIosAuth = async (): Promise<boolean> => {
   if (!isIosDevice()) return false;
 
   const user =
@@ -201,6 +201,12 @@ export const restoreIosAuth = (): boolean => {
 
   if (user && token) {
     return true; // Auth already exists
+  }
+
+  // Try IndexedDB first (most persistent)
+  const indexedDBRestored = await restoreIosAuthFromIndexedDB();
+  if (indexedDBRestored) {
+    return true;
   }
 
   // Try to restore from backups
