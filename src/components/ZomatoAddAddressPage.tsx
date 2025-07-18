@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { locationService, Coordinates } from "@/services/locationService";
 import { LocationDetectionService } from "@/services/locationDetectionService";
+import LocationUnavailableModal from "./LocationUnavailableModal";
 import { Loader } from "@googlemaps/js-api-loader";
 
 // Add CSS for bounce animation
