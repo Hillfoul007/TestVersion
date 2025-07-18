@@ -229,10 +229,25 @@ export const restoreIosAuth = (): boolean => {
 
     if (authCookie) {
       const cookieUser = decodeURIComponent(authCookie.split("=")[1]);
-      localStorage.setItem("current_user", cookieUser);
-      localStorage.setItem("cleancare_user", cookieUser);
-      console.log("🍎 Restored iPhone auth from cookie backup");
-      return true;
+      // Parse user to get phone and create proper token
+      try {
+        const user = JSON.parse(cookieUser);
+        const phone = user.phone || user.mobile || user.id;
+        const persistentToken = `user_token_${phone}_persistent`;
+
+        localStorage.setItem("current_user", cookieUser);
+        localStorage.setItem("cleancare_user", cookieUser);
+        localStorage.setItem("auth_token", persistentToken);
+        localStorage.setItem("cleancare_auth_token", persistentToken);
+        console.log("🍎 Restored iPhone auth from cookie backup with token");
+        return true;
+      } catch (e) {
+        // Fallback without token
+        localStorage.setItem("current_user", cookieUser);
+        localStorage.setItem("cleancare_user", cookieUser);
+        console.log("🍎 Restored iPhone auth from cookie backup (no token)");
+        return true;
+      }
     }
   } catch (e) {
     // Cookie restore failed
