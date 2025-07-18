@@ -134,29 +134,39 @@ const SavedAddressesModal: React.FC<SavedAddressesModalProps> = React.memo(
       }
     };
 
-    const handleEditAddress = (updatedAddress: AddressData) => {
-      if (!editingAddress?.id) {
+    const handleEditAddress = async (updatedAddress: AddressData) => {
+      if (!editingAddress?.id && !editingAddress?._id) {
         console.error("No editing address ID found");
         return;
       }
 
-      console.log("💾 Saving edited address:", editingAddress.id);
+      try {
+        console.log(
+          "💾 Updating address with AddressService:",
+          editingAddress.id || editingAddress._id,
+        );
+        const addressService = AddressService.getInstance();
 
-      const updatedAddresses = addresses.map((addr) =>
-        addr.id === editingAddress.id
-          ? {
-              ...updatedAddress,
-              id: editingAddress.id,
-              createdAt: editingAddress.createdAt || new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            }
-          : addr,
-      );
+        const addressToUpdate = {
+          ...updatedAddress,
+          id: editingAddress.id || editingAddress._id,
+          _id: editingAddress._id || editingAddress.id,
+        };
 
-      saveAddresses(updatedAddresses);
-      setEditingAddress(null);
-      setShowAddAddressPage(false);
-      console.log("✅ Address updated successfully");
+        const result = await addressService.saveAddress(addressToUpdate);
+
+        if (result.success) {
+          console.log("✅ Address updated successfully");
+          await loadSavedAddresses(); // Reload addresses from backend
+          setEditingAddress(null);
+          setShowAddAddressPage(false);
+        } else {
+          console.error("❌ Failed to update address:", result.error);
+          // Show user-friendly error message here if needed
+        }
+      } catch (error) {
+        console.error("❌ Error updating address:", error);
+      }
     };
 
     const handleDeleteAddress = async (id: string) => {
