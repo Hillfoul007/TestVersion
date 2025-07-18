@@ -1787,6 +1787,23 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
           Save address
         </Button>
       </div>
+
+      {/* Location Unavailable Modal */}
+      <LocationUnavailableModal
+        isOpen={showLocationUnavailable}
+        onClose={() => setShowLocationUnavailable(false)}
+        detectedLocation={unavailableAddressText}
+        onExplore={() => {
+          console.log(
+            "🔍 User chose to explore available services instead of saving address",
+          );
+          // Clear the form to allow user to try a different address
+          setArea("");
+          setPincode("");
+          setSelectedLocation(null);
+          setSearchQuery("");
+        }}
+      />
     </div>
   );
 };
