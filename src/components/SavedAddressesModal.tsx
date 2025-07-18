@@ -105,13 +105,7 @@ const SavedAddressesModal: React.FC<SavedAddressesModalProps> = React.memo(
       }
     };
 
-    const saveAddresses = (newAddresses: AddressData[]) => {
-      if (!currentUser?.id && !currentUser?._id && !currentUser?.phone) return;
-
-      const userId = currentUser._id || currentUser.id || currentUser.phone;
-      localStorage.setItem(`addresses_${userId}`, JSON.stringify(newAddresses));
-      setAddresses(newAddresses);
-    };
+    // saveAddresses function removed - using AddressService directly
 
     const handleNewAddressSave = async (newAddress: any) => {
       if (!currentUser) return;
