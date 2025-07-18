@@ -509,12 +509,13 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
         return;
       }
 
-      // Validate form and show inline errors
-      console.log("🔍 Starting form validation...");
+      // Validate form with location availability checking
+      console.log("🔍 Starting form validation with location check...");
 
       let errors;
+      let locationUnavailable = false;
       try {
-        errors = validateCheckoutForm(
+        const validationResult = await validateCheckoutFormWithLocation(
           currentUser,
           addressData,
           phoneNumber,
@@ -523,7 +524,9 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
           deliveryDate,
           deliveryTime,
         );
-        console.log("📋 Validation results:", errors);
+        errors = validationResult.errors;
+        locationUnavailable = validationResult.locationUnavailable;
+        console.log("📋 Validation results:", { errors, locationUnavailable });
       } catch (validationError) {
         console.error("❌ Validation function failed:", validationError);
         addNotification(
@@ -532,6 +535,18 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
             "There was an error checking your form. Please try again.",
           ),
         );
+        return;
+      }
+
+      // Handle location unavailable case
+      if (locationUnavailable && addressData?.fullAddress) {
+        console.log(
+          "🚫 Location not available for service:",
+          addressData.fullAddress,
+        );
+        setUnavailableLocationText(addressData.fullAddress);
+        setShowLocationUnavailable(true);
+        setValidationErrors(errors);
         return;
       }
 
