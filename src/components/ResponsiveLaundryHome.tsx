@@ -139,6 +139,77 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
     }
   };
 
+  // Automatic location detection for new users/devices
+  useEffect(() => {
+    const handleAutoLocationDetection = async () => {
+      // Only auto-detect if no location is set and user hasn't explicitly denied
+      if (
+        !userLocation ||
+        (!userLocation.includes("denied") &&
+          !userLocation.includes("access denied"))
+      ) {
+        // Check if we've already detected location for this device recently
+        const lastDetection = localStorage.getItem("lastLocationDetection");
+        const now = Date.now();
+
+        // Only auto-detect once per day per device
+        if (
+          !lastDetection ||
+          now - parseInt(lastDetection) > 24 * 60 * 60 * 1000
+        ) {
+          try {
+            console.log("🔍 Auto-detecting location for new user/device...");
+
+            // Try to get location without triggering permission popup
+            const detectedLocation =
+              await locationDetectionService.detectLocationGPS();
+
+            if (detectedLocation) {
+              console.log("📍 Auto-detected location:", detectedLocation);
+              setDetectedLocationText(detectedLocation.full_address);
+
+              // Save detected location to database
+              await locationDetectionService.saveDetectedLocation(
+                detectedLocation,
+              );
+
+              // Check availability
+              const availability =
+                await locationDetectionService.checkLocationAvailability(
+                  detectedLocation.city,
+                  detectedLocation.pincode,
+                  detectedLocation.full_address,
+                );
+
+              console.log(
+                "🏠 Auto-detected location availability:",
+                availability,
+              );
+
+              if (!availability.is_available) {
+                // Show unavailable popup for auto-detected location
+                setShowLocationUnavailable(true);
+              }
+
+              // Mark that we've detected location for this device
+              localStorage.setItem("lastLocationDetection", now.toString());
+            }
+          } catch (error) {
+            console.log(
+              "🔍 Auto location detection failed (expected for permission restrictions):",
+              error,
+            );
+            // This is expected if user hasn't granted permission - don't show error
+          }
+        }
+      }
+    };
+
+    // Run auto-detection after a short delay to not block initial render
+    const timer = setTimeout(handleAutoLocationDetection, 2000);
+    return () => clearTimeout(timer);
+  }, [userLocation, locationDetectionService]);
+
   // Add keyboard shortcut for booking debug panel
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
