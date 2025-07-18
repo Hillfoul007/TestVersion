@@ -81,7 +81,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   const dvhostingSmsService = DVHostingSmsService.getInstance();
   const locationDetectionService = LocationDetectionService.getInstance();
 
-  // Function to request location permission again
+  // Function to request location permission and check availability
   const requestLocationPermission = async () => {
     setIsRequestingLocation(true);
     try {
@@ -95,7 +95,38 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         },
       );
 
-      // Location successful - reload the page to update location
+      console.log("📍 Location detected:", position.coords);
+
+      // Detect location details using our service
+      const detectedLocation =
+        await locationDetectionService.detectLocationGPS();
+
+      if (detectedLocation) {
+        console.log("📍 Location details:", detectedLocation);
+        setDetectedLocationText(detectedLocation.full_address);
+
+        // Save detected location to database
+        await locationDetectionService.saveDetectedLocation(detectedLocation);
+
+        // Check if location is available for service
+        const availability =
+          await locationDetectionService.checkLocationAvailability(
+            detectedLocation.city,
+            detectedLocation.pincode,
+            detectedLocation.full_address,
+          );
+
+        console.log("🏠 Location availability:", availability);
+
+        if (!availability.is_available) {
+          // Show unavailable popup instead of reloading
+          setShowLocationUnavailable(true);
+          setIsRequestingLocation(false);
+          return;
+        }
+      }
+
+      // If location is available or detection failed, reload as before
       window.location.reload();
     } catch (error) {
       console.error("Location request failed:", error);
