@@ -23,7 +23,33 @@ const LocationUnavailableModal: React.FC<LocationUnavailableModalProps> = ({
   onClose,
   detectedLocation,
   onExplore,
+  onNavigateHome,
 }) => {
+  const handleExploreServices = () => {
+    console.log("🔍 User clicked Explore Available Services");
+
+    // First execute any custom explore logic
+    if (onExplore) {
+      onExplore();
+    }
+
+    // Then navigate to home page
+    if (onNavigateHome) {
+      onNavigateHome();
+    } else {
+      // Fallback: direct navigation to home
+      window.location.href = "/";
+    }
+
+    // Close the modal
+    onClose();
+  };
+
+  const handleMaybeLater = () => {
+    console.log("⏰ User clicked Maybe Later - closing modal");
+    // Just close the modal, allow user to edit address
+    onClose();
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md w-[90vw] mx-auto border-0 shadow-2xl rounded-3xl overflow-hidden bg-white">
