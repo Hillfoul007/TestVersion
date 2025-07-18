@@ -15,6 +15,8 @@ import {
   User,
 } from "lucide-react";
 import { locationService, Coordinates } from "@/services/locationService";
+import { LocationDetectionService } from "@/services/locationDetectionService";
+import LocationUnavailableModal from "./LocationUnavailableModal";
 import { Loader } from "@googlemaps/js-api-loader";
 
 // Add CSS for bounce animation
@@ -127,6 +129,10 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     google.maps.marker.AdvancedMarkerElement | google.maps.Marker | null
   >(null);
   const [isMapLoading, setIsMapLoading] = useState(true);
+
+  // Location availability modal state
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [unavailableAddressText, setUnavailableAddressText] = useState("");
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -1276,7 +1282,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!selectedLocation) return;
 
     // Build complete address from split fields
@@ -1291,6 +1297,37 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     ].filter(Boolean);
 
     const completeAddress = fullAddressParts.join(", ");
+
+    // Check location availability before saving
+    try {
+      console.log("🏠 Checking location availability before saving address:", {
+        area,
+        pincode,
+        completeAddress,
+      });
+
+      const locationService = LocationDetectionService.getInstance();
+      const availability = await locationService.checkLocationAvailability(
+        area, // city
+        pincode,
+        completeAddress,
+      );
+
+      console.log("🏠 Address availability result:", availability);
+
+      if (!availability.is_available) {
+        console.log("🚫 Address not available for service, showing popup");
+        setUnavailableAddressText(completeAddress || selectedLocation.address);
+        setShowLocationUnavailable(true);
+        return; // Don't save the address
+      }
+    } catch (error) {
+      console.error("❌ Error checking address availability:", error);
+      // Continue with saving if location check fails
+      console.warn(
+        "⚠️ Location check failed, allowing address save to proceed",
+      );
+    }
 
     const addressData: AddressData = {
       flatNo: flatNo,
@@ -1750,6 +1787,23 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
           Save address
         </Button>
       </div>
+
+      {/* Location Unavailable Modal */}
+      <LocationUnavailableModal
+        isOpen={showLocationUnavailable}
+        onClose={() => setShowLocationUnavailable(false)}
+        detectedLocation={unavailableAddressText}
+        onExplore={() => {
+          console.log(
+            "🔍 User chose to explore available services instead of saving address",
+          );
+          // Clear the form to allow user to try a different address
+          setArea("");
+          setPincode("");
+          setSelectedLocation(null);
+          setSearchQuery("");
+        }}
+      />
     </div>
   );
 };

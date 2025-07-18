@@ -135,7 +135,7 @@ export const restoreAuthState = async (): Promise<boolean> => {
 
     // First try iPhone-specific restoration if on iOS
     if (isIosDevice()) {
-      const iosRestored = restoreIosAuth();
+      const iosRestored = await restoreIosAuth();
       if (iosRestored) {
         console.log("🍎 iPhone auth restored from backup");
       }

@@ -9,10 +9,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Edit, Save, X, LogOut, Gift, Copy, Calendar } from "lucide-react";
+import {
+  Edit,
+  Save,
+  X,
+  LogOut,
+  Gift,
+  Copy,
+  Calendar,
+  MapPin,
+} from "lucide-react";
 import { ReferralService } from "@/services/referralService";
 import { useToast } from "@/hooks/use-toast";
 import UserService from "@/services/userService";
+import SavedAddressesModal from "./SavedAddressesModal";
 
 interface ProfileSettingsModalProps {
   isOpen: boolean;
@@ -30,6 +40,7 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({
   onLogout,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
   const [formData, setFormData] = useState({
     name: currentUser?.name || "",
     email: currentUser?.email || "",
@@ -327,6 +338,40 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({
             </div>
           </div>
 
+          {/* Address Management Section */}
+          <div className="pt-6 border-t border-gray-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-green-600" />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Saved Addresses
+                </h3>
+              </div>
+              <Button
+                onClick={() => setShowAddressModal(true)}
+                variant="outline"
+                size="sm"
+                className="text-green-600 border-green-200 hover:bg-green-50 hover:border-green-300"
+              >
+                Manage
+              </Button>
+            </div>
+
+            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-xl border border-blue-200">
+              <p className="text-sm text-gray-600 mb-2">
+                Manage your delivery addresses for faster checkout
+              </p>
+              <Button
+                onClick={() => setShowAddressModal(true)}
+                variant="ghost"
+                size="sm"
+                className="text-blue-600 hover:bg-blue-100 p-0 h-auto font-medium"
+              >
+                View & Edit Addresses →
+              </Button>
+            </div>
+          </div>
+
           {/* Logout Button */}
           {onLogout && (
             <div className="pt-6 border-t border-gradient-to-r from-transparent via-gray-200 to-transparent">
@@ -351,6 +396,13 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({
           )}
         </div>
       </DialogContent>
+
+      {/* Address Management Modal */}
+      <SavedAddressesModal
+        isOpen={showAddressModal}
+        onClose={() => setShowAddressModal(false)}
+        currentUser={currentUser}
+      />
     </Dialog>
   );
 };

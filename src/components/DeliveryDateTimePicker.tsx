@@ -174,18 +174,18 @@ const DeliveryDateTimePicker: React.FC<DeliveryDateTimePickerProps> = ({
   const timeSlots = generateDeliveryTimeSlots();
   const earliestDateTime = getEarliestDeliveryDateTime();
 
-  // Auto-select earliest date if none selected and pickup is scheduled
+  // Clear delivery date and time when pickup date/time changes
   useEffect(() => {
-    if (pickupDate && pickupTime && !selectedDeliveryDate) {
-      onDeliveryDateChange(availableDates[0]?.date);
+    if (selectedDeliveryDate || selectedDeliveryTime) {
+      // Only clear if there was something selected before
+      onDeliveryDateChange(undefined);
+      onDeliveryTimeChange("");
+      console.log("🗓️ Cleared delivery date/time due to pickup date change");
     }
-  }, [
-    pickupDate,
-    pickupTime,
-    selectedDeliveryDate,
-    availableDates,
-    onDeliveryDateChange,
-  ]);
+  }, [pickupDate, pickupTime]);
+
+  // Don't auto-select delivery date - let user choose manually
+  // This ensures user makes a conscious choice for delivery date
 
   // Show warning if no pickup is scheduled
   if (!pickupDate || !pickupTime) {
@@ -233,7 +233,7 @@ const DeliveryDateTimePicker: React.FC<DeliveryDateTimePickerProps> = ({
           {availableDates.length > 0 && (
             <Button
               variant={
-                !selectedDeliveryDate ||
+                selectedDeliveryDate &&
                 isSameDay(selectedDeliveryDate, availableDates[0].date)
                   ? "default"
                   : "outline"

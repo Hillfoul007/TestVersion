@@ -249,6 +249,14 @@ const LaundryIndex = () => {
       handleReferralBonus as EventListener,
     );
 
+    // Handle iOS session restoration
+    const handleIOSSessionRestore = () => {
+      console.log("📱 iOS session restoration event received");
+      checkAuthState(); // Refresh auth state from localStorage
+    };
+
+    window.addEventListener("ios-session-restored", handleIOSSessionRestore);
+
     return () => {
       window.removeEventListener(
         "auth-login",
@@ -258,6 +266,10 @@ const LaundryIndex = () => {
       window.removeEventListener(
         "referralBonusAwarded",
         handleReferralBonus as EventListener,
+      );
+      window.removeEventListener(
+        "ios-session-restored",
+        handleIOSSessionRestore,
       );
     };
   }, []);
@@ -774,7 +786,7 @@ const LaundryIndex = () => {
         <>
           {/* Referral Discount Banner */}
           {currentUser && (
-            <div className="px-4 pt-4">
+            <div className="px-4 pt-4 bg-gradient-to-r from-green-500 to-green-600">
               <ReferralDiscountBanner user={currentUser} />
             </div>
           )}

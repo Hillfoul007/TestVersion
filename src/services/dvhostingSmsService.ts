@@ -719,6 +719,24 @@ export class DVHostingSmsService {
         console.log(
           "✅ User authentication saved to localStorage (persistent session)",
         );
+
+        // Save to IndexedDB on iPhone for extra persistence
+        if (
+          /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+        ) {
+          import("../utils/iosAuthFix").then(({ saveIosAuthToIndexedDB }) => {
+            const currentToken =
+              token ||
+              localStorage.getItem("auth_token") ||
+              localStorage.getItem("cleancare_auth_token");
+            if (currentToken) {
+              saveIosAuthToIndexedDB(user, currentToken).catch((error) => {
+                console.warn("📱⚠️ Failed to save to IndexedDB:", error);
+              });
+            }
+          });
+        }
       }
     } catch (error) {
       console.error("Error setting current user:", error);

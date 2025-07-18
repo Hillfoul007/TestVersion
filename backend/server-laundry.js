@@ -210,6 +210,17 @@ try {
   console.error("❌ Failed to load Referral routes:", error.message);
 }
 
+// Detected Locations routes
+try {
+  const detectedLocationRoutes = require("./routes/detected-locations");
+  app.use("/api/detected-locations", detectedLocationRoutes);
+  console.log(
+    "🔗 Detected Locations routes registered at /api/detected-locations",
+  );
+} catch (error) {
+  console.error("❌ Failed to load Detected Locations routes:", error.message);
+}
+
 // Google Sheets integration removed
 
 // Push notification endpoints
@@ -463,7 +474,7 @@ process.on("uncaughtException", (err) => {
 
 // Handle unhandled promise rejections
 process.on("unhandledRejection", (reason, promise) => {
-  console.error("💥 Unhandled Rejection at:", promise, "reason:", reason);
+  console.error("��� Unhandled Rejection at:", promise, "reason:", reason);
   gracefulShutdown("unhandledRejection");
 });
 

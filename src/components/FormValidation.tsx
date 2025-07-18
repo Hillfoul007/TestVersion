@@ -132,4 +132,77 @@ export const validateCheckoutForm = (
   return errors;
 };
 
+// Async helper function to validate checkout form with location availability
+export const validateCheckoutFormWithLocation = async (
+  currentUser: any,
+  addressData: any,
+  phoneNumber: string,
+  selectedDate: Date | null,
+  selectedTime: string,
+  deliveryDate?: Date | null,
+  deliveryTime?: string,
+): Promise<{ errors: ValidationError[]; locationUnavailable: boolean }> => {
+  // Get basic validation errors first
+  const errors = validateCheckoutForm(
+    currentUser,
+    addressData,
+    phoneNumber,
+    selectedDate,
+    selectedTime,
+    deliveryDate,
+    deliveryTime,
+  );
+
+  let locationUnavailable = false;
+
+  // If address is provided, check location availability
+  if (addressData && addressData.fullAddress) {
+    try {
+      // Import the service dynamically to avoid circular dependencies
+      const { LocationDetectionService } = await import(
+        "@/services/locationDetectionService"
+      );
+      const locationService = LocationDetectionService.getInstance();
+
+      // Extract city from address for availability check
+      const city = addressData.city || addressData.village || "";
+      const pincode = addressData.pincode || "";
+
+      console.log("🏠 Checking location availability for booking:", {
+        city,
+        pincode,
+        address: addressData.fullAddress,
+      });
+
+      const availability = await locationService.checkLocationAvailability(
+        city,
+        pincode,
+        addressData.fullAddress,
+      );
+
+      console.log("🏠 Location availability result:", availability);
+
+      if (!availability.is_available) {
+        locationUnavailable = true;
+        errors.push({
+          field: "location",
+          message:
+            "Service not available in your area.",
+        });
+      }
+    } catch (error) {
+      console.error(
+        "❌ Error checking location availability during booking:",
+        error,
+      );
+      // Don't block booking if location check fails - assume available
+      console.warn(
+        "⚠️ Location availability check failed, allowing booking to proceed",
+      );
+    }
+  }
+
+  return { errors, locationUnavailable };
+};
+
 export default FormValidation;

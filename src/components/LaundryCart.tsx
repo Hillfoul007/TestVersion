@@ -41,7 +41,12 @@ import {
 import SimplifiedAddressForm from "./SimplifiedAddressForm";
 import ProfessionalDateTimePicker from "./ProfessionalDateTimePicker";
 import DeliveryDateTimePicker from "./DeliveryDateTimePicker";
-import { FormValidation, validateCheckoutForm } from "./FormValidation";
+import {
+  FormValidation,
+  validateCheckoutForm,
+  validateCheckoutFormWithLocation,
+} from "./FormValidation";
+import LocationUnavailableModal from "./LocationUnavailableModal";
 import SavedAddressesModal from "./SavedAddressesModal";
 import ZomatoAddressSelector from "./ZomatoAddressSelector";
 import ZomatoAddAddressPage from "./ZomatoAddAddressPage";
@@ -76,6 +81,10 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
     maxDiscount?: number;
     isReferral?: boolean;
   } | null>(null);
+
+  // Location availability modal state
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [unavailableLocationText, setUnavailableLocationText] = useState("");
 
   const authService = OTPAuthService.getInstance();
   const referralService = ReferralService.getInstance();
@@ -500,12 +509,13 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
         return;
       }
 
-      // Validate form and show inline errors
-      console.log("🔍 Starting form validation...");
+      // Validate form with location availability checking
+      console.log("🔍 Starting form validation with location check...");
 
       let errors;
+      let locationUnavailable = false;
       try {
-        errors = validateCheckoutForm(
+        const validationResult = await validateCheckoutFormWithLocation(
           currentUser,
           addressData,
           phoneNumber,
@@ -514,7 +524,9 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
           deliveryDate,
           deliveryTime,
         );
-        console.log("📋 Validation results:", errors);
+        errors = validationResult.errors;
+        locationUnavailable = validationResult.locationUnavailable;
+        console.log("📋 Validation results:", { errors, locationUnavailable });
       } catch (validationError) {
         console.error("❌ Validation function failed:", validationError);
         addNotification(
@@ -523,6 +535,18 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
             "There was an error checking your form. Please try again.",
           ),
         );
+        return;
+      }
+
+      // Handle location unavailable case
+      if (locationUnavailable && addressData?.fullAddress) {
+        console.log(
+          "🚫 Location not available for service:",
+          addressData.fullAddress,
+        );
+        setUnavailableLocationText(addressData.fullAddress);
+        setShowLocationUnavailable(true);
+        setValidationErrors(errors);
         return;
       }
 
@@ -1280,6 +1304,21 @@ Confirm this booking?`;
           setShowSavedAddresses(false);
         }}
         currentUser={currentUser}
+      />
+
+      {/* Location Unavailable Modal */}
+      <LocationUnavailableModal
+        isOpen={showLocationUnavailable}
+        onClose={() => setShowLocationUnavailable(false)}
+        detectedLocation={unavailableLocationText}
+        onExplore={() => {
+          console.log(
+            "🔍 User chose to explore available services instead of booking",
+          );
+          // Clear the problematic address to allow user to select a different one
+          setAddressData(null);
+          setValidationErrors([]);
+        }}
       />
     </div>
   );

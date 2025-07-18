@@ -84,77 +84,83 @@ const SavedAddressesModal: React.FC<SavedAddressesModalProps> = React.memo(
       }
     }, [isOpen, currentUser]);
 
-    const loadSavedAddresses = () => {
+    const loadSavedAddresses = async () => {
       if (!currentUser?.id && !currentUser?._id && !currentUser?.phone) return;
 
-      const userId = currentUser._id || currentUser.id || currentUser.phone;
-      const savedAddresses = localStorage.getItem(`addresses_${userId}`);
+      try {
+        console.log("📍 Loading saved addresses from AddressService...");
+        const addressService = AddressService.getInstance();
+        const result = await addressService.getUserAddresses();
 
-      if (savedAddresses) {
-        try {
-          const parsedAddresses = JSON.parse(savedAddresses);
-          setAddresses(Array.isArray(parsedAddresses) ? parsedAddresses : []);
-        } catch (error) {
-          console.error("Error parsing saved addresses:", error);
+        if (result.success && result.data) {
+          setAddresses(Array.isArray(result.data) ? result.data : []);
+          console.log(`✅ Loaded ${result.data.length} saved addresses`);
+        } else {
+          console.warn("⚠️ Failed to load addresses:", result.error);
           setAddresses([]);
         }
-      } else {
+      } catch (error) {
+        console.error("❌ Error loading saved addresses:", error);
         setAddresses([]);
       }
     };
 
-    const saveAddresses = (newAddresses: AddressData[]) => {
-      if (!currentUser?.id && !currentUser?._id && !currentUser?.phone) return;
+    // saveAddresses function removed - using AddressService directly
 
-      const userId = currentUser._id || currentUser.id || currentUser.phone;
-      localStorage.setItem(`addresses_${userId}`, JSON.stringify(newAddresses));
-      setAddresses(newAddresses);
-    };
-
-    const handleNewAddressSave = (newAddress: any) => {
+    const handleNewAddressSave = async (newAddress: any) => {
       if (!currentUser) return;
 
       try {
-        const addressWithId = {
-          ...newAddress,
-          id: `addr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
+        console.log("💾 Saving new address with AddressService...");
+        const addressService = AddressService.getInstance();
+        const result = await addressService.saveAddress(newAddress);
 
-        const updatedAddresses = [...addresses, addressWithId];
-        saveAddresses(updatedAddresses);
-
-        setShowAddAddressPage(false);
-        console.log("✅ New address saved successfully");
+        if (result.success) {
+          console.log("✅ New address saved successfully");
+          await loadSavedAddresses(); // Reload addresses from backend
+          setShowAddAddressPage(false);
+        } else {
+          console.error("❌ Failed to save address:", result.error);
+          // Show user-friendly error message here if needed
+        }
       } catch (error) {
-        console.error("Failed to save new address:", error);
+        console.error("❌ Error saving new address:", error);
       }
     };
 
-    const handleEditAddress = (updatedAddress: AddressData) => {
-      if (!editingAddress?.id) {
+    const handleEditAddress = async (updatedAddress: AddressData) => {
+      if (!editingAddress?.id && !editingAddress?._id) {
         console.error("No editing address ID found");
         return;
       }
 
-      console.log("💾 Saving edited address:", editingAddress.id);
+      try {
+        console.log(
+          "💾 Updating address with AddressService:",
+          editingAddress.id || editingAddress._id,
+        );
+        const addressService = AddressService.getInstance();
 
-      const updatedAddresses = addresses.map((addr) =>
-        addr.id === editingAddress.id
-          ? {
-              ...updatedAddress,
-              id: editingAddress.id,
-              createdAt: editingAddress.createdAt || new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            }
-          : addr,
-      );
+        const addressToUpdate = {
+          ...updatedAddress,
+          id: editingAddress.id || editingAddress._id,
+          _id: editingAddress._id || editingAddress.id,
+        };
 
-      saveAddresses(updatedAddresses);
-      setEditingAddress(null);
-      setShowAddAddressPage(false);
-      console.log("✅ Address updated successfully");
+        const result = await addressService.saveAddress(addressToUpdate);
+
+        if (result.success) {
+          console.log("✅ Address updated successfully");
+          await loadSavedAddresses(); // Reload addresses from backend
+          setEditingAddress(null);
+          setShowAddAddressPage(false);
+        } else {
+          console.error("❌ Failed to update address:", result.error);
+          // Show user-friendly error message here if needed
+        }
+      } catch (error) {
+        console.error("❌ Error updating address:", error);
+      }
     };
 
     const handleDeleteAddress = async (id: string) => {
@@ -167,32 +173,17 @@ const SavedAddressesModal: React.FC<SavedAddressesModalProps> = React.memo(
       try {
         console.log("🗑️ Deleting address with ID:", id);
 
-        // Immediately remove from UI for better UX
-        const updatedAddresses = addresses.filter(
-          (addr) => addr.id !== id && addr._id !== id,
-        );
-
-        // Update localStorage first
-        saveAddresses(updatedAddresses);
-
-        // Try to delete from backend (don't await to avoid blocking UI)
+        console.log("🗑️ Deleting address with AddressService...");
         const addressService = AddressService.getInstance();
-        addressService
-          .deleteAddress(id)
-          .then((result) => {
-            if (result.success) {
-              console.log("✅ Address deleted from backend:", result.message);
-            } else {
-              console.warn(
-                "⚠️ Backend deletion failed, but local deletion succeeded:",
-                result.error,
-              );
-            }
-          })
-          .catch((error) => {
-            console.warn("❌ Backend deletion error:", error);
-            // Keep local deletion even if backend fails
-          });
+        const result = await addressService.deleteAddress(id);
+
+        if (result.success) {
+          console.log("✅ Address deleted successfully:", result.message);
+          await loadSavedAddresses(); // Reload addresses from backend
+        } else {
+          console.error("❌ Failed to delete address:", result.error);
+          // Show user-friendly error message here if needed
+        }
 
         console.log("✅ Address deleted from UI and localStorage");
       } catch (error) {

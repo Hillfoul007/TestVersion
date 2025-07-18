@@ -46,7 +46,9 @@ import ConnectionStatus from "./ConnectionStatus";
 import NotificationPanel from "./NotificationPanel";
 import VoiceSearch from "./VoiceSearch";
 import AdminServicesManager from "./AdminServicesManager";
+import LocationUnavailableModal from "./LocationUnavailableModal";
 import { DVHostingSmsService } from "@/services/dvhostingSmsService";
+import { LocationDetectionService } from "@/services/locationDetectionService";
 import { saveCartData, getCartData } from "@/utils/formPersistence";
 import "@/styles/mobile-sticky-search.css";
 import { preloadCriticalImages } from "@/utils/imagePreloader";
@@ -74,9 +76,12 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   const [showBookingDebugPanel, setShowBookingDebugPanel] = useState(false);
   const [showAdminServices, setShowAdminServices] = useState(false);
   const [isRequestingLocation, setIsRequestingLocation] = useState(false);
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [detectedLocationText, setDetectedLocationText] = useState("");
   const dvhostingSmsService = DVHostingSmsService.getInstance();
+  const locationDetectionService = LocationDetectionService.getInstance();
 
-  // Function to request location permission again
+  // Function to request location permission and check availability
   const requestLocationPermission = async () => {
     setIsRequestingLocation(true);
     try {
@@ -90,7 +95,38 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         },
       );
 
-      // Location successful - reload the page to update location
+      console.log("📍 Location detected:", position.coords);
+
+      // Detect location details using our service
+      const detectedLocation =
+        await locationDetectionService.detectLocationGPS();
+
+      if (detectedLocation) {
+        console.log("📍 Location details:", detectedLocation);
+        setDetectedLocationText(detectedLocation.full_address);
+
+        // Save detected location to database
+        await locationDetectionService.saveDetectedLocation(detectedLocation);
+
+        // Check if location is available for service
+        const availability =
+          await locationDetectionService.checkLocationAvailability(
+            detectedLocation.city,
+            detectedLocation.pincode,
+            detectedLocation.full_address,
+          );
+
+        console.log("🏠 Location availability:", availability);
+
+        if (!availability.is_available) {
+          // Show unavailable popup instead of reloading
+          setShowLocationUnavailable(true);
+          setIsRequestingLocation(false);
+          return;
+        }
+      }
+
+      // If location is available or detection failed, reload as before
       window.location.reload();
     } catch (error) {
       console.error("Location request failed:", error);
@@ -102,6 +138,77 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
       setIsRequestingLocation(false);
     }
   };
+
+  // Automatic location detection for new users/devices
+  useEffect(() => {
+    const handleAutoLocationDetection = async () => {
+      // Only auto-detect if no location is set and user hasn't explicitly denied
+      if (
+        !userLocation ||
+        (!userLocation.includes("denied") &&
+          !userLocation.includes("access denied"))
+      ) {
+        // Check if we've already detected location for this device recently
+        const lastDetection = localStorage.getItem("lastLocationDetection");
+        const now = Date.now();
+
+        // Only auto-detect once per day per device
+        if (
+          !lastDetection ||
+          now - parseInt(lastDetection) > 24 * 60 * 60 * 1000
+        ) {
+          try {
+            console.log("🔍 Auto-detecting location for new user/device...");
+
+            // Try to get location without triggering permission popup
+            const detectedLocation =
+              await locationDetectionService.detectLocationGPS();
+
+            if (detectedLocation) {
+              console.log("📍 Auto-detected location:", detectedLocation);
+              setDetectedLocationText(detectedLocation.full_address);
+
+              // Save detected location to database
+              await locationDetectionService.saveDetectedLocation(
+                detectedLocation,
+              );
+
+              // Check availability
+              const availability =
+                await locationDetectionService.checkLocationAvailability(
+                  detectedLocation.city,
+                  detectedLocation.pincode,
+                  detectedLocation.full_address,
+                );
+
+              console.log(
+                "🏠 Auto-detected location availability:",
+                availability,
+              );
+
+              if (!availability.is_available) {
+                // Show unavailable popup for auto-detected location
+                setShowLocationUnavailable(true);
+              }
+
+              // Mark that we've detected location for this device
+              localStorage.setItem("lastLocationDetection", now.toString());
+            }
+          } catch (error) {
+            console.log(
+              "🔍 Auto location detection failed (expected for permission restrictions):",
+              error,
+            );
+            // This is expected if user hasn't granted permission - don't show error
+          }
+        }
+      }
+    };
+
+    // Run auto-detection after a short delay to not block initial render
+    const timer = setTimeout(handleAutoLocationDetection, 2000);
+    return () => clearTimeout(timer);
+  }, [userLocation, locationDetectionService]);
 
   // Add keyboard shortcut for booking debug panel
   useEffect(() => {
@@ -1224,6 +1331,17 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
         {/* Connection Status */}
         <ConnectionStatus />
+
+        {/* Location Unavailable Modal */}
+        <LocationUnavailableModal
+          isOpen={showLocationUnavailable}
+          onClose={() => setShowLocationUnavailable(false)}
+          detectedLocation={detectedLocationText}
+          onExplore={() => {
+            console.log("🔍 User chose to explore available services");
+            // You can add navigation logic here if needed
+          }}
+        />
 
         {/* Google Sheets integration removed */}
       </div>
