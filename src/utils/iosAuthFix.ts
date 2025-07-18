@@ -64,6 +64,19 @@ export const isIosDevice = (): boolean => {
   );
 };
 
+export const isPWAMode = (): boolean => {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    (window.navigator as any).standalone === true ||
+    document.referrer.includes("android-app://") ||
+    window.location.search.includes("pwa=true")
+  );
+};
+
+export const isIosPWA = (): boolean => {
+  return isIosDevice() && isPWAMode();
+};
+
 export const addIosOtpDelay = async (): Promise<void> => {
   if (isIosDevice()) {
     // Add 2-3 second delay for iOS to prevent DVHosting rate limiting
