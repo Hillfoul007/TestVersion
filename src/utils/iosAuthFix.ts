@@ -192,6 +192,35 @@ export const preventIosAutoLogout = (): void => {
 
   // Run initial preservation
   preserveAuth();
+
+  // Aggressive session monitoring for iPhone - check every 10 seconds
+  setInterval(async () => {
+    const user =
+      localStorage.getItem("current_user") ||
+      localStorage.getItem("cleancare_user");
+    const token =
+      localStorage.getItem("auth_token") ||
+      localStorage.getItem("cleancare_auth_token");
+
+    if (!user || !token) {
+      console.log("🍎🚨 iPhone session lost detected - attempting restoration");
+      const restored = await restoreIosAuth();
+      if (restored) {
+        console.log("🍎✅ iPhone session successfully restored");
+        // Trigger a custom event to notify the app
+        window.dispatchEvent(
+          new CustomEvent("ios-session-restored", {
+            detail: {
+              user: JSON.parse(localStorage.getItem("current_user") || "{}"),
+              restored: true,
+            },
+          }),
+        );
+      } else {
+        console.log("🍎❌ iPhone session restoration failed");
+      }
+    }
+  }, 10000); // Check every 10 seconds
 };
 
 /**
