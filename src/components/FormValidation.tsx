@@ -187,7 +187,7 @@ export const validateCheckoutFormWithLocation = async (
         errors.push({
           field: "location",
           message:
-            "Service not available in your area. We currently serve Sector 69, Gurgaon only.",
+            "Service not available in your area.",
         });
       }
     } catch (error) {
