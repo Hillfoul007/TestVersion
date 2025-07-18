@@ -39,6 +39,7 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({
   onLogout,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
   const [formData, setFormData] = useState({
     name: currentUser?.name || "",
     email: currentUser?.email || "",
