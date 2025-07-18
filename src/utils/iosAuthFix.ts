@@ -200,13 +200,21 @@ export const preventIosAutoLogout = (): void => {
     }
   };
 
-  // Run preservation every 30 seconds on iPhone
-  setInterval(preserveAuth, 30000);
+  // Different intervals for PWA vs Safari
+  const preservationInterval = isPWAMode() ? 15000 : 30000; // PWA: every 15s, Safari: every 30s
+  const monitoringInterval = isPWAMode() ? 5000 : 10000; // PWA: every 5s, Safari: every 10s
+
+  console.log(
+    `🍎 ${isPWAMode() ? "PWA" : "Safari"} mode detected - using ${preservationInterval / 1000}s preservation interval`,
+  );
+
+  // Run preservation more frequently for PWA
+  setInterval(preserveAuth, preservationInterval);
 
   // Run initial preservation
   preserveAuth();
 
-  // Aggressive session monitoring for iPhone - check every 10 seconds
+  // Aggressive session monitoring for iPhone - more frequent for PWA
   setInterval(async () => {
     const user =
       localStorage.getItem("current_user") ||
@@ -216,24 +224,31 @@ export const preventIosAutoLogout = (): void => {
       localStorage.getItem("cleancare_auth_token");
 
     if (!user || !token) {
-      console.log("🍎🚨 iPhone session lost detected - attempting restoration");
+      console.log(
+        `🍎🚨 iPhone ${isPWAMode() ? "PWA" : "Safari"} session lost detected - attempting restoration`,
+      );
       const restored = await restoreIosAuth();
       if (restored) {
-        console.log("🍎✅ iPhone session successfully restored");
+        console.log(
+          `🍎✅ iPhone ${isPWAMode() ? "PWA" : "Safari"} session successfully restored`,
+        );
         // Trigger a custom event to notify the app
         window.dispatchEvent(
           new CustomEvent("ios-session-restored", {
             detail: {
               user: JSON.parse(localStorage.getItem("current_user") || "{}"),
               restored: true,
+              mode: isPWAMode() ? "pwa" : "safari",
             },
           }),
         );
       } else {
-        console.log("🍎❌ iPhone session restoration failed");
+        console.log(
+          `🍎❌ iPhone ${isPWAMode() ? "PWA" : "Safari"} session restoration failed`,
+        );
       }
     }
-  }, 10000); // Check every 10 seconds
+  }, monitoringInterval);
 };
 
 /**
