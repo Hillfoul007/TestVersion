@@ -113,24 +113,24 @@ const SavedAddressesModal: React.FC<SavedAddressesModalProps> = React.memo(
       setAddresses(newAddresses);
     };
 
-    const handleNewAddressSave = (newAddress: any) => {
+    const handleNewAddressSave = async (newAddress: any) => {
       if (!currentUser) return;
 
       try {
-        const addressWithId = {
-          ...newAddress,
-          id: `addr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
+        console.log("💾 Saving new address with AddressService...");
+        const addressService = AddressService.getInstance();
+        const result = await addressService.saveAddress(newAddress);
 
-        const updatedAddresses = [...addresses, addressWithId];
-        saveAddresses(updatedAddresses);
-
-        setShowAddAddressPage(false);
-        console.log("✅ New address saved successfully");
+        if (result.success) {
+          console.log("✅ New address saved successfully");
+          await loadSavedAddresses(); // Reload addresses from backend
+          setShowAddAddressPage(false);
+        } else {
+          console.error("❌ Failed to save address:", result.error);
+          // Show user-friendly error message here if needed
+        }
       } catch (error) {
-        console.error("Failed to save new address:", error);
+        console.error("❌ Error saving new address:", error);
       }
     };
 
