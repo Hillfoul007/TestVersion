@@ -90,7 +90,50 @@ export const addIosOtpDelay = async (): Promise<void> => {
 export const preventIosAutoLogout = (): void => {
   if (!isIosDevice()) return;
 
-  console.log("🍎 Initializing iPhone-specific auth persistence");
+  const mode = isPWAMode() ? "PWA" : "Safari";
+  console.log(
+    `🍎 Initializing iPhone-specific auth persistence for ${mode} mode`,
+  );
+
+  // PWA launch detection - immediate auth check
+  if (isPWAMode()) {
+    console.log("🍎📱 PWA mode detected - performing immediate auth check");
+    setTimeout(async () => {
+      const user =
+        localStorage.getItem("current_user") ||
+        localStorage.getItem("cleancare_user");
+      const token =
+        localStorage.getItem("auth_token") ||
+        localStorage.getItem("cleancare_auth_token");
+
+      if (!user || !token) {
+        console.log("🍎📱 PWA launch - no auth found, attempting restoration");
+        const restored = await restoreIosAuth();
+        if (restored) {
+          console.log("🍎📱 PWA launch - auth restored successfully");
+          window.dispatchEvent(
+            new CustomEvent("ios-session-restored", {
+              detail: {
+                user: JSON.parse(localStorage.getItem("current_user") || "{}"),
+                restored: true,
+                mode: "pwa",
+                trigger: "launch",
+              },
+            }),
+          );
+        }
+      } else {
+        console.log("🍎📱 PWA launch - auth found, preserving state");
+        // Ensure auth is preserved
+        try {
+          const userObj = JSON.parse(user);
+          await saveIosAuthToIndexedDB(userObj, token);
+        } catch (e) {
+          console.warn("🍎📱 PWA launch - failed to save to IndexedDB:", e);
+        }
+      }
+    }, 1000); // Wait 1 second after launch
+  }
 
   // Handle iOS PWA state changes that can clear localStorage
   document.addEventListener("visibilitychange", () => {
