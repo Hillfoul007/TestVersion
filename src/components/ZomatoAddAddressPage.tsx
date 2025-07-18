@@ -129,6 +129,10 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
   >(null);
   const [isMapLoading, setIsMapLoading] = useState(true);
 
+  // Location availability modal state
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [unavailableAddressText, setUnavailableAddressText] = useState("");
+
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
