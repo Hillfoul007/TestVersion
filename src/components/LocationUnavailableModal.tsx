@@ -14,7 +14,8 @@ interface LocationUnavailableModalProps {
   isOpen: boolean;
   onClose: () => void;
   detectedLocation?: string;
-  onExplore: () => void;
+  onExplore?: () => void;
+  onNavigateHome?: () => void;
 }
 
 const LocationUnavailableModal: React.FC<LocationUnavailableModalProps> = ({
