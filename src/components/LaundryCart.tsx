@@ -82,6 +82,10 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
     isReferral?: boolean;
   } | null>(null);
 
+  // Location availability modal state
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [unavailableLocationText, setUnavailableLocationText] = useState("");
+
   const authService = OTPAuthService.getInstance();
   const referralService = ReferralService.getInstance();
 
