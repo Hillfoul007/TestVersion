@@ -179,7 +179,7 @@ export const calculateDeliveryDate = (
     console.error("Error calculating delivery date:", error);
     return {
       date: pickupDate,
-      time: "18:00",
+      time: deliveryTime || "18:00",
     };
   }
 };
