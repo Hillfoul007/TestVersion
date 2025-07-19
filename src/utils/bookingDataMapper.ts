@@ -287,6 +287,7 @@ export const mapBookingData = (rawBooking: any): MappedBookingData => {
 
   return {
     id: rawBooking._id || rawBooking.id,
+    _id: rawBooking._id,
     custom_order_id: rawBooking.custom_order_id || rawBooking.order_id || "",
     status: rawBooking.status || "pending",
     customer_name: rawBooking.name || "N/A",
@@ -302,6 +303,10 @@ export const mapBookingData = (rawBooking: any): MappedBookingData => {
     created_at: rawBooking.created_at || rawBooking.createdAt || "",
     order_notes:
       rawBooking.additional_details || rawBooking.special_instructions,
+    // Legacy properties for backward compatibility
+    totalAmount: pricing.final_amount,
+    total_price: pricing.final_amount,
+    final_amount: pricing.final_amount,
   };
 };
 
