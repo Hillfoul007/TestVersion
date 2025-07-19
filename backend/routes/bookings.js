@@ -555,6 +555,84 @@ router.post("/", async (req, res) => {
     );
     console.log("🆔 Generated custom order ID:", booking.custom_order_id);
 
+    // Save booking address to addresses table for future use
+    try {
+      console.log("💾 Saving booking address to addresses table...");
+
+      if (sanitizedAddress && sanitizedAddress.length > 10 && customer._id) {
+        // Check if this address already exists for the user
+        const existingAddress = await Address.findOne({
+          user_id: customer._id,
+          full_address: sanitizedAddress,
+          status: "active",
+        });
+
+        if (!existingAddress) {
+          // Parse address components from addressObject or sanitizedAddress
+          let addressData = {
+            user_id: customer._id,
+            title: "Recent Address",
+            full_address: sanitizedAddress,
+            area: "",
+            city: "",
+            state: "India",
+            pincode: "",
+            landmark: "",
+            coordinates: coordinates || {},
+            address_type: "other",
+            is_default: false,
+            status: "active",
+          };
+
+          // If we have structured address data, use it
+          if (addressObject) {
+            addressData.area = addressObject.area || addressObject.street || "";
+            addressData.city =
+              addressObject.city || addressObject.village || "";
+            addressData.pincode = addressObject.pincode || "";
+            addressData.landmark = addressObject.landmark || "";
+            addressData.coordinates =
+              addressObject.coordinates || coordinates || {};
+          } else {
+            // Try to parse components from address string
+            const parts = sanitizedAddress.split(",").map((s) => s.trim());
+            addressData.area = parts[1] || "";
+            addressData.city = parts[parts.length - 2] || "";
+            addressData.pincode = parts[parts.length - 1] || "";
+
+            // Look for landmark (contains "near")
+            const landmarkPart = parts.find((p) =>
+              p.toLowerCase().includes("near"),
+            );
+            if (landmarkPart) {
+              addressData.landmark = landmarkPart.replace(/near\s*/i, "");
+            }
+          }
+
+          const savedAddress = await Address.create(addressData);
+          console.log(
+            "✅ Booking address saved to addresses table:",
+            savedAddress._id,
+          );
+        } else {
+          console.log(
+            "ℹ️ Address already exists in addresses table:",
+            existingAddress._id,
+          );
+        }
+      } else {
+        console.log(
+          "⚠️ Skipping address save - insufficient data or invalid customer",
+        );
+      }
+    } catch (addressError) {
+      console.error(
+        "❌ Error saving address to addresses table:",
+        addressError,
+      );
+      // Don't fail the booking if address saving fails
+    }
+
     // Handle referral discounts after successful booking save
     try {
       console.log("��� Checking for referral discounts...");
@@ -615,7 +693,7 @@ router.post("/", async (req, res) => {
             $inc: { "referral_stats.pending_rewards": 1 },
           });
 
-          console.log("��� Referral discount applied successfully");
+          console.log("✅ Referral discount applied successfully");
         }
       }
     } catch (referralError) {
