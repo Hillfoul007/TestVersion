@@ -192,7 +192,7 @@ const DeliveryDateTimePicker: React.FC<DeliveryDateTimePickerProps> = ({
     return (
       <div
         className={cn(
-          "space-y-3 p-4 bg-amber-50 border border-amber-200 rounded-lg",
+          "space-y-3 p-4 bg-amber-50 border border-amber-200 sm:border-amber-200 border-amber-600 rounded-lg",
           className,
         )}
       >
