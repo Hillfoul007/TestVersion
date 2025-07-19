@@ -173,7 +173,7 @@ export const calculateDeliveryDate = (
 
     return {
       date: formattedDate,
-      time: "18:00", // Default evening delivery
+      time: deliveryTime || "18:00", // Use provided delivery time or default evening delivery
     };
   } catch (error) {
     console.error("Error calculating delivery date:", error);
