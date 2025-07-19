@@ -12,6 +12,7 @@ export interface MappedService {
 
 export interface MappedBookingData {
   id: string;
+  _id?: string;
   custom_order_id: string;
   status: string;
   customer_name: string;
@@ -33,6 +34,10 @@ export interface MappedBookingData {
   payment_status: string;
   created_at: string;
   order_notes?: string;
+  // Legacy properties for backward compatibility
+  totalAmount?: number;
+  total_price?: number;
+  final_amount?: number;
 }
 
 /**
@@ -107,12 +112,13 @@ export const calculateDeliveryDate = (
   pickupDate: string,
   serviceType?: string,
   deliveryDate?: string,
+  deliveryTime?: string,
 ): { date: string; time: string } => {
   // If delivery date is explicitly provided, use it
   if (deliveryDate && deliveryDate !== pickupDate) {
     return {
       date: deliveryDate,
-      time: "18:00", // Default delivery time
+      time: deliveryTime || "18:00", // Use provided delivery time or default
     };
   }
 
@@ -172,13 +178,13 @@ export const calculateDeliveryDate = (
 
     return {
       date: formattedDate,
-      time: "18:00", // Default evening delivery
+      time: deliveryTime || "18:00", // Use provided delivery time or default evening delivery
     };
   } catch (error) {
     console.error("Error calculating delivery date:", error);
     return {
       date: pickupDate,
-      time: "18:00",
+      time: deliveryTime || "18:00",
     };
   }
 };
@@ -251,6 +257,7 @@ export const mapBookingData = (rawBooking: any): MappedBookingData => {
         rawBooking.scheduled_date,
         rawBooking.service_type || rawBooking.service,
         rawBooking.delivery_date,
+        rawBooking.delivery_time,
       ).date,
     time:
       rawBooking.delivery_time ||
@@ -258,6 +265,7 @@ export const mapBookingData = (rawBooking: any): MappedBookingData => {
         rawBooking.scheduled_date,
         rawBooking.service_type || rawBooking.service,
         rawBooking.delivery_date,
+        rawBooking.delivery_time,
       ).time,
   };
 
@@ -279,6 +287,7 @@ export const mapBookingData = (rawBooking: any): MappedBookingData => {
 
   return {
     id: rawBooking._id || rawBooking.id,
+    _id: rawBooking._id,
     custom_order_id: rawBooking.custom_order_id || rawBooking.order_id || "",
     status: rawBooking.status || "pending",
     customer_name: rawBooking.name || "N/A",
@@ -294,6 +303,10 @@ export const mapBookingData = (rawBooking: any): MappedBookingData => {
     created_at: rawBooking.created_at || rawBooking.createdAt || "",
     order_notes:
       rawBooking.additional_details || rawBooking.special_instructions,
+    // Legacy properties for backward compatibility
+    totalAmount: pricing.final_amount,
+    total_price: pricing.final_amount,
+    final_amount: pricing.final_amount,
   };
 };
 

@@ -1060,7 +1060,9 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                             })()}
                           </p>
                           <p className="text-xs text-emerald-600">
-                            {safeBooking.deliveryTime || "18:00"}
+                            {safeBooking.deliveryTime ||
+                              booking.delivery_time ||
+                              "2:00 PM"}
                           </p>
                         </div>
                       </div>

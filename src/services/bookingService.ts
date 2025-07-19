@@ -1,5 +1,6 @@
 import MongoDBService from "./mongodbService";
 import { DVHostingSmsService } from "./dvhostingSmsService";
+import { AddressService } from "./addressService";
 import { config } from "../config/env";
 
 export interface AddressDetails {
@@ -63,6 +64,72 @@ export class BookingService {
     this.apiBaseUrl = config.apiBaseUrl;
 
     console.log("📡 BookingService API URL:", this.apiBaseUrl);
+  }
+
+  /**
+   * Save booking address to addresses table for future use
+   */
+  private async saveBookingAddressToTable(
+    address: string | AddressDetails,
+    coordinates?: { lat: number; lng: number },
+    userId?: string,
+  ): Promise<void> {
+    try {
+      if (!address || !userId) return;
+
+      const addressService = AddressService.getInstance();
+
+      let addressData;
+
+      if (typeof address === "string") {
+        // Parse address string into components
+        const parts = address.split(",").map((s) => s.trim());
+        addressData = {
+          flatNo: parts[0] || "",
+          street: parts[1] || "",
+          landmark: parts.find((p) => p.toLowerCase().includes("near")) || "",
+          village: parts[parts.length - 2] || "",
+          city: parts[parts.length - 2] || "",
+          pincode: parts[parts.length - 1] || "",
+          fullAddress: address,
+          coordinates: coordinates || { lat: 0, lng: 0 },
+          label: "Recent Address",
+          type: "other" as const,
+        };
+      } else {
+        // Address is already an object with details
+        addressData = {
+          flatNo: address.flatNo || "",
+          street: address.street || "",
+          landmark: address.landmark || "",
+          village: address.village || address.city || "",
+          city: address.city || address.village || "",
+          pincode: address.pincode || "",
+          fullAddress: address.fullAddress || address.street || "",
+          coordinates: address.coordinates || coordinates || { lat: 0, lng: 0 },
+          label: "Recent Address",
+          type: "other" as const,
+        };
+      }
+
+      // Only save if address has meaningful content
+      if (addressData.fullAddress.length > 10) {
+        console.log(
+          "💾 Saving booking address to addresses table:",
+          addressData,
+        );
+        const result = await addressService.saveAddress(addressData);
+
+        if (result.success) {
+          console.log("✅ Booking address saved to addresses table");
+        } else {
+          console.warn("⚠️ Failed to save booking address:", result.error);
+        }
+      }
+    } catch (error) {
+      console.warn("⚠️ Error saving booking address to table:", error);
+      // Don't fail the booking creation if address saving fails
+    }
   }
 
   public static getInstance(): BookingService {
@@ -177,6 +244,15 @@ export class BookingService {
         // Always save to localStorage first for immediate availability
         this.saveBookingToLocalStorage(booking);
         console.log("💾 Booking saved to localStorage:", booking.id);
+
+        // Save booking address to addresses table for future use
+        await this.saveBookingAddressToTable(
+          booking.address,
+          typeof booking.address === "object"
+            ? booking.address.coordinates
+            : undefined,
+          resolvedUserId,
+        );
 
         // Trigger immediate UI update for booking history
         const bookingCreatedEvent = new CustomEvent("bookingCreated", {
