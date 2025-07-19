@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Booking = require("../models/Booking");
 const User = require("../models/User");
 const Referral = require("../models/Referral");
+const Address = require("../models/Address");
 
 const router = express.Router();
 
@@ -614,7 +615,7 @@ router.post("/", async (req, res) => {
             $inc: { "referral_stats.pending_rewards": 1 },
           });
 
-          console.log("✅ Referral discount applied successfully");
+          console.log("��� Referral discount applied successfully");
         }
       }
     } catch (referralError) {
