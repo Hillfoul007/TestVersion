@@ -252,6 +252,7 @@ export const mapBookingData = (rawBooking: any): MappedBookingData => {
         rawBooking.scheduled_date,
         rawBooking.service_type || rawBooking.service,
         rawBooking.delivery_date,
+        rawBooking.delivery_time,
       ).date,
     time:
       rawBooking.delivery_time ||
@@ -259,6 +260,7 @@ export const mapBookingData = (rawBooking: any): MappedBookingData => {
         rawBooking.scheduled_date,
         rawBooking.service_type || rawBooking.service,
         rawBooking.delivery_date,
+        rawBooking.delivery_time,
       ).time,
   };
 
