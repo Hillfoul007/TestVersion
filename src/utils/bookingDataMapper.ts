@@ -12,6 +12,7 @@ export interface MappedService {
 
 export interface MappedBookingData {
   id: string;
+  _id?: string;
   custom_order_id: string;
   status: string;
   customer_name: string;
@@ -33,6 +34,10 @@ export interface MappedBookingData {
   payment_status: string;
   created_at: string;
   order_notes?: string;
+  // Legacy properties for backward compatibility
+  totalAmount?: number;
+  total_price?: number;
+  final_amount?: number;
 }
 
 /**
