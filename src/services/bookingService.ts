@@ -1,5 +1,6 @@
 import MongoDBService from "./mongodbService";
 import { DVHostingSmsService } from "./dvhostingSmsService";
+import { AddressService } from "./addressService";
 import { config } from "../config/env";
 
 export interface AddressDetails {
