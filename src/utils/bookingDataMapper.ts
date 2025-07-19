@@ -107,12 +107,13 @@ export const calculateDeliveryDate = (
   pickupDate: string,
   serviceType?: string,
   deliveryDate?: string,
+  deliveryTime?: string,
 ): { date: string; time: string } => {
   // If delivery date is explicitly provided, use it
   if (deliveryDate && deliveryDate !== pickupDate) {
     return {
       date: deliveryDate,
-      time: "18:00", // Default delivery time
+      time: deliveryTime || "18:00", // Use provided delivery time or default
     };
   }
 
