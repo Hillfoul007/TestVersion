@@ -245,6 +245,15 @@ export class BookingService {
         this.saveBookingToLocalStorage(booking);
         console.log("💾 Booking saved to localStorage:", booking.id);
 
+        // Save booking address to addresses table for future use
+        await this.saveBookingAddressToTable(
+          booking.address,
+          typeof booking.address === "object"
+            ? booking.address.coordinates
+            : undefined,
+          resolvedUserId,
+        );
+
         // Trigger immediate UI update for booking history
         const bookingCreatedEvent = new CustomEvent("bookingCreated", {
           detail: { booking },
@@ -452,7 +461,7 @@ export class BookingService {
           console.warn("⚠️ Backend request timed out, using localStorage");
         } else if (error.message.includes("Failed to fetch")) {
           console.warn(
-            "⚠��� Network error - backend unavailable, using localStorage",
+            "⚠️ Network error - backend unavailable, using localStorage",
           );
         } else {
           console.warn("⚠️ Backend fetch failed:", error.message);
