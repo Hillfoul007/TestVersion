@@ -80,13 +80,13 @@ const LocationUnavailableModal: React.FC<LocationUnavailableModalProps> = ({
             <DialogTitle className="text-xl font-bold text-gray-900 mb-2">
               Service Not Available
             </DialogTitle>
-            <DialogDescription className="text-gray-600 text-base leading-relaxed">
+                        <DialogDescription className="text-gray-600 text-base leading-relaxed">
               We're not available in your location yet, but we're expanding
               soon!
               {detectedLocation && (
-                <div className="mt-2 text-sm text-green-600 font-medium">
+                <span className="block mt-2 text-sm text-green-600 font-medium">
                   📍 {detectedLocation}
-                </div>
+                </span>
               )}
             </DialogDescription>
           </DialogHeader>
