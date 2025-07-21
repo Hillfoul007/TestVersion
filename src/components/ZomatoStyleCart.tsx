@@ -176,9 +176,9 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
   const applyCoupon = () => {
     const validCoupons = {
       FIRST10: { discount: 10, description: "10% off on first order" },
-      SAVE20: { discount: 20, description: "20% off" },
+      SAVE20: { discount: 20, description: "20% off on your order" },
       WELCOME5: { discount: 5, description: "5% welcome discount" },
-      UPTO50: { discount: 50, description: "Upto 50% OFF applied!" },
+      NEWUSER15: { discount: 15, description: "15% off for new users" },
     };
 
     const coupon = validCoupons[couponCode.toUpperCase()];
