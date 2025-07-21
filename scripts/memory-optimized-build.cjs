@@ -15,9 +15,9 @@ function runCommand(command, args = [], options = {}) {
     const child = spawn(command, args, {
       stdio: 'inherit',
       shell: true,
-      env: {
+            env: {
         ...process.env,
-        NODE_OPTIONS: '--max-old-space-size=8192'
+        NODE_OPTIONS: '--max-old-space-size=384'
       },
       ...options
     });
