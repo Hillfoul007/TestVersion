@@ -1211,9 +1211,20 @@ Confirm this booking?`;
                   disabled={!couponCode.trim()}
                   className="h-7 px-2 text-xs"
                   type="button"
-                >
+                                >
                   Apply
                 </Button>
+              </div>
+              {/* Coupon Help Text */}
+              <div className="text-xs text-gray-500 mt-1 space-y-0.5">
+                <div className="flex items-center gap-1">
+                  <span className="text-green-600 font-medium">FIRST30</span>
+                  <span>- 30% off for first order only (up to ₹200)</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-blue-600 font-medium">NEW10</span>
+                  <span>- 10% off on all orders (except first order)</span>
+                </div>
               </div>
             ) : (
               <div className="flex justify-between items-center text-sm">
