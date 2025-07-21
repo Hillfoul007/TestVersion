@@ -19,7 +19,7 @@
     "start:frontend": "npx serve -s dist -p 8080",
     "deploy": "chmod +x deploy.sh && ./deploy.sh",
     "deploy:pwa": "npm run build:pwa && chmod +x deploy.sh && ./deploy.sh",
-        "render:build": "NODE_OPTIONS=--max-old-space-size=8192 npm install && npm run build:pwa && cd backend && npm install --production && echo 'Build completed successfully'",
+            "render:build": "NODE_OPTIONS=--max-old-space-size=8192 npm install && NODE_OPTIONS=--max-old-space-size=8192 npm run build:pwa && cd backend && npm install --production && echo 'Build completed successfully'",
     "render:start": "NODE_ENV=production node backend/server-laundry.js",
     "install:all": "npm install && cd backend && npm install",
     "build:production": "npm run install:all && npm run build:pwa"
