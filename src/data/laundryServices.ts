@@ -69,16 +69,16 @@ export const laundryServices: LaundryService[] = [
     image:
       "https://cdn.builder.io/api/v1/image/assets%2F3ed634e80c4f4cd793d62c1354de966f%2Fcc2c175e90d74b4cac7f761ced5e7f7b?format=webp&width=800",
   },
-    {
+      {
     id: "steam-press-ladies-suit",
-    name: "Steam Press",
-    description: "Ladies Suit / Kurta & Pyjama / Saree - expert steam pressing.",
+    name: "Steam Press - Ladies Suit / Kurta & Pyjama / Saree",
+    description: "Expert steam pressing for ladies suits, kurta sets, and sarees.",
     price: 100,
     unit: "SET",
     category: "iron",
     estimatedTime: "24 hours",
     image:
-      "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2Ff93ebf096d1e43529c8a1e3625dea9da?format=webp&width=800",
+      "https://cdn.builder.io/api/v1/image/assets%2F3ed634e80c4f4cd793d62c1354de966f%2F16b932c5fca14b4494b37f55e477584d?format=webp&width=800",
   },
     {
     id: "steam-press-regular",
