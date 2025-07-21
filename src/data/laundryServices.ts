@@ -159,7 +159,7 @@ export const laundryServices: LaundryService[] = [
     image:
       "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2Fe2cd35058c474d539527c1c79ae91bcd?format=webp&width=800",
   },
-  {
+    {
     id: "dry-clean-achkan-sherwani",
     name: "Achkan / Sherwani",
     description: "Premium dry cleaning for traditional formal wear.",
@@ -169,6 +169,17 @@ export const laundryServices: LaundryService[] = [
     estimatedTime: "48-72 hours",
     image:
       "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2F073f84434da746a49ef6185f9a6115fe?format=webp&width=800",
+  },
+  {
+    id: "dry-clean-mens-kurta",
+    name: "Kurta",
+    description: "Professional dry cleaning for men's kurtas.",
+    price: 120,
+    unit: "PC",
+    category: "mens-dry-clean",
+    estimatedTime: "48-72 hours",
+    image:
+      "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2Fe2cd35058c474d539527c1c79ae91bcd?format=webp&width=800",
   },
 
   // Women's Dry Clean
