@@ -757,7 +757,7 @@ Confirm this booking?`;
         console.log("❌ User cancelled the order");
       }
     } catch (error) {
-      console.error("���� Checkout failed:", error);
+      console.error("����� Checkout failed:", error);
       addNotification(
         createErrorNotification(
           "Checkout Failed",
@@ -1214,7 +1214,7 @@ Confirm this booking?`;
                                 >
                   Apply
                 </Button>
-              </div>
+                            </div>
               {/* Coupon Help Text */}
               <div className="text-xs text-gray-500 mt-1 space-y-0.5">
                 <div className="flex items-center gap-1">
