@@ -335,7 +335,7 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
 
     try {
       // First check if it's a referral code
-      const referralDiscount = referralService.validateReferralCode(
+      const referralDiscount = await referralService.validateReferralCode(
         couponCode,
         currentUser,
       );
