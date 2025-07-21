@@ -985,74 +985,36 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                               Delivery
                             </span>
                           </div>
-                          <p className="text-xs text-gray-900">
+                                                    <p className="text-xs text-gray-900">
                             {(() => {
-                              // First check if deliveryDate is explicitly set
-                              if (safeBooking.deliveryDate) {
-                                try {
-                                  const date = new Date(
-                                    safeBooking.deliveryDate,
-                                  );
-                                  if (!isNaN(date.getTime())) {
-                                    return date.toLocaleDateString("en-US", {
-                                      weekday: "short",
-                                      month: "short",
-                                      day: "numeric",
-                                    });
-                                  }
-                                } catch (error) {
-                                  console.error(
-                                    "Error parsing delivery date:",
-                                    error,
-                                  );
-                                }
-                              }
-
-                              // Calculate delivery date from pickup/scheduled date
-                              const dateStr =
-                                safeBooking.pickupDate ||
-                                safeBooking.scheduled_date;
-                              if (!dateStr) return "Date TBD";
+                              // Use the mapped delivery_date field from booking data mapper
+                              const deliveryDateStr = booking.delivery_date || safeBooking.deliveryDate;
+                              if (!deliveryDateStr) return "Date TBD";
 
                               try {
-                                let pickupDate;
-
-                                // Handle YYYY-MM-DD format (local date)
-                                if (
-                                  dateStr.includes("-") &&
-                                  dateStr.split("-").length === 3
-                                ) {
-                                  const [year, month, day] = dateStr
+                                let date;
+                                if (deliveryDateStr.includes("-")) {
+                                  // YYYY-MM-DD format - parse as local date
+                                  const [year, month, day] = deliveryDateStr
                                     .split("-")
                                     .map(Number);
-                                  if (year && month && day) {
-                                    pickupDate = new Date(year, month - 1, day);
-                                  }
+                                  date = new Date(year, month - 1, day);
                                 } else {
-                                  pickupDate = new Date(dateStr);
+                                  date = new Date(deliveryDateStr);
                                 }
 
-                                if (isNaN(pickupDate.getTime())) {
-                                  return "Date TBD";
-                                }
+                                // Validate date
+                                if (isNaN(date.getTime())) return "Date TBD";
 
-                                // Add 24-48 hours for delivery (default to 1 day)
-                                const deliveryDate = new Date(pickupDate);
-                                deliveryDate.setDate(
-                                  deliveryDate.getDate() + 1,
-                                );
-
-                                return deliveryDate.toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    weekday: "short",
-                                    month: "short",
-                                    day: "numeric",
-                                  },
-                                );
+                                return date.toLocaleDateString("en-US", {
+                                  weekday: "short",
+                                  month: "short",
+                                  day: "numeric",
+                                });
                               } catch (error) {
                                 console.error(
-                                  "Error calculating delivery date:",
+                                  "Error parsing delivery date:",
+                                  deliveryDateStr,
                                   error,
                                 );
                                 return "Date TBD";
@@ -1060,9 +1022,7 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                             })()}
                           </p>
                           <p className="text-xs text-emerald-600">
-                            {safeBooking.deliveryTime ||
-                              booking.delivery_time ||
-                              "2:00 PM"}
+                            {booking.delivery_time || safeBooking.deliveryTime || "2:00 PM"}
                           </p>
                         </div>
                       </div>

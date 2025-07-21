@@ -294,18 +294,7 @@ const DeliveryDateTimePicker: React.FC<DeliveryDateTimePickerProps> = ({
           </div>
         </div>
 
-        {/* Extended date dropdown for more options */}
-        {availableDates.length > 7 && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowDropdown(!showDropdown)}
-            className="w-full text-xs"
-          >
-            <CalendarIcon className="h-3 w-3 mr-2" />
-            More dates ({availableDates.length - 7} more available)
-          </Button>
-        )}
+        
 
         {showDropdown && (
           <div className="space-y-2">
