@@ -58,16 +58,16 @@ export const laundryServices: LaundryService[] = [
     image:
       "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2F4566c495ee9f41b59d0bc341b7b430ae?format=webp&width=800",
   },
-    {
+      {
     id: "steam-press-suit",
-    name: "Steam Press",
-    description: "Men's Suit / Lehenga / heavy Dresses - professional steam pressing.",
+    name: "Steam Press - Men's Suit / Lehenga / Heavy Dresses",
+    description: "Professional steam pressing for men's suits, lehengas, and heavy dresses.",
     price: 150,
     unit: "SET",
     category: "iron",
     estimatedTime: "24-48 hours",
     image:
-      "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2Ff93ebf096d1e43529c8a1e3625dea9da?format=webp&width=800",
+      "https://cdn.builder.io/api/v1/image/assets%2F3ed634e80c4f4cd793d62c1354de966f%2Fcc2c175e90d74b4cac7f761ced5e7f7b?format=webp&width=800",
   },
     {
     id: "steam-press-ladies-suit",
