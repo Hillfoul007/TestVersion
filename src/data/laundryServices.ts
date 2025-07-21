@@ -80,10 +80,10 @@ export const laundryServices: LaundryService[] = [
     image:
       "https://cdn.builder.io/api/v1/image/assets%2F3ed634e80c4f4cd793d62c1354de966f%2F16b932c5fca14b4494b37f55e477584d?format=webp&width=800",
   },
-    {
+      {
     id: "steam-press-regular",
-    name: "Steam Press",
-    description: "Regular items - steam pressing for standard clothing items.",
+    name: "Steam Press - Regular Items",
+    description: "Steam pressing for standard clothing items.",
     price: 40,
     unit: "PC",
     category: "iron",
