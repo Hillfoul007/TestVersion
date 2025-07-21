@@ -27,48 +27,29 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-        build: {
-      chunkSizeWarningLimit: 2000,
+            build: {
+      chunkSizeWarningLimit: 1000,
       rollupOptions: {
         output: {
-          manualChunks(id) {
-            if (id.includes('node_modules')) {
-              if (id.includes('react') || id.includes('react-dom')) {
-                return 'react-vendor';
-              }
-              if (id.includes('@radix-ui')) {
-                return 'radix-ui';
-              }
-              if (id.includes('lucide-react')) {
-                return 'icons';
-              }
-              return 'vendor';
-            }
+          // Simplified chunking strategy for memory efficiency
+          manualChunks: {
+            'react-vendor': ['react', 'react-dom'],
+            'vendor': ['@radix-ui/react-dialog', '@radix-ui/react-button'],
           },
         },
-        // Reduce memory usage during build
-        maxParallelFileOps: 2,
+        // Minimize parallel operations to reduce memory usage
+        maxParallelFileOps: 1,
       },
-      // Reduce memory usage
-      minify: mode === "production" ? "terser" : false,
-      terserOptions: mode === "production" ? {
-        compress: {
-          drop_console: true,
-          drop_debugger: true,
-        },
-        mangle: {
-          safari10: true,
-        },
-        format: {
-          safari10: true,
-        },
-      } : {},
+      // Use esbuild instead of terser for lower memory usage
+      minify: mode === "production" ? "esbuild" : false,
       // Disable CSS code splitting to reduce memory usage
       cssCodeSplit: false,
-      // Disable sourcemap in production to save memory
+      // Disable sourcemap to save memory
       sourcemap: false,
-      // Reduce memory usage
+      // Disable reporting to save memory
       reportCompressedSize: false,
+      // Reduce target to minimize polyfills
+      target: 'esnext',
     },
     // Enable gzip compression for assets
     esbuild: {
