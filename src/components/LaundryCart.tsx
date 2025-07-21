@@ -1210,8 +1210,8 @@ Confirm this booking?`;
                   variant="outline"
                   disabled={!couponCode.trim()}
                   className="h-7 px-2 text-xs"
-                  type="button"
-                                                >
+                                    type="button"
+                >
                   Apply
                 </Button>
               </div>
