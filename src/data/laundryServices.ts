@@ -304,10 +304,10 @@ export const laundryServices: LaundryService[] = [
     image:
       "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2Fc6f8193b331d4fd182faf379bea4644b?format=webp&width=800",
   },
-  {
-    id: "dry-clean-lehenga-luxury",
-    name: "Lehenga Luxury Heavy",
-    description: "Luxury cleaning service for designer and luxury lehengas.",
+    {
+    id: "dry-clean-lehenga-bridal-luxury",
+    name: "Lehenga Bridal / Luxury",
+    description: "Premium cleaning service for bridal and luxury lehengas.",
     price: 1000,
     unit: "SET",
     category: "womens-dry-clean",
