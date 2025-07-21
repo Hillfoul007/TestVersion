@@ -1138,7 +1138,7 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                                 "Date TBD"}
                             </p>
                             <p className="text-xs text-emerald-600">
-                              {booking.deliveryTime || "18:00"}
+                              {booking.deliveryTime || "TBD"}
                             </p>
                           </div>
                         </div>
