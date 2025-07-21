@@ -305,19 +305,20 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
     return 0; // Free handling fee as shown in UI
   };
 
-  const getCouponDiscount = () => {
+    const getCouponDiscount = () => {
     if (!appliedCoupon) return 0;
     const subtotal = getSubtotal();
 
-    if (appliedCoupon.isReferral && appliedCoupon.maxDiscount) {
-      // For referral codes, apply max discount limit
-      const discountAmount = Math.round(
-        subtotal * (appliedCoupon.discount / 100),
-      );
+    const discountAmount = Math.round(
+      subtotal * (appliedCoupon.discount / 100),
+    );
+
+    // Apply max discount limit if specified
+    if (appliedCoupon.maxDiscount) {
       return Math.min(discountAmount, appliedCoupon.maxDiscount);
     }
 
-    return Math.round(subtotal * (appliedCoupon.discount / 100));
+    return discountAmount;
   };
 
   const getTotal = () => {
@@ -356,8 +357,19 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
         return;
       }
 
-      // Then check regular coupons
+                  // Then check regular coupons
       const validCoupons = {
+        FIRST30: {
+          discount: 30,
+          maxDiscount: 200,
+          description: "30% off on first order (up to ₹200)",
+          isFirstOrder: true
+        },
+        NEW10: {
+          discount: 10,
+          description: "10% off on all orders (except first order)",
+          excludeFirstOrder: true
+        },
         FIRST10: { discount: 10, description: "10% off on first order" },
         SAVE20: { discount: 20, description: "20% off" },
         WELCOME5: { discount: 5, description: "5% welcome discount" },
@@ -368,16 +380,39 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
       console.log("Looking for coupon:", couponCode.toUpperCase());
       console.log("Found coupon:", coupon);
 
-      if (coupon) {
+                  if (coupon) {
+        // Check if coupon is restricted to first orders only
+        if (coupon.isFirstOrder && !referralService.isFirstTimeUser(currentUser)) {
+          addNotification(
+            createErrorNotification(
+              "Invalid Coupon",
+              "This coupon is valid for first orders only.",
+            ),
+          );
+          return;
+        }
+
+        // Check if coupon excludes first orders
+        if (coupon.excludeFirstOrder && referralService.isFirstTimeUser(currentUser)) {
+          addNotification(
+            createErrorNotification(
+              "Invalid Coupon",
+              "This coupon is not valid for first orders.",
+            ),
+          );
+          return;
+        }
+
         setAppliedCoupon({
           code: couponCode.toUpperCase(),
           discount: coupon.discount,
+          maxDiscount: coupon.maxDiscount || undefined,
         });
         console.log("Coupon applied successfully");
         addNotification(
           createSuccessNotification(
             "Coupon Applied",
-            `${coupon.discount}% discount applied successfully!`,
+            coupon.description,
           ),
         );
       } else {
@@ -722,7 +757,7 @@ Confirm this booking?`;
         console.log("❌ User cancelled the order");
       }
     } catch (error) {
-      console.error("���� Checkout failed:", error);
+      console.error("����� Checkout failed:", error);
       addNotification(
         createErrorNotification(
           "Checkout Failed",
@@ -1149,36 +1184,49 @@ Confirm this booking?`;
             </div>
 
             {/* Ultra Compact Coupon Section */}
-            {!appliedCoupon ? (
-              <div className="flex gap-1 pt-1">
-                <Input
-                  placeholder="Coupon"
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      if (couponCode.trim()) {
-                        applyCoupon();
+                        {!appliedCoupon ? (
+              <div className="space-y-1">
+                <div className="flex gap-1 pt-1">
+                  <Input
+                    placeholder="Coupon"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (couponCode.trim()) {
+                          applyCoupon();
+                        }
                       }
-                    }
-                  }}
-                  className="flex-1 h-7 text-xs"
-                />
-                <Button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log("Apply button clicked");
-                    applyCoupon();
-                  }}
-                  variant="outline"
-                  disabled={!couponCode.trim()}
-                  className="h-7 px-2 text-xs"
-                  type="button"
-                >
-                  Apply
-                </Button>
+                    }}
+                    className="flex-1 h-7 text-xs"
+                  />
+                  <Button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log("Apply button clicked");
+                      applyCoupon();
+                    }}
+                    variant="outline"
+                    disabled={!couponCode.trim()}
+                    className="h-7 px-2 text-xs"
+                    type="button"
+                  >
+                    Apply
+                  </Button>
+                </div>
+                {/* Coupon Help Text */}
+                <div className="text-xs text-gray-500 space-y-0.5">
+                  <div className="flex items-center gap-1">
+                    <span className="text-green-600 font-medium">FIRST30</span>
+                    <span>- 30% off for first order only (up to ₹200)</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-blue-600 font-medium">NEW10</span>
+                    <span>- 10% off on all orders (except first order)</span>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="flex justify-between items-center text-sm">

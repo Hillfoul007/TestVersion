@@ -27,35 +27,22 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-    build: {
+            build: {
       chunkSizeWarningLimit: 1000,
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            vendor: ["react", "react-dom"],
-            router: ["react-router-dom"],
-            ui: [
-              "@radix-ui/react-accordion",
-              "@radix-ui/react-alert-dialog",
-              "@radix-ui/react-dialog",
-            ],
-            icons: ["lucide-react"],
-            utils: ["clsx", "tailwind-merge", "class-variance-authority"],
-          },
-        },
+            rollupOptions: {
+        // Minimize parallel operations to reduce memory usage
+        maxParallelFileOps: 1,
       },
-      // Enable minification and compression
-      minify: "terser",
-      terserOptions: {
-        compress: {
-          drop_console: mode === "production",
-          drop_debugger: mode === "production",
-        },
-      },
-      // Enable CSS code splitting
-      cssCodeSplit: true,
-      // Reduce bundle size
-      sourcemap: mode !== "production",
+      // Use esbuild instead of terser for lower memory usage
+      minify: mode === "production" ? "esbuild" : false,
+      // Disable CSS code splitting to reduce memory usage
+      cssCodeSplit: false,
+      // Disable sourcemap to save memory
+      sourcemap: false,
+      // Disable reporting to save memory
+      reportCompressedSize: false,
+      // Reduce target to minimize polyfills
+      target: 'esnext',
     },
     // Enable gzip compression for assets
     esbuild: {

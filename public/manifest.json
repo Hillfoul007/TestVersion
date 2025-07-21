@@ -2,7 +2,7 @@
   "name": "CleanCare Pro - Laundry & Dry Cleaning",
   "short_name": "CleanCare",
   "description": "Professional laundry and dry cleaning services at your doorstep",
-  "start_url": "/",
+  "start_url": "/?v=1753079645539",
   "display": "standalone",
   "background_color": "#22c55e",
   "theme_color": "#22c55e",
@@ -57,7 +57,11 @@
       "purpose": "maskable any"
     }
   ],
-  "categories": ["lifestyle", "business", "utilities"],
+  "categories": [
+    "lifestyle",
+    "business",
+    "utilities"
+  ],
   "screenshots": [
     {
       "src": "/screenshots/screenshot1.png",

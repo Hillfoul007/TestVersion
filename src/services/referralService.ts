@@ -194,8 +194,23 @@ export class ReferralService {
       localStorage.getItem(`referrer_coupons_${userReferralCode}`) || "[]",
     );
 
-    // Get general coupons
+            // Get general coupons
     const generalCoupons = [
+      {
+        code: "FIRST30",
+        discount: 30,
+        maxDiscount: 200,
+        description: "30% off on first order (up to ₹200)",
+        type: "general",
+        isFirstOrder: true,
+      },
+      {
+        code: "NEW10",
+        discount: 10,
+        description: "10% off on all orders (except first order)",
+        type: "general",
+        excludeFirstOrder: true,
+      },
       {
         code: "FIRST10",
         discount: 10,

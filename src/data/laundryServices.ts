@@ -31,7 +31,7 @@ export const laundryServices: LaundryService[] = [
 
     popular: true,
   },
-  {
+    {
     id: "laundry-iron",
     name: "Laundry and Iron",
     description:
@@ -41,16 +41,16 @@ export const laundryServices: LaundryService[] = [
     category: "laundry",
     estimatedTime: "24-48 hours",
     image:
-      "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2F85560ebfcaaa46bba67b1b09dfa0998e?format=webp&width=800",
+      "https://cdn.builder.io/api/v1/image/assets%2F3ed634e80c4f4cd793d62c1354de966f%2Fe8e7c3bcefaf40448da183ce942f6bc1?format=webp&width=800",
 
     popular: true,
   },
 
   // Iron Services
-  {
-    id: "coal-iron-basic",
-    name: "Coal Iron",
-    description: "Traditional coal iron service for all clothing items.",
+    {
+    id: "regular-iron",
+    name: "Regular Iron",
+    description: "All clothing items - basic ironing service.",
     price: 20,
     unit: "PC",
     category: "iron",
@@ -58,35 +58,32 @@ export const laundryServices: LaundryService[] = [
     image:
       "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2F4566c495ee9f41b59d0bc341b7b430ae?format=webp&width=800",
   },
-  {
-    id: "steam-iron-suit",
-    name: "Steam Iron - Men's Suit / Heavy Dresses",
-    description:
-      "Professional steam ironing for men's suits (2/3 PC), lehengas, and heavy dresses.",
+      {
+    id: "steam-press-suit",
+    name: "Steam Press - Men's Suit / Lehenga / Heavy Dresses",
+    description: "Professional steam pressing for men's suits, lehengas, and heavy dresses.",
     price: 150,
     unit: "SET",
     category: "iron",
     estimatedTime: "24-48 hours",
     image:
-      "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2Ff93ebf096d1e43529c8a1e3625dea9da?format=webp&width=800",
+      "https://cdn.builder.io/api/v1/image/assets%2F3ed634e80c4f4cd793d62c1354de966f%2Fcc2c175e90d74b4cac7f761ced5e7f7b?format=webp&width=800",
   },
-  {
-    id: "steam-iron-ladies-suit",
-    name: "Steam Iron - Ladies Suit / Kurta & Pyjama / Saree",
-    description:
-      "Expert steam ironing for ladies suits, kurta sets, and sarees.",
+      {
+    id: "steam-press-ladies-suit",
+    name: "Steam Press - Ladies Suit / Kurta & Pyjama / Saree",
+    description: "Expert steam pressing for ladies suits, kurta sets, and sarees.",
     price: 100,
     unit: "SET",
     category: "iron",
     estimatedTime: "24 hours",
     image:
-      "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2Ff93ebf096d1e43529c8a1e3625dea9da?format=webp&width=800",
+      "https://cdn.builder.io/api/v1/image/assets%2F3ed634e80c4f4cd793d62c1354de966f%2F16b932c5fca14b4494b37f55e477584d?format=webp&width=800",
   },
-  {
-    id: "steam-iron-general",
-    name: "Steam Iron - Other Items",
-    description:
-      "Steam ironing for all other clothing items not specified above.",
+      {
+    id: "steam-press-regular",
+    name: "Steam Press - Regular Items",
+    description: "Steam pressing for standard clothing items.",
     price: 40,
     unit: "PC",
     category: "iron",
@@ -162,7 +159,7 @@ export const laundryServices: LaundryService[] = [
     image:
       "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2Fe2cd35058c474d539527c1c79ae91bcd?format=webp&width=800",
   },
-  {
+    {
     id: "dry-clean-achkan-sherwani",
     name: "Achkan / Sherwani",
     description: "Premium dry cleaning for traditional formal wear.",
@@ -173,18 +170,29 @@ export const laundryServices: LaundryService[] = [
     image:
       "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2F073f84434da746a49ef6185f9a6115fe?format=webp&width=800",
   },
+    {
+    id: "dry-clean-mens-kurta",
+    name: "Kurta",
+    description: "Professional dry cleaning for men's kurtas.",
+    price: 120,
+    unit: "PC",
+    category: "mens-dry-clean",
+    estimatedTime: "48-72 hours",
+    image:
+      "https://cdn.builder.io/api/v1/image/assets%2F3ed634e80c4f4cd793d62c1354de966f%2F751e8f21a94f4fbb9dd0c820dd7eabf3?format=webp&width=800",
+  },
 
   // Women's Dry Clean
-  {
-    id: "dry-clean-womens-kurta",
-    name: "Kurta",
-    description: "Professional dry cleaning for women's kurtas.",
+      {
+    id: "dry-clean-womens-kurta-kurti",
+    name: "Kurta / Kurti",
+    description: "Professional dry cleaning for women's kurtas and kurtis.",
     price: 120,
     unit: "PC",
     category: "womens-dry-clean",
     estimatedTime: "48-72 hours",
     image:
-      "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2Fe2cd35058c474d539527c1c79ae91bcd?format=webp&width=800",
+      "https://cdn.builder.io/api/v1/image/assets%2F3ed634e80c4f4cd793d62c1354de966f%2F581217e0f5cf47f68d3c0c898a2eae65?format=webp&width=800",
   },
   {
     id: "dry-clean-salwar-plazo",
@@ -296,10 +304,10 @@ export const laundryServices: LaundryService[] = [
     image:
       "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2Fc6f8193b331d4fd182faf379bea4644b?format=webp&width=800",
   },
-  {
-    id: "dry-clean-lehenga-luxury",
-    name: "Lehenga Luxury Heavy",
-    description: "Luxury cleaning service for designer and luxury lehengas.",
+    {
+    id: "dry-clean-lehenga-bridal-luxury",
+    name: "Lehenga Bridal / Luxury",
+    description: "Premium cleaning service for bridal and luxury lehengas.",
     price: 1000,
     unit: "SET",
     category: "womens-dry-clean",
