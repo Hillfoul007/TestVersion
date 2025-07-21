@@ -38,10 +38,10 @@ export class ReferralService {
   }
 
   // Validate referral code and return discount if valid
-  validateReferralCode(
+  async validateReferralCode(
     code: string,
     currentUser: User,
-  ): ReferralDiscount | null {
+  ): Promise<ReferralDiscount | null> {
     if (!code || !currentUser) return null;
 
     // Check if it's the user's first order
@@ -51,18 +51,31 @@ export class ReferralService {
       return null; // Referral discount only for first-time users
     }
 
-    // For now, we'll accept any referral code that follows pattern
-    // In a real app, this would validate against a database
-    const referralPattern = /^[A-Z0-9]{4,10}$/;
+    try {
+      // Call backend API to validate referral code
+      const response = await fetch(`/api/referrals/validate/${code.toUpperCase()}`);
 
-    if (referralPattern.test(code.toUpperCase())) {
-      return {
-        code: code.toUpperCase(),
-        discount: 50, // 50% off
-        maxDiscount: 200, // Max ₹200 discount
-        isFirstOrder: true,
-        description: "50% off on first order (up to ₹200)",
-      };
+      if (!response.ok) {
+        console.log("Invalid referral code:", code);
+        return null;
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.referral) {
+        const discountPercentage = data.referral.discount_percentage || 50;
+        const maxDiscount = discountPercentage === 50 ? 200 : 100; // Default max discount
+
+        return {
+          code: code.toUpperCase(),
+          discount: discountPercentage,
+          maxDiscount: maxDiscount,
+          isFirstOrder: true,
+          description: `${discountPercentage}% off on first order (up to ₹${maxDiscount})`,
+        };
+      }
+    } catch (error) {
+      console.error("Error validating referral code:", error);
     }
 
     return null;
