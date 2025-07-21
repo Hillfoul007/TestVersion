@@ -161,7 +161,17 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
   const getCouponDiscount = () => {
     if (!appliedCoupon) return 0;
     const subtotal = getSubtotal();
-    return Math.round(subtotal * (appliedCoupon.discount / 100));
+
+    const discountAmount = Math.round(
+      subtotal * (appliedCoupon.discount / 100),
+    );
+
+    // Apply max discount limit if specified
+    if (appliedCoupon.maxDiscount) {
+      return Math.min(discountAmount, appliedCoupon.maxDiscount);
+    }
+
+    return discountAmount;
   };
 
   const getTotal = () => {
