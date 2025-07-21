@@ -8,7 +8,7 @@
     "dev:backend": "cd backend && node server-laundry.js",
     "dev:full": "concurrently \"npm run dev\" \"npm run dev:backend\"",
         "build": "NODE_OPTIONS=--max-old-space-size=8192 vite build && NODE_OPTIONS=--max-old-space-size=8192 node scripts/optimize-build.js",
-    "build:pwa": "NODE_OPTIONS=--max-old-space-size=8192 node scripts/pwa-build.cjs && NODE_OPTIONS=--max-old-space-size=8192 vite build && NODE_OPTIONS=--max-old-space-size=8192 node scripts/optimize-build.js",
+        "build:pwa": "NODE_OPTIONS=--max-old-space-size=8192 node scripts/memory-optimized-build.js",
     "build:check": "NODE_OPTIONS=--max-old-space-size=8192 tsc -b && NODE_OPTIONS=--max-old-space-size=8192 vite build && NODE_OPTIONS=--max-old-space-size=8192 node scripts/optimize-build.js",
     "build:analyze": "NODE_OPTIONS=--max-old-space-size=8192 vite build --mode production && NODE_OPTIONS=--max-old-space-size=8192 node scripts/bundle-analyzer.js",
     "lint": "eslint .",
