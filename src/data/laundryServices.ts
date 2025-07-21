@@ -47,10 +47,10 @@ export const laundryServices: LaundryService[] = [
   },
 
   // Iron Services
-  {
-    id: "coal-iron-basic",
-    name: "Coal Iron",
-    description: "Traditional coal iron service for all clothing items.",
+    {
+    id: "regular-iron",
+    name: "Regular Iron",
+    description: "All clothing items - basic ironing service.",
     price: 20,
     unit: "PC",
     category: "iron",
