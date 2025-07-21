@@ -8,13 +8,16 @@ export default defineConfig({
     host: "::",
     port: 10000,
   },
-  build: {
+    build: {
     // Minimal chunking to reduce memory usage
     chunkSizeWarningLimit: 500,
     rollupOptions: {
       output: {
-        // Single chunk strategy to minimize memory usage
-        manualChunks: undefined,
+        // Simple chunking strategy to minimize memory usage
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'radix-ui': ['@radix-ui/react-dialog', '@radix-ui/react-slot'],
+        },
       },
       // Absolute minimum parallel operations
       maxParallelFileOps: 1,
