@@ -478,7 +478,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
                 </Button>
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                Try "UPTO50" for up to 50% off!
+                Enter a valid coupon code to get discount
               </p>
             </CardContent>
           </Card>
