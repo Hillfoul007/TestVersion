@@ -1211,10 +1211,10 @@ Confirm this booking?`;
                   disabled={!couponCode.trim()}
                   className="h-7 px-2 text-xs"
                   type="button"
-                                >
+                                                >
                   Apply
                 </Button>
-                            </div>
+              </div>
               {/* Coupon Help Text */}
               <div className="text-xs text-gray-500 mt-1 space-y-0.5">
                 <div className="flex items-center gap-1">
