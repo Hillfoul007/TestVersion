@@ -31,7 +31,7 @@ export const laundryServices: LaundryService[] = [
 
     popular: true,
   },
-  {
+    {
     id: "laundry-iron",
     name: "Laundry and Iron",
     description:
@@ -41,7 +41,7 @@ export const laundryServices: LaundryService[] = [
     category: "laundry",
     estimatedTime: "24-48 hours",
     image:
-      "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2F85560ebfcaaa46bba67b1b09dfa0998e?format=webp&width=800",
+      "https://cdn.builder.io/api/v1/image/assets%2F3ed634e80c4f4cd793d62c1354de966f%2Fe8e7c3bcefaf40448da183ce942f6bc1?format=webp&width=800",
 
     popular: true,
   },
