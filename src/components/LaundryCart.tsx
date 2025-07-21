@@ -330,7 +330,7 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
     );
   };
 
-  const applyCoupon = () => {
+  const applyCoupon = async () => {
     console.log("applyCoupon function called with code:", couponCode);
 
     try {
