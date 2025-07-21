@@ -29,14 +29,7 @@ export default defineConfig(({ mode }) => {
     },
             build: {
       chunkSizeWarningLimit: 1000,
-      rollupOptions: {
-                output: {
-          // Simplified chunking strategy for memory efficiency
-          manualChunks: {
-            'react-vendor': ['react', 'react-dom'],
-            'vendor': ['@radix-ui/react-dialog', '@radix-ui/react-slot'],
-          },
-        },
+            rollupOptions: {
         // Minimize parallel operations to reduce memory usage
         maxParallelFileOps: 1,
       },
