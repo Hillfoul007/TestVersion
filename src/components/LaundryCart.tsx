@@ -305,19 +305,20 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
     return 0; // Free handling fee as shown in UI
   };
 
-  const getCouponDiscount = () => {
+    const getCouponDiscount = () => {
     if (!appliedCoupon) return 0;
     const subtotal = getSubtotal();
 
-    if (appliedCoupon.isReferral && appliedCoupon.maxDiscount) {
-      // For referral codes, apply max discount limit
-      const discountAmount = Math.round(
-        subtotal * (appliedCoupon.discount / 100),
-      );
+    const discountAmount = Math.round(
+      subtotal * (appliedCoupon.discount / 100),
+    );
+
+    // Apply max discount limit if specified
+    if (appliedCoupon.maxDiscount) {
       return Math.min(discountAmount, appliedCoupon.maxDiscount);
     }
 
-    return Math.round(subtotal * (appliedCoupon.discount / 100));
+    return discountAmount;
   };
 
   const getTotal = () => {
