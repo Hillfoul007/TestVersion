@@ -129,7 +129,7 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                 pickupDate: booking.scheduled_date,
                 deliveryDate: booking.scheduled_date, // Could calculate +1 day
                 pickupTime: booking.scheduled_time,
-                deliveryTime: "18:00",
+                deliveryTime: booking.delivery_time || "TBD",
                 address: booking.address,
                 contactDetails: {
                   phone: currentUser.phone,
