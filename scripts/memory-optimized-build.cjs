@@ -4,8 +4,8 @@
 const { spawn } = require('child_process');
 const path = require('path');
 
-// Set maximum memory allocation
-process.env.NODE_OPTIONS = '--max-old-space-size=8192';
+// Set maximum memory allocation for constrained environments
+process.env.NODE_OPTIONS = '--max-old-space-size=384';
 
 // Function to run command with proper memory settings
 function runCommand(command, args = [], options = {}) {
