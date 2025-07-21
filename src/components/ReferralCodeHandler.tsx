@@ -72,7 +72,7 @@ export function ReferralCodeHandler({
     setError(null);
 
     try {
-      const validation = referralService.validateReferralCode(
+      const validation = await referralService.validateReferralCode(
         code,
         currentUser,
       );
