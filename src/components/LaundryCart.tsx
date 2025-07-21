@@ -357,13 +357,18 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
         return;
       }
 
-            // Then check regular coupons
+                  // Then check regular coupons
       const validCoupons = {
         FIRST30: {
           discount: 30,
           maxDiscount: 200,
           description: "30% off on first order (up to ₹200)",
           isFirstOrder: true
+        },
+        NEW10: {
+          discount: 10,
+          description: "10% off on all orders (except first order)",
+          excludeFirstOrder: true
         },
         FIRST10: { discount: 10, description: "10% off on first order" },
         SAVE20: { discount: 20, description: "20% off" },
