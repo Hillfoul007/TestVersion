@@ -374,16 +374,17 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
       console.log("Looking for coupon:", couponCode.toUpperCase());
       console.log("Found coupon:", coupon);
 
-      if (coupon) {
+            if (coupon) {
         setAppliedCoupon({
           code: couponCode.toUpperCase(),
           discount: coupon.discount,
+          maxDiscount: coupon.maxDiscount || undefined,
         });
         console.log("Coupon applied successfully");
         addNotification(
           createSuccessNotification(
             "Coupon Applied",
-            `${coupon.discount}% discount applied successfully!`,
+            coupon.description,
           ),
         );
       } else {
