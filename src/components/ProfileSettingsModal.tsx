@@ -271,71 +271,7 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({
               </div>
             </div>
 
-            {/* Available Coupons */}
-            <div className="space-y-3">
-              <h4 className="font-semibold text-gray-900">Available Coupons</h4>
-              {userCoupons.length > 0 ? (
-                <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {userCoupons.map((coupon, index) => (
-                    <div
-                      key={index}
-                      className={`p-3 rounded-lg border ${
-                        coupon.type === "referral"
-                          ? "bg-purple-50 border-purple-200"
-                          : "bg-blue-50 border-blue-200"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-sm">
-                              {coupon.code}
-                            </span>
-                            {coupon.type === "referral" && (
-                              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                                Referral Bonus
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-600">
-                            {coupon.description}
-                          </p>
-                          {coupon.expiresAt && (
-                            <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                              <Calendar className="h-3 w-3" />
-                              Expires:{" "}
-                              {new Date(coupon.expiresAt).toLocaleDateString()}
-                            </p>
-                          )}
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            navigator.clipboard.writeText(coupon.code);
-                            toast({
-                              title: "Copied!",
-                              description: "Coupon code copied to clipboard",
-                            });
-                          }}
-                          className="text-xs"
-                        >
-                          Copy
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-6 text-gray-500">
-                  <Gift className="h-12 w-12 mx-auto mb-2 text-gray-300" />
-                  <p className="text-sm">No coupons available</p>
-                  <p className="text-xs">
-                    Refer friends to earn coupon rewards!
-                  </p>
-                </div>
-              )}
-            </div>
+
           </div>
 
           {/* Address Management Section */}
