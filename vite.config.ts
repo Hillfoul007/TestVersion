@@ -30,11 +30,11 @@ export default defineConfig(({ mode }) => {
             build: {
       chunkSizeWarningLimit: 1000,
       rollupOptions: {
-        output: {
+                output: {
           // Simplified chunking strategy for memory efficiency
           manualChunks: {
             'react-vendor': ['react', 'react-dom'],
-            'vendor': ['@radix-ui/react-dialog', '@radix-ui/react-button'],
+            'vendor': ['@radix-ui/react-dialog', '@radix-ui/react-slot'],
           },
         },
         // Minimize parallel operations to reduce memory usage
