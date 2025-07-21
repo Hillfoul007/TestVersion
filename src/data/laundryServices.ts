@@ -183,7 +183,7 @@ export const laundryServices: LaundryService[] = [
   },
 
   // Women's Dry Clean
-    {
+      {
     id: "dry-clean-womens-kurta-kurti",
     name: "Kurta / Kurti",
     description: "Professional dry cleaning for women's kurtas and kurtis.",
@@ -192,7 +192,7 @@ export const laundryServices: LaundryService[] = [
     category: "womens-dry-clean",
     estimatedTime: "48-72 hours",
     image:
-      "https://cdn.builder.io/api/v1/image/assets%2Fc97d5a75b4604b65bd2bd6fccd499b08%2Fe2cd35058c474d539527c1c79ae91bcd?format=webp&width=800",
+      "https://cdn.builder.io/api/v1/image/assets%2F3ed634e80c4f4cd793d62c1354de966f%2F581217e0f5cf47f68d3c0c898a2eae65?format=webp&width=800",
   },
   {
     id: "dry-clean-salwar-plazo",
