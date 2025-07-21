@@ -16,7 +16,6 @@ import {
   LogOut,
   Gift,
   Copy,
-  Calendar,
   MapPin,
 } from "lucide-react";
 import { ReferralService } from "@/services/referralService";
