@@ -183,10 +183,10 @@ export const laundryServices: LaundryService[] = [
   },
 
   // Women's Dry Clean
-  {
-    id: "dry-clean-womens-kurta",
-    name: "Kurta",
-    description: "Professional dry cleaning for women's kurtas.",
+    {
+    id: "dry-clean-womens-kurta-kurti",
+    name: "Kurta / Kurti",
+    description: "Professional dry cleaning for women's kurtas and kurtis.",
     price: 120,
     unit: "PC",
     category: "womens-dry-clean",
