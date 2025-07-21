@@ -41,9 +41,9 @@ async function main() {
     // Skip PWA build script to save memory
     console.log('Skipping PWA build script to conserve memory...');
     
-    // Run vite build with minimal settings
+        // Run vite build with minimal settings and render-specific config
     console.log('Starting minimal Vite build...');
-    await runCommand('npx', ['vite', 'build', '--mode', 'production']);
+    await runCommand('npx', ['vite', 'build', '--config', 'vite.render.config.ts', '--mode', 'production']);
     
     // Skip optimization script to save memory
     console.log('Skipping build optimization to conserve memory...');
