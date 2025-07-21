@@ -380,7 +380,29 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
       console.log("Looking for coupon:", couponCode.toUpperCase());
       console.log("Found coupon:", coupon);
 
-            if (coupon) {
+                  if (coupon) {
+        // Check if coupon is restricted to first orders only
+        if (coupon.isFirstOrder && !referralService.isFirstTimeUser(currentUser)) {
+          addNotification(
+            createErrorNotification(
+              "Invalid Coupon",
+              "This coupon is valid for first orders only.",
+            ),
+          );
+          return;
+        }
+
+        // Check if coupon excludes first orders
+        if (coupon.excludeFirstOrder && referralService.isFirstTimeUser(currentUser)) {
+          addNotification(
+            createErrorNotification(
+              "Invalid Coupon",
+              "This coupon is not valid for first orders.",
+            ),
+          );
+          return;
+        }
+
         setAppliedCoupon({
           code: couponCode.toUpperCase(),
           discount: coupon.discount,
