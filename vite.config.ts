@@ -27,35 +27,48 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-    build: {
-      chunkSizeWarningLimit: 1000,
+        build: {
+      chunkSizeWarningLimit: 2000,
       rollupOptions: {
         output: {
-          manualChunks: {
-            vendor: ["react", "react-dom"],
-            router: ["react-router-dom"],
-            ui: [
-              "@radix-ui/react-accordion",
-              "@radix-ui/react-alert-dialog",
-              "@radix-ui/react-dialog",
-            ],
-            icons: ["lucide-react"],
-            utils: ["clsx", "tailwind-merge", "class-variance-authority"],
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('react-dom')) {
+                return 'react-vendor';
+              }
+              if (id.includes('@radix-ui')) {
+                return 'radix-ui';
+              }
+              if (id.includes('lucide-react')) {
+                return 'icons';
+              }
+              return 'vendor';
+            }
           },
         },
+        // Reduce memory usage during build
+        maxParallelFileOps: 2,
       },
-      // Enable minification and compression
-      minify: "terser",
-      terserOptions: {
+      // Reduce memory usage
+      minify: mode === "production" ? "terser" : false,
+      terserOptions: mode === "production" ? {
         compress: {
-          drop_console: mode === "production",
-          drop_debugger: mode === "production",
+          drop_console: true,
+          drop_debugger: true,
         },
-      },
-      // Enable CSS code splitting
-      cssCodeSplit: true,
-      // Reduce bundle size
-      sourcemap: mode !== "production",
+        mangle: {
+          safari10: true,
+        },
+        format: {
+          safari10: true,
+        },
+      } : {},
+      // Disable CSS code splitting to reduce memory usage
+      cssCodeSplit: false,
+      // Disable sourcemap in production to save memory
+      sourcemap: false,
+      // Reduce memory usage
+      reportCompressedSize: false,
     },
     // Enable gzip compression for assets
     esbuild: {
