@@ -330,12 +330,12 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
     );
   };
 
-  const applyCoupon = () => {
+  const applyCoupon = async () => {
     console.log("applyCoupon function called with code:", couponCode);
 
     try {
       // First check if it's a referral code
-      const referralDiscount = referralService.validateReferralCode(
+      const referralDiscount = await referralService.validateReferralCode(
         couponCode,
         currentUser,
       );

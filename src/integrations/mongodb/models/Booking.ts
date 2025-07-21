@@ -16,6 +16,8 @@ export interface Booking extends Document {
   }>;
   scheduled_date: string;
   scheduled_time: string;
+  delivery_date?: string;
+  delivery_time?: string;
   provider_name: string;
   address: string;
   coordinates?: {
@@ -99,6 +101,14 @@ const bookingSchema = new Schema<Booking>({
   scheduled_time: {
     type: String,
     required: true,
+  },
+  delivery_date: {
+    type: String,
+    required: false,
+  },
+  delivery_time: {
+    type: String,
+    required: false,
   },
   provider_name: {
     type: String,
