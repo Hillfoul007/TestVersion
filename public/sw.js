@@ -1,5 +1,5 @@
-const CACHE_NAME = "cleancare-v4";
-const STATIC_CACHE = "cleancare-static-v4";
+const CACHE_NAME = "laundrify-v4";
+const STATIC_CACHE = "laundrify-static-v4";
 const urlsToCache = [
   "/",
   "/manifest.json",
@@ -55,7 +55,7 @@ self.addEventListener("fetch", (event) => {
     event.request.url.includes("/api/") ||
     event.request.url.includes("onrender.com") ||
     event.request.url.includes("localhost:3001") ||
-    event.request.url.includes("cleancarepro") ||
+    event.request.url.includes("laundrify") ||
     event.request.method !== "GET"
   ) {
     // Let these requests pass through without any service worker intervention
@@ -126,7 +126,7 @@ self.addEventListener("push", (event) => {
   const options = {
     body: event.data
       ? event.data.text()
-      : "New notification from CleanCare Pro",
+      : "New notification from Laundrify",
     icon: "/icons/icon-192x192.png",
     badge: "/icons/icon-72x72.png",
     vibrate: [100, 50, 100],
@@ -148,7 +148,7 @@ self.addEventListener("push", (event) => {
     ],
   };
 
-  event.waitUntil(self.registration.showNotification("CleanCare Pro", options));
+  event.waitUntil(self.registration.showNotification("Laundrify", options));
 });
 
 // Notification click handler
