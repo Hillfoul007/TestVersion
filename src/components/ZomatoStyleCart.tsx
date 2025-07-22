@@ -460,7 +460,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
         <Button
           variant="ghost"
           onClick={onBack}
-          className="w-full text-green-600 border border-green-600 hover:bg-green-50"
+          className="w-full text-laundrify-blue border border-laundrify-blue hover:bg-laundrify-mint/20"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add more items
@@ -499,7 +499,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
                   }}
                   variant="outline"
                   disabled={!couponCode.trim()}
-                  className="border-green-600 text-green-600 hover:bg-green-50"
+                  className="border-laundrify-blue text-laundrify-blue hover:bg-laundrify-mint/20"
                   type="button"
                 >
                   Apply
@@ -517,12 +517,12 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
             </CardContent>
           </Card>
         ) : (
-          <Card className="border-0 shadow-sm bg-green-50">
+          <Card className="border-0 shadow-sm bg-laundrify-mint/20">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span className="font-medium text-green-800">
+                  <CheckCircle className="h-5 w-5 text-laundrify-blue" />
+                  <span className="font-medium text-laundrify-blue">
                     Upto {appliedCoupon.discount}% OFF applied!
                   </span>
                 </div>
