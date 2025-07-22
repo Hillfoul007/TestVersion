@@ -918,7 +918,7 @@ Confirm this booking?`;
                 key={service!.id}
                 className="flex items-center gap-2 p-1.5 bg-gray-50 rounded-md"
               >
-                <div className="w-12 h-12 rounded-md overflow-hidden bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 rounded-md overflow-hidden bg-gradient-to-br from-laundrify-mint/20 to-laundrify-mint/40 flex items-center justify-center flex-shrink-0">
                   {service!.image ? (
                     <img
                       src={service!.image}
@@ -941,7 +941,7 @@ Confirm this booking?`;
                   <h4 className="font-medium text-xs break-words leading-tight">
                     {service!.name}
                   </h4>
-                  <p className="text-xs text-green-600">₹{service!.price}</p>
+                  <p className="text-xs text-laundrify-red">₹{service!.price}</p>
                 </div>
 
                 <div className="flex items-center gap-1">
