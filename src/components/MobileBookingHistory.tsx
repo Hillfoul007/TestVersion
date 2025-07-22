@@ -522,6 +522,15 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
             };
 
             try {
+              // Debug delivery date mapping
+              console.log(`📅 Debug delivery date for booking ${booking.id || index}:`, {
+                delivery_date: booking.delivery_date,
+                deliveryDate: booking.deliveryDate,
+                pickup_date: booking.pickup_date,
+                pickupDate: booking.pickupDate,
+                scheduled_date: booking.scheduled_date
+              });
+
               // Comprehensive data sanitization to prevent object rendering
               const sanitizeValue = (value: any, fallback: any = "") => {
                 if (value === null || value === undefined) return fallback;
@@ -632,12 +641,12 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                 phone: sanitizeValue(booking.phone, "Not specified"),
                 // Order ID fields - always include for proper fallback
                 order_id: sanitizeValue(booking.order_id, ""),
-                // Date and time fields
-                pickupDate: sanitizeValue(booking.pickupDate, ""),
-                deliveryDate: sanitizeValue(booking.deliveryDate, ""),
+                // Date and time fields - use mapped values from booking data mapper
+                pickupDate: sanitizeValue(booking.pickup_date || booking.pickupDate || booking.scheduled_date, ""),
+                deliveryDate: sanitizeValue(booking.delivery_date || booking.deliveryDate, ""),
                 scheduled_date: sanitizeValue(booking.scheduled_date, ""),
-                pickupTime: sanitizeValue(booking.pickupTime, ""),
-                deliveryTime: sanitizeValue(booking.deliveryTime, ""),
+                pickupTime: sanitizeValue(booking.pickup_time || booking.pickupTime || booking.scheduled_time, ""),
+                deliveryTime: sanitizeValue(booking.delivery_time || booking.deliveryTime, ""),
                 scheduled_time: sanitizeValue(booking.scheduled_time, ""),
                 // Other fields
                 address: sanitizeValue(booking.address, "Address not provided"),
@@ -988,7 +997,7 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                                                     <p className="text-xs text-gray-900">
                             {(() => {
                               // Use the mapped delivery_date field from booking data mapper
-                              const deliveryDateStr = booking.delivery_date || safeBooking.deliveryDate;
+                              const deliveryDateStr = safeBooking.deliveryDate;
                               if (!deliveryDateStr) return "Date TBD";
 
                               try {
@@ -1022,7 +1031,7 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                             })()}
                           </p>
                           <p className="text-xs text-emerald-600">
-                            {booking.delivery_time || safeBooking.deliveryTime || "TBD"}
+                            {safeBooking.deliveryTime || "TBD"}
                           </p>
                         </div>
                       </div>

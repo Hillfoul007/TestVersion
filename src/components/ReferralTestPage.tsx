@@ -63,7 +63,7 @@ export function ReferralTestPage({ currentUser }: ReferralTestPageProps) {
       try {
         const referralCode = referralService.generateReferralCode(currentUser);
         const shareLink = {
-          share_url: `${window.location.origin}?ref=${referralCode}`,
+          share_url: `${window.location.origin}/refer?ref=${referralCode}`,
           referral_code: referralCode,
           discount_percentage: 50,
         };

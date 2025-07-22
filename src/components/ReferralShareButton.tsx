@@ -118,7 +118,7 @@ export const ReferralShareButton = React.forwardRef<
         const referralCode = referralService.generateReferralCode(currentUser);
 
         setShareData({
-          share_url: `${window.location.origin}?ref=${referralCode}`,
+          share_url: `${window.location.origin}/refer?ref=${referralCode}`,
           referral_code: referralCode,
           discount_percentage: 50,
         });
@@ -204,10 +204,10 @@ export const ReferralShareButton = React.forwardRef<
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Gift className="h-5 w-5 text-primary" />
-              Share & Earn 50% OFF
+              Share & Earn Rewards
             </DialogTitle>
             <DialogDescription>
-              Share CleanCare Pro with friends and both of you get 50% OFF!
+              Share CleanCare Pro with friends! They get FIRST30 (30% OFF), you get rewards!
             </DialogDescription>
           </DialogHeader>
 
@@ -224,8 +224,8 @@ export const ReferralShareButton = React.forwardRef<
                   <div className="space-y-2">
                     <p className="font-medium">How it works:</p>
                     <ol className="text-sm list-decimal list-inside space-y-1 text-muted-foreground">
-                      <li>Share your referral link</li>
-                      <li>Friend signs up & gets 50% OFF first order</li>
+                      <li>Share your referral link (takes them to login page)</li>
+                      <li>Friend signs up & gets FIRST30 (30% OFF) first order</li>
                       <li>After their payment, you get 50% OFF too!</li>
                     </ol>
                   </div>

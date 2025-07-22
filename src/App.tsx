@@ -8,6 +8,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import InstallPrompt from "@/components/InstallPrompt";
 import PWAUpdateNotification from "@/components/PWAUpdateNotification";
 import AddressSearchDemo from "@/components/AddressSearchDemo";
+import ReferralLoginPage from "@/pages/ReferralLoginPage";
 import {
   initializeAuthPersistence,
   restoreAuthState,
@@ -48,6 +49,8 @@ function App() {
           <div className="App">
             <Routes>
               <Route path="/" element={<LaundryIndex />} />
+              <Route path="/login" element={<ReferralLoginPage />} />
+              <Route path="/refer" element={<ReferralLoginPage />} />
               <Route path="/address-demo" element={<AddressSearchDemo />} />
               <Route
                 path="/admin/location-config"

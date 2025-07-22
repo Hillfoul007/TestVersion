@@ -6,8 +6,10 @@ import PhoneOtpAuthModal from "@/components/PhoneOtpAuthModal";
 import BookingConfirmed from "@/components/BookingConfirmed";
 import ReferralCodeHandler from "@/components/ReferralCodeHandler";
 import ReferralDiscountBanner from "@/components/ReferralDiscountBanner";
+import First30OfferNotification from "@/components/First30OfferNotification";
 import { DVHostingSmsService } from "../services/dvhostingSmsService";
 import PushNotificationService from "../services/pushNotificationService";
+import { ReferralService } from "@/services/referralService";
 import { useNotifications } from "@/contexts/NotificationContext";
 import {
   createSuccessNotification,
@@ -209,14 +211,17 @@ const LaundryIndex = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<string>("");
+  const [showFirst30Notification, setShowFirst30Notification] = useState(false);
   const authService = DVHostingSmsService.getInstance();
   const pushService = PushNotificationService.getInstance();
+  const referralService = ReferralService.getInstance();
 
   // Initialize PWA and check auth state
   useEffect(() => {
     initializeApp();
     checkAuthState();
     getUserLocation();
+    checkFirst30Notification();
 
     // Listen for auth events from other tabs or auth persistence
     const handleAuthLogin = (event: CustomEvent) => {
@@ -292,6 +297,19 @@ const LaundryIndex = () => {
       themeColorMeta.name = "theme-color";
       themeColorMeta.content = "#22c55e";
       document.head.appendChild(themeColorMeta);
+    }
+  };
+
+  const checkFirst30Notification = () => {
+    // Check if we should show FIRST30 notification for new users
+    const shouldShow = localStorage.getItem("show_first30_notification");
+    if (shouldShow === "true") {
+      // Show notification with a slight delay for better UX
+      setTimeout(() => {
+        setShowFirst30Notification(true);
+      }, 1000);
+      // Clear the flag so it only shows once
+      localStorage.removeItem("show_first30_notification");
     }
   };
 
@@ -425,6 +443,15 @@ const LaundryIndex = () => {
 
     console.log("✅ User logged in successfully:", user.name || user.phone);
     console.log("📍 Redirecting to:", targetView);
+
+    // Check if this is a first-time user for FIRST30 notification
+    const isFirstTime = referralService.isFirstTimeUser(user);
+    if (isFirstTime && targetView === "home") {
+      // Show FIRST30 notification for new users after a short delay
+      setTimeout(() => {
+        setShowFirst30Notification(true);
+      }, 2000);
+    }
 
     // Add success notification
     addNotification(
@@ -786,6 +813,13 @@ const LaundryIndex = () => {
 
       {currentView === "home" && (
         <>
+          {/* FIRST30 Offer Notification for New Users */}
+          <First30OfferNotification
+            isVisible={showFirst30Notification}
+            onDismiss={() => setShowFirst30Notification(false)}
+            userName={currentUser?.name}
+          />
+
           {/* Referral Discount Banner */}
           {currentUser && (
             <div className="px-4 pt-4 bg-gradient-to-r from-green-500 to-green-600">
