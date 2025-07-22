@@ -118,7 +118,7 @@ export const ReferralShareButton = React.forwardRef<
         const referralCode = referralService.generateReferralCode(currentUser);
 
         setShareData({
-          share_url: `${window.location.origin}?ref=${referralCode}`,
+          share_url: `${window.location.origin}/refer?ref=${referralCode}`,
           referral_code: referralCode,
           discount_percentage: 50,
         });
