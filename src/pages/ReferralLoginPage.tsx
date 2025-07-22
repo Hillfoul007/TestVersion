@@ -125,13 +125,13 @@ const ReferralLoginPage: React.FC = () => {
           </div>
           
           {referralCode && (
-            <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200 rounded-lg p-4 mb-6">
+            <div className="bg-gradient-to-r from-laundrify-mint/20 to-laundrify-purple/20 border border-laundrify-mint rounded-lg p-4 mb-6">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <Gift className="h-5 w-5 text-green-600" />
-                <span className="font-semibold text-green-800">Special Offer!</span>
+                <Gift className="h-5 w-5 text-laundrify-blue" />
+                <span className="font-semibold text-laundrify-blue">Special Offer!</span>
               </div>
-              <p className="text-green-700">
-                You've been invited with referral code: <span className="font-bold text-green-800">{referralCode}</span>
+              <p className="text-laundrify-blue">
+                You've been invited with referral code: <span className="font-bold text-laundrify-blue">{referralCode}</span>
               </p>
               <p className="text-green-600 text-sm mt-1">
                 Sign in to get 50% off your first order!
