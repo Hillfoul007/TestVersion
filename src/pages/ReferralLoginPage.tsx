@@ -133,7 +133,7 @@ const ReferralLoginPage: React.FC = () => {
               <p className="text-laundrify-blue">
                 You've been invited with referral code: <span className="font-bold text-laundrify-blue">{referralCode}</span>
               </p>
-              <p className="text-green-600 text-sm mt-1">
+              <p className="text-laundrify-blue text-sm mt-1">
                 Sign in to get 50% off your first order!
               </p>
             </div>
@@ -189,7 +189,7 @@ const ReferralLoginPage: React.FC = () => {
                 <CardContent className="space-y-4">
                   <Button
                     onClick={() => setIsAuthModalOpen(true)}
-                    className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all duration-200"
+                    className="w-full bg-gradient-to-r from-laundrify-purple to-laundrify-pink hover:from-laundrify-purple/90 hover:to-laundrify-pink/90 text-white py-3 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all duration-200"
                     size="lg"
                   >
                     <Phone className="mr-2 h-5 w-5" />
@@ -204,8 +204,8 @@ const ReferralLoginPage: React.FC = () => {
                   </div>
 
                   {referralCode && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                      <div className="flex items-center gap-2 text-green-700">
+                    <div className="bg-laundrify-mint/20 border border-laundrify-mint rounded-lg p-3">
+                      <div className="flex items-center gap-2 text-laundrify-blue">
                         <Check className="h-4 w-4" />
                         <span className="text-sm font-medium">
                           Referral code {referralCode} will be automatically applied
@@ -233,7 +233,7 @@ const ReferralLoginPage: React.FC = () => {
         <div className="max-w-2xl mx-auto mt-12 text-center">
           <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
             <div className="flex flex-col items-center gap-2">
-              <div className="bg-green-100 p-2 rounded-full">
+              <div className="bg-laundrify-mint/40 p-2 rounded-full">
                 <Check className="h-5 w-5 text-green-600" />
               </div>
               <span>Trusted by 10,000+ customers</span>
