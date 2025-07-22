@@ -813,6 +813,13 @@ const LaundryIndex = () => {
 
       {currentView === "home" && (
         <>
+          {/* FIRST30 Offer Notification for New Users */}
+          <First30OfferNotification
+            isVisible={showFirst30Notification}
+            onDismiss={() => setShowFirst30Notification(false)}
+            userName={currentUser?.name}
+          />
+
           {/* Referral Discount Banner */}
           {currentUser && (
             <div className="px-4 pt-4 bg-gradient-to-r from-green-500 to-green-600">
