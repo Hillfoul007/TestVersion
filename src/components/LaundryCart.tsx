@@ -1006,7 +1006,7 @@ Confirm this booking?`;
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-green-600"
+                className="text-laundrify-blue"
                 onClick={() => setShowZomatoAddressSelector(true)}
               >
                 <ArrowLeft className="h-4 w-4 rotate-180" />
