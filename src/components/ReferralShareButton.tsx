@@ -120,7 +120,7 @@ export const ReferralShareButton = React.forwardRef<
         setShareData({
           share_url: `${window.location.origin}/refer?ref=${referralCode}`,
           referral_code: referralCode,
-          discount_percentage: 50,
+          discount_percentage: 30,
         });
         setStats({
           total_referrals: 0,
@@ -226,7 +226,7 @@ export const ReferralShareButton = React.forwardRef<
                     <ol className="text-sm list-decimal list-inside space-y-1 text-muted-foreground">
                       <li>Share your referral link (takes them to login page)</li>
                       <li>Friend signs up & gets FIRST30 (30% OFF) first order</li>
-                      <li>After their payment, you get 50% OFF too!</li>
+                      <li>After their payment, you get 30% OFF too!</li>
                     </ol>
                   </div>
                 </AlertDescription>
