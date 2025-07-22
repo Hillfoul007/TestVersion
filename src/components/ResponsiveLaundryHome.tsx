@@ -999,7 +999,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
               <div className="hidden lg:flex items-center gap-2 bg-laundrify-mint/20 px-3 py-2 rounded-lg">
                 <Clock className="h-4 w-4 text-laundrify-blue" />
-                <span className="text-sm font-medium text-green-700">
+                <span className="text-sm font-medium text-laundrify-blue">
                   Delivery in {deliveryTime}
                 </span>
               </div>
@@ -1133,9 +1133,9 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                 placeholder="Search for laundry services..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="pl-12 pr-12 py-3 rounded-xl border-gray-200 focus:border-green-500"
+                className="pl-12 pr-12 py-3 rounded-xl border-gray-200 focus:border-laundrify-purple"
               />
-              <Mic className="absolute right-4 top-3 h-5 w-5 text-gray-400 cursor-pointer hover:text-green-500" />
+              <Mic className="absolute right-4 top-3 h-5 w-5 text-gray-400 cursor-pointer hover:text-laundrify-purple" />
             </div>
           </div>
 
@@ -1145,8 +1145,8 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
               onClick={() => setSelectedCategory("all")}
               className={`flex-shrink-0 rounded-xl ${
                 selectedCategory === "all"
-                  ? "bg-green-600 text-white"
-                  : "hover:bg-green-50 hover:border-green-200"
+                  ? "bg-laundrify-purple text-white"
+                  : "hover:bg-laundrify-mint/20 hover:border-laundrify-mint"
               }`}
             >
               <ShoppingBag className="h-4 w-4 mr-2" />
@@ -1167,8 +1167,8 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                   onClick={() => setSelectedCategory(category.id)}
                   className={`flex-shrink-0 rounded-xl ${
                     selectedCategory === category.id
-                      ? "bg-green-600 text-white"
-                      : "hover:bg-green-50 hover:border-green-200"
+                      ? "bg-laundrify-purple text-white"
+                      : "hover:bg-laundrify-mint/20 hover:border-laundrify-mint"
                   }`}
                 >
                   <span className="mr-2">{category.icon}</span>
