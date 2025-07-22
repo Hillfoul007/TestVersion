@@ -224,8 +224,8 @@ export const ReferralShareButton = React.forwardRef<
                   <div className="space-y-2">
                     <p className="font-medium">How it works:</p>
                     <ol className="text-sm list-decimal list-inside space-y-1 text-muted-foreground">
-                      <li>Share your referral link</li>
-                      <li>Friend signs up & gets 50% OFF first order</li>
+                      <li>Share your referral link (takes them to login page)</li>
+                      <li>Friend signs up & gets FIRST30 (30% OFF) first order</li>
                       <li>After their payment, you get 50% OFF too!</li>
                     </ol>
                   </div>
