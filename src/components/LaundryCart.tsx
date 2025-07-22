@@ -1062,7 +1062,7 @@ Confirm this booking?`;
                     }
                   }}
                   variant="outline"
-                  className="w-full border-green-600 text-green-600 hover:bg-green-50"
+                  className="w-full border-laundrify-blue text-laundrify-blue hover:bg-laundrify-mint/20"
                 >
                   <MapPin className="h-4 w-4 mr-2" />
                   {!currentUser ? "Login to Add Address" : "Select Address"}
