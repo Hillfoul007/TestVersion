@@ -882,7 +882,7 @@ Confirm this booking?`;
             Your cart is empty
           </h2>
           <p className="text-gray-600 mb-6">Add some items to get started</p>
-          <Button onClick={onBack} className="bg-green-600 hover:bg-green-700">
+          <Button onClick={onBack} className="bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue">
             Continue Shopping
           </Button>
         </div>
