@@ -127,7 +127,7 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
                 item_prices: booking.item_prices, // Include item prices from database
                 status: booking.status,
                 pickupDate: booking.scheduled_date,
-                deliveryDate: booking.scheduled_date, // Could calculate +1 day
+                deliveryDate: booking.delivery_date || booking.scheduled_date,
                 pickupTime: booking.scheduled_time,
                 deliveryTime: booking.delivery_time || "TBD",
                 address: booking.address,
@@ -188,7 +188,7 @@ const EnhancedBookingHistory: React.FC<EnhancedBookingHistoryProps> =
       setRefreshing(true);
       try {
         // Don't clear cache immediately - preserve local bookings during refresh
-        console.log("🔄 Refreshing bookings while preserving local data...");
+        console.log("��� Refreshing bookings while preserving local data...");
 
         await loadBookings(true);
         addNotification(
