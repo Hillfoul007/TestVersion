@@ -228,6 +228,13 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
           : [provider?.name || "Service"],
         scheduled_date: selectedDate.toISOString().split("T")[0],
         scheduled_time: selectedTime,
+        // Set delivery date to 2 days after pickup and delivery time to 6 PM
+        delivery_date: (() => {
+          const deliveryDate = new Date(selectedDate);
+          deliveryDate.setDate(deliveryDate.getDate() + 2);
+          return deliveryDate.toISOString().split("T")[0];
+        })(),
+        delivery_time: "6:00 PM",
         provider_name: isMultipleServices
           ? "CleanCare Pro"
           : provider?.provider || "CleanCare Pro",
