@@ -547,9 +547,9 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   if (isMobile) {
     // Mobile Interface
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-400 via-green-500 to-green-600">
+      <div className="min-h-screen bg-gradient-to-br from-laundrify-purple via-purple-400 to-laundrify-pink">
         {/* Mobile Header */}
-        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white relative z-40">
+        <div className="bg-gradient-to-r from-laundrify-purple to-laundrify-pink text-white relative z-40">
           <div className="flex items-center justify-between mobile-header-safe">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-3">
@@ -702,7 +702,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         </div>
 
         {/* Sticky Search and Categories Only */}
-        <div className="sticky top-0 bg-gradient-to-b from-green-500 to-green-600 z-50 shadow-lg">
+        <div className="sticky top-0 bg-gradient-to-b from-laundrify-purple to-laundrify-pink z-50 shadow-lg">
           <div className="px-4 pt-4 pb-2 space-y-3">
             {/* Search Bar */}
             <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search">
@@ -1081,7 +1081,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
       {/* Desktop Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl text-white p-8 mb-8">
+        <div className="bg-gradient-to-r from-laundrify-purple to-laundrify-pink rounded-2xl text-white p-8 mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h2 className="text-4xl font-bold mb-4">
