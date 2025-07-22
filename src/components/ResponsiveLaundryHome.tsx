@@ -1221,7 +1221,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                           </div>
 
                           {service.popular && (
-                            <Badge className="bg-green-100 text-green-700">
+                            <Badge className="bg-laundrify-yellow/20 text-laundrify-blue">
                               <Star className="w-3 h-3 mr-1 fill-current" />
                               Popular
                             </Badge>
@@ -1236,7 +1236,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                         )}
 
                         {quantity > 0 ? (
-                          <div className="flex items-center justify-between bg-green-50 rounded-lg p-3">
+                          <div className="flex items-center justify-between bg-laundrify-mint/20 rounded-lg p-3">
                             <Button
                               variant="ghost"
                               size="sm"
@@ -1246,7 +1246,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                               <Minus className="h-4 w-4" />
                             </Button>
 
-                            <span className="font-semibold text-green-700 text-lg">
+                            <span className="font-semibold text-laundrify-blue text-lg">
                               {quantity}
                             </span>
 
@@ -1262,7 +1262,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                         ) : (
                           <Button
                             onClick={() => addToCart(service.id)}
-                            className="w-full bg-green-600 hover:bg-green-700 text-white rounded-xl py-3 font-semibold"
+                            className="w-full bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue rounded-xl py-3 font-semibold"
                           >
                             ADD TO CART
                           </Button>
@@ -1281,7 +1281,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           <div className="fixed bottom-8 right-8 z-50">
             <Button
               onClick={onViewCart}
-              className="bg-green-600 hover:bg-green-700 text-white rounded-2xl py-4 px-6 flex items-center gap-3 shadow-lg hover:shadow-xl transition-all"
+              className="bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue rounded-2xl py-4 px-6 flex items-center gap-3 shadow-lg hover:shadow-xl transition-all"
             >
               <ShoppingBag className="h-5 w-5" />
               <div>
