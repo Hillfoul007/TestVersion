@@ -213,6 +213,7 @@ const LaundryIndex = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<string>("");
   const [showFirst30Notification, setShowFirst30Notification] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const authService = DVHostingSmsService.getInstance();
   const pushService = PushNotificationService.getInstance();
   const referralService = ReferralService.getInstance();
