@@ -506,9 +506,11 @@ router.post("/", async (req, res) => {
       services,
       scheduled_date,
       scheduled_time,
-            delivery_date: delivery_date && delivery_date.trim() !== "" ? delivery_date : scheduled_date,
-delivery_time: delivery_time && delivery_time.trim() !== "" ? delivery_time : scheduled_time,
-provider_name,
+
+            delivery_date: delivery_date || scheduled_date, // Use delivery date from cart or fallback to pickup date
+      delivery_time: delivery_time || scheduled_time, // Use delivery time from cart or fallback to pickup time
+      provider_name,
+
       address: sanitizedAddress, // Use sanitized string address
       address_details: addressObject
         ? {

@@ -33,6 +33,7 @@ import {
 } from "@/utils/notificationUtils";
 import DynamicServicesService from "@/services/dynamicServicesService";
 import type { DynamicLaundryService } from "@/services/dynamicServicesService";
+import { ReferralService } from "@/services/referralService";
 import SimplifiedAddressForm from "./SimplifiedAddressForm";
 import ProfessionalDateTimePicker from "./ProfessionalDateTimePicker";
 import { FormValidation, validateCheckoutForm } from "./FormValidation";
@@ -184,15 +185,25 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
   };
 
   const applyCoupon = () => {
+    const referralService = ReferralService.getInstance();
     const validCoupons = {
-      FIRST10: { discount: 10, description: "10% off on first order" },
-      SAVE20: { discount: 20, description: "20% off on your order" },
-      WELCOME5: { discount: 5, description: "5% welcome discount" },
-      NEWUSER15: { discount: 15, description: "15% off for new users" },
+      NEW10: { discount: 10, description: "10% off on your order" },
+      FIRST30: { discount: 30, description: "30% off on first order", isFirstOrder: true },
     };
 
     const coupon = validCoupons[couponCode.toUpperCase()];
     if (coupon) {
+      // Check if coupon is restricted to first orders only
+      if (coupon.isFirstOrder && !referralService.isFirstTimeUser(currentUser)) {
+        addNotification(
+          createErrorNotification(
+            "Invalid Coupon",
+            "This coupon is valid for first orders only.",
+          ),
+        );
+        return;
+      }
+
       setAppliedCoupon({
         code: couponCode.toUpperCase(),
         discount: coupon.discount,

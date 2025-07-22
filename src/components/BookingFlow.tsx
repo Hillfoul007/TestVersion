@@ -120,8 +120,11 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
   const applyCoupon = () => {
     const code = couponCode.trim().toUpperCase();
 
-    if (code === "FIRST10") {
-      setAppliedCoupon({ code: "FIRST10", discount: 10 });
+    if (code === "NEW10") {
+      setAppliedCoupon({ code: "NEW10", discount: 10 });
+      setError("");
+    } else if (code === "FIRST30") {
+      setAppliedCoupon({ code: "FIRST30", discount: 30 });
       setError("");
     } else if (code === "") {
       setError("Please enter a coupon code");
@@ -699,7 +702,7 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
                   )}
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  Try "FIRST10" for 10% off your first order!
+                  Try "NEW10" for 10% off or "FIRST30" for 30% off your first order!
                 </p>
               </div>
 
