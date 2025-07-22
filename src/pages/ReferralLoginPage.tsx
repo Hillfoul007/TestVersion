@@ -89,7 +89,7 @@ const ReferralLoginPage: React.FC = () => {
 
   const benefits = [
     {
-      icon: <Gift className="h-6 w-6 text-green-600" />,
+      icon: <Gift className="h-6 w-6 text-laundrify-red" />,
       title: "50% Off First Order",
       description: "Get amazing savings on your first laundry service"
     },
@@ -111,16 +111,16 @@ const ReferralLoginPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-laundrify-purple/10 via-laundrify-pink/10 to-laundrify-mint/10">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="bg-gradient-to-r from-green-500 to-blue-500 p-3 rounded-full">
+            <div className="bg-gradient-to-r from-laundrify-purple to-laundrify-pink p-3 rounded-full">
               <Sparkles className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-              CleanCare Pro
+            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-laundrify-purple to-laundrify-pink bg-clip-text text-transparent">
+              Laundrify
             </h1>
           </div>
           
