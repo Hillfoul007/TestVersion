@@ -210,9 +210,9 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
           <Button
             onClick={onAddNewAddress}
             variant="ghost"
-            className="w-full h-14 justify-start text-green-600 hover:bg-green-50"
+            className="w-full h-14 justify-start text-laundrify-blue hover:bg-laundrify-mint/20"
           >
-            <Plus className="h-5 w-5 mr-3 text-green-600" />
+            <Plus className="h-5 w-5 mr-3 text-laundrify-blue" />
             <span className="font-medium">Add Address</span>
             <ArrowRight className="h-4 w-4 ml-auto" />
           </Button>
@@ -234,7 +234,7 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
                   key={address.id}
                   className={`border cursor-pointer transition-all ${
                     selectedAddressId === address.id
-                      ? "border-green-500 bg-green-50"
+                      ? "border-laundrify-purple bg-laundrify-mint/20"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                   onClick={() => onSelectAddress(address)}
@@ -314,7 +314,7 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 text-green-600"
+                          className="h-8 w-8 p-0 text-laundrify-blue"
                           onClick={(e) => {
                             e.stopPropagation();
                             onSelectAddress(address);
@@ -343,7 +343,7 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
             </p>
             <Button
               onClick={onAddNewAddress}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Address
