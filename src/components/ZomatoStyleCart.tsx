@@ -65,6 +65,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
     code: string;
     discount: number;
   } | null>(null);
+  const [couponError, setCouponError] = useState("");
   const [validationErrors, setValidationErrors] = useState<any[]>([]);
   const [showSavedAddresses, setShowSavedAddresses] = useState(false);
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
@@ -185,6 +186,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
   };
 
   const applyCoupon = () => {
+    setCouponError(""); // Clear any previous errors
     const referralService = ReferralService.getInstance();
     const validCoupons = {
       NEW10: {
@@ -203,23 +205,13 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
     if (coupon) {
       // Check if coupon is restricted to first orders only
       if (coupon.isFirstOrder && !referralService.isFirstTimeUser(currentUser)) {
-        addNotification(
-          createErrorNotification(
-            "Invalid Coupon",
-            "This coupon is valid for first orders only.",
-          ),
-        );
+        setCouponError("This coupon is valid for first orders only.");
         return;
       }
 
       // Check if coupon excludes first orders
       if (coupon.excludeFirstOrder && referralService.isFirstTimeUser(currentUser)) {
-        addNotification(
-          createErrorNotification(
-            "Invalid Coupon",
-            "This coupon is not valid for first orders.",
-          ),
-        );
+        setCouponError("This coupon is not valid for first orders.");
         return;
       }
 
@@ -231,18 +223,14 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
         createSuccessNotification("Coupon Applied", coupon.description),
       );
     } else {
-      addNotification(
-        createErrorNotification(
-          "Invalid Coupon",
-          "Not a valid coupon. Valid coupons: FIRST30, NEW10",
-        ),
-      );
+      setCouponError("Invalid coupon. Valid coupons: FIRST30, NEW10");
     }
   };
 
   const removeCoupon = () => {
     setAppliedCoupon(null);
     setCouponCode("");
+    setCouponError("");
   };
 
   const updateQuantity = (serviceId: string, change: number) => {
@@ -517,6 +505,12 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
                   Apply
                 </Button>
               </div>
+              {/* Coupon Error Message */}
+              {couponError && (
+                <div className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded mt-2">
+                  {couponError}
+                </div>
+              )}
               <p className="text-xs text-gray-500 mt-2">
                 Enter a valid coupon code to get discount
               </p>
