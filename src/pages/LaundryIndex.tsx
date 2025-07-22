@@ -548,6 +548,8 @@ const LaundryIndex = () => {
         services: servicesArray,
         scheduled_date: cartData.pickupDate,
         scheduled_time: cartData.pickupTime,
+        delivery_date: cartData.deliveryDate,
+        delivery_time: cartData.deliveryTime,
         provider_name: "CleanCare Pro",
         address:
           typeof cartData.address === "string"
