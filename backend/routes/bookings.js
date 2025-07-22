@@ -507,8 +507,8 @@ router.post("/", async (req, res) => {
       scheduled_date,
       scheduled_time,
 
-            delivery_date: delivery_date || scheduled_date, // Use delivery date from cart or fallback to pickup date
-      delivery_time: delivery_time || scheduled_time, // Use delivery time from cart or fallback to pickup time
+            delivery_date: delivery_date, // Use delivery date from request
+      delivery_time: delivery_time, // Use delivery time from request
       provider_name,
 
       address: sanitizedAddress, // Use sanitized string address
