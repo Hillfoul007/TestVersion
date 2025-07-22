@@ -293,8 +293,6 @@ export const bookingHelpers = {
           delivery_time:
             bookingData.deliveryTime ||
             bookingData.delivery_time ||
-            bookingData.pickupTime ||
-            bookingData.scheduled_time ||
             "18:00",
           provider_name: bookingData.provider_name || "CleanCare Pro",
           address: addressString,
