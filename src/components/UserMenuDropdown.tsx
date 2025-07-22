@@ -133,12 +133,12 @@ const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
                       {currentUser.name || "User"}
                     </p>
                   </div>
-                  <p className="text-sm text-green-100 truncate">
+                  <p className="text-sm text-white/80 truncate">
                     {formatPhone(currentUser.phone)}
                   </p>
                   <div className="flex items-center mt-1">
-                    <div className="w-2 h-2 bg-green-300 rounded-full mr-2 animate-pulse"></div>
-                    <span className="text-xs text-green-100">Online</span>
+                    <div className="w-2 h-2 bg-white/60 rounded-full mr-2 animate-pulse"></div>
+                    <span className="text-xs text-white/80">Online</span>
                   </div>
                 </div>
               </div>
