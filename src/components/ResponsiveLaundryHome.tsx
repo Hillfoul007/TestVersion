@@ -581,9 +581,8 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                 </div>
                 <div>
                   <h1 className="text-lg font-bold">Laundrify</h1>
-                  <div className="flex items-center gap-1 text-xs text-white/80">
-                    <Smartphone className="h-3 w-3" />
-                    <span>Mobile</span>
+                  <div className="text-xs text-white/80">
+                    <span>Quick clean & convenient</span>
                   </div>
                 </div>
               </div>
