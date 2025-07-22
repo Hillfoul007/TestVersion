@@ -185,13 +185,25 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
   };
 
   const applyCoupon = () => {
+    const referralService = ReferralService.getInstance();
     const validCoupons = {
       NEW10: { discount: 10, description: "10% off on your order" },
-      FIRST30: { discount: 30, description: "30% off on first order" },
+      FIRST30: { discount: 30, description: "30% off on first order", isFirstOrder: true },
     };
 
     const coupon = validCoupons[couponCode.toUpperCase()];
     if (coupon) {
+      // Check if coupon is restricted to first orders only
+      if (coupon.isFirstOrder && !referralService.isFirstTimeUser(currentUser)) {
+        addNotification(
+          createErrorNotification(
+            "Invalid Coupon",
+            "This coupon is valid for first orders only.",
+          ),
+        );
+        return;
+      }
+
       setAppliedCoupon({
         code: couponCode.toUpperCase(),
         discount: coupon.discount,
