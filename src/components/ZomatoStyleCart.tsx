@@ -345,7 +345,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
           <p className="text-gray-600 mb-6 text-center">
             Add some items to get started
           </p>
-          <Button onClick={onBack} className="bg-green-600 hover:bg-green-700">
+          <Button onClick={onBack} className="bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue">
             Continue Shopping
           </Button>
         </div>
@@ -370,10 +370,10 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
 
       {/* Savings Banner - Zomato Style */}
       {savingsAmount > 0 && (
-        <div className="bg-green-50 border-l-4 border-green-500 px-4 py-3 mx-4 my-2 rounded-r-lg">
+        <div className="bg-laundrify-mint/20 border-l-4 border-laundrify-mint px-4 py-3 mx-4 my-2 rounded-r-lg">
           <div className="flex items-center gap-2">
-            <Tag className="h-4 w-4 text-green-600" />
-            <span className="text-sm font-medium text-green-800">
+            <Tag className="h-4 w-4 text-laundrify-blue" />
+            <span className="text-sm font-medium text-laundrify-blue">
               You saved ₹{savingsAmount} on this order
             </span>
           </div>
@@ -422,7 +422,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
                           variant="outline"
                           size="sm"
                           onClick={() => updateQuantity(service!.id, -1)}
-                          className="h-8 w-8 p-0 rounded-md border-green-600 text-green-600 hover:bg-green-50"
+                          className="h-8 w-8 p-0 rounded-md border-laundrify-blue text-laundrify-blue hover:bg-laundrify-mint/20"
                         >
                           <Minus className="h-4 w-4" />
                         </Button>
@@ -433,7 +433,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
                           variant="outline"
                           size="sm"
                           onClick={() => updateQuantity(service!.id, 1)}
-                          className="h-8 w-8 p-0 rounded-md border-green-600 text-green-600 hover:bg-green-50"
+                          className="h-8 w-8 p-0 rounded-md border-laundrify-blue text-laundrify-blue hover:bg-laundrify-mint/20"
                         >
                           <Plus className="h-4 w-4" />
                         </Button>
