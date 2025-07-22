@@ -702,7 +702,7 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
                   )}
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  Try "FIRST10" for 10% off your first order!
+                  Try "NEW10" for 10% off or "FIRST30" for 30% off your first order!
                 </p>
               </div>
 
