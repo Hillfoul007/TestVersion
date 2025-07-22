@@ -806,6 +806,11 @@ const LaundryIndex = () => {
     }
   };
 
+  // Show splash loader on initial load
+  if (isInitialLoading) {
+    return <LaundrifySplashLoader isVisible={true} message="Initializing Laundrify..." />;
+  }
+
   return (
     <div className="min-h-screen">
       {/* Referral Code Handler - handles URL-based referrals */}
@@ -829,7 +834,7 @@ const LaundryIndex = () => {
 
           {/* Referral Discount Banner */}
           {currentUser && (
-            <div className="px-4 pt-4 bg-gradient-to-r from-green-500 to-green-600">
+            <div className="px-4 pt-4 bg-gradient-to-r from-laundrify-purple to-laundrify-pink">
               <ReferralDiscountBanner user={currentUser} />
             </div>
           )}
