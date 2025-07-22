@@ -782,7 +782,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                     className="border-0 shadow-lg rounded-2xl overflow-hidden service-card"
                   >
                     <CardContent className="p-3 card-content">
-                      <div className="aspect-square bg-gradient-to-br from-green-100 to-green-200 rounded-xl mb-3 flex items-center justify-center relative overflow-hidden">
+                      <div className="aspect-square bg-gradient-to-br from-laundrify-mint/20 to-laundrify-mint/40 rounded-xl mb-3 flex items-center justify-center relative overflow-hidden">
                         {service.image ? (
                           <>
                             <OptimizedImage
@@ -927,7 +927,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
             </p>
             <Button
               onClick={handleBookService}
-              className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 px-8 py-3 rounded-xl text-lg font-medium"
+              className="bg-laundrify-mint hover:bg-laundrify-mint/90 px-8 py-3 rounded-xl text-lg font-medium text-laundrify-blue"
             >
               Get Started
             </Button>
@@ -1066,7 +1066,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                     console.log("Desktop signin button clicked");
                     handleLogin();
                   }}
-                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 cursor-pointer"
+                  className="bg-laundrify-mint hover:bg-laundrify-mint/90 cursor-pointer text-laundrify-blue"
                   type="button"
                 >
                   <User className="h-4 w-4 mr-2" />
@@ -1196,7 +1196,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                     className="border-0 shadow-lg rounded-2xl overflow-hidden hover:shadow-xl transition-shadow"
                   >
                     <CardContent className="p-6">
-                      <div className="aspect-square bg-gradient-to-br from-green-100 to-green-200 rounded-xl mb-4 flex items-center justify-center">
+                      <div className="aspect-square bg-gradient-to-br from-laundrify-mint/20 to-laundrify-mint/40 rounded-xl mb-4 flex items-center justify-center">
                         <span className="text-5xl">
                           {getCategoryDisplay(service.category).split(" ")[0]}
                         </span>
