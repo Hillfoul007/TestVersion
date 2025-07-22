@@ -62,6 +62,15 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Laundrify brand colors
+        'laundrify': {
+          'purple': '#C46DD8',
+          'pink': '#F36BAF',
+          'mint': '#B9F9D3',
+          'red': '#FF3F63',
+          'blue': '#243C90',
+          'yellow': '#E3FF63',
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
