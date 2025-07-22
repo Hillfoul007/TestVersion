@@ -267,21 +267,16 @@ export const mapBookingData = (rawBooking: any): MappedBookingData => {
     });
   }
 
-  // Use delivery date from database if available and different from pickup, otherwise calculate
-  const needsCalculation = !rawBooking.delivery_date ||
-                          rawBooking.delivery_date === rawBooking.scheduled_date ||
-                          rawBooking.delivery_date === rawBooking.pickup_date;
-
-  const deliveryInfo = needsCalculation ?
-    calculateDeliveryDate(
-      rawBooking.scheduled_date || rawBooking.pickup_date,
-      rawBooking.service_type || rawBooking.service,
-      undefined, // Don't pass delivery_date to force calculation
-      rawBooking.delivery_time,
-    ) : {
-      date: rawBooking.delivery_date,
-      time: rawBooking.delivery_time || "18:00"
-    };
+  // Use delivery date from database if available, only calculate if missing
+  const deliveryInfo = rawBooking.delivery_date ? {
+    date: rawBooking.delivery_date,
+    time: rawBooking.delivery_time || "18:00"
+  } : calculateDeliveryDate(
+    rawBooking.scheduled_date || rawBooking.pickup_date,
+    rawBooking.service_type || rawBooking.service,
+    undefined,
+    rawBooking.delivery_time,
+  );
 
   // Map pricing information
   const pricing = {

@@ -81,6 +81,7 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
     maxDiscount?: number;
     isReferral?: boolean;
   } | null>(null);
+  const [couponError, setCouponError] = useState("");
 
   // Location availability modal state
   const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
@@ -332,6 +333,7 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
 
   const applyCoupon = async () => {
     console.log("applyCoupon function called with code:", couponCode);
+    setCouponError(""); // Clear any previous errors
 
     try {
       // First check if it's a referral code
@@ -380,23 +382,13 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
                   if (coupon) {
         // Check if coupon is restricted to first orders only
         if (coupon.isFirstOrder && !referralService.isFirstTimeUser(currentUser)) {
-          addNotification(
-            createErrorNotification(
-              "Invalid Coupon",
-              "This coupon is valid for first orders only.",
-            ),
-          );
+          setCouponError("This coupon is valid for first orders only.");
           return;
         }
 
         // Check if coupon excludes first orders
         if (coupon.excludeFirstOrder && referralService.isFirstTimeUser(currentUser)) {
-          addNotification(
-            createErrorNotification(
-              "Invalid Coupon",
-              "This coupon is not valid for first orders.",
-            ),
-          );
+          setCouponError("This coupon is not valid for first orders.");
           return;
         }
 
@@ -414,27 +406,18 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
         );
       } else {
         console.log("Invalid coupon code");
-        addNotification(
-          createErrorNotification(
-            "Invalid Coupon",
-            "Not a valid coupon. Valid coupons: FIRST30, NEW10",
-          ),
-        );
+        setCouponError("Invalid coupon. Valid coupons: FIRST30, NEW10");
       }
     } catch (error) {
       console.error("Error in applyCoupon:", error);
-      addNotification(
-        createErrorNotification(
-          "Error",
-          "Something went wrong while applying the coupon.",
-        ),
-      );
+      setCouponError("Something went wrong while applying the coupon.");
     }
   };
 
   const removeCoupon = () => {
     setAppliedCoupon(null);
     setCouponCode("");
+    setCouponError("");
   };
 
   const updateQuantity = (serviceId: string, change: number) => {
@@ -874,7 +857,7 @@ Confirm this booking?`;
           savedAddressesKey,
           JSON.stringify(updatedAddresses),
         );
-        console.log("✅ Address saved after booking");
+        console.log("�� Address saved after booking");
       }
     } catch (error) {
       console.error("Failed to save address after booking:", error);
@@ -1214,6 +1197,12 @@ Confirm this booking?`;
                     Apply
                   </Button>
                 </div>
+                {/* Coupon Error Message */}
+                {couponError && (
+                  <div className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
+                    {couponError}
+                  </div>
+                )}
                 {/* Coupon Help Text */}
                 <div className="text-xs text-gray-500 space-y-0.5">
                   <div className="flex items-center gap-1">
