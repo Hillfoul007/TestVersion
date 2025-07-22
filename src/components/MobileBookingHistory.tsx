@@ -632,12 +632,12 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                 phone: sanitizeValue(booking.phone, "Not specified"),
                 // Order ID fields - always include for proper fallback
                 order_id: sanitizeValue(booking.order_id, ""),
-                // Date and time fields
-                pickupDate: sanitizeValue(booking.pickupDate, ""),
-                deliveryDate: sanitizeValue(booking.deliveryDate, ""),
+                // Date and time fields - use mapped values from booking data mapper
+                pickupDate: sanitizeValue(booking.pickup_date || booking.pickupDate || booking.scheduled_date, ""),
+                deliveryDate: sanitizeValue(booking.delivery_date || booking.deliveryDate, ""),
                 scheduled_date: sanitizeValue(booking.scheduled_date, ""),
-                pickupTime: sanitizeValue(booking.pickupTime, ""),
-                deliveryTime: sanitizeValue(booking.deliveryTime, ""),
+                pickupTime: sanitizeValue(booking.pickup_time || booking.pickupTime || booking.scheduled_time, ""),
+                deliveryTime: sanitizeValue(booking.delivery_time || booking.deliveryTime, ""),
                 scheduled_time: sanitizeValue(booking.scheduled_time, ""),
                 // Other fields
                 address: sanitizeValue(booking.address, "Address not provided"),
