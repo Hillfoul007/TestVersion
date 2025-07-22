@@ -623,7 +623,7 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
                   />
                 </div>
                 {referralValidation.isValid === true && (
-                  <p className="text-xs text-green-600">
+                  <p className="text-xs text-laundrify-blue">
                     ✓ {referralValidation.message}
                   </p>
                 )}
@@ -647,9 +647,9 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
               )}
 
               {success && (
-                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-md">
-                  <Shield className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span className="text-sm text-green-700">{success}</span>
+                <div className="flex items-center gap-2 p-3 bg-laundrify-mint/20 border border-laundrify-mint rounded-md">
+                  <Shield className="h-4 w-4 text-laundrify-blue flex-shrink-0" />
+                  <span className="text-sm text-laundrify-blue">{success}</span>
                 </div>
               )}
 
@@ -712,9 +712,9 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
               )}
 
               {success && (
-                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-md">
-                  <Shield className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span className="text-sm text-green-700">{success}</span>
+                <div className="flex items-center gap-2 p-3 bg-laundrify-mint/20 border border-laundrify-mint rounded-md">
+                  <Shield className="h-4 w-4 text-laundrify-blue flex-shrink-0" />
+                  <span className="text-sm text-laundrify-blue">{success}</span>
                 </div>
               )}
 
@@ -730,7 +730,7 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
                 <Button
                   variant="link"
                   onClick={handleSendOTP}
-                  className="text-sm text-green-600"
+                  className="text-sm text-laundrify-blue"
                   disabled={isLoading}
                 >
                   Didn't receive SMS? Resend OTP
