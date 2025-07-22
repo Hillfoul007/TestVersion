@@ -204,10 +204,10 @@ export const ReferralShareButton = React.forwardRef<
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Gift className="h-5 w-5 text-primary" />
-              Share & Earn 50% OFF
+              Share & Earn Rewards
             </DialogTitle>
             <DialogDescription>
-              Share CleanCare Pro with friends and both of you get 50% OFF!
+              Share CleanCare Pro with friends! They get FIRST30 (30% OFF), you get rewards!
             </DialogDescription>
           </DialogHeader>
 
