@@ -999,7 +999,7 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                                                     <p className="text-xs text-gray-900">
                             {(() => {
                               // Use the mapped delivery_date field from booking data mapper
-                              const deliveryDateStr = safeBooking.deliveryDate;
+                              const deliveryDateStr = safeBooking.delivery_date;
                               if (!deliveryDateStr) return "Date TBD";
 
                               try {
