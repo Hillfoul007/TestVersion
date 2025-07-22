@@ -234,7 +234,7 @@ const ReferralLoginPage: React.FC = () => {
           <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
             <div className="flex flex-col items-center gap-2">
               <div className="bg-laundrify-mint/40 p-2 rounded-full">
-                <Check className="h-5 w-5 text-green-600" />
+                <Check className="h-5 w-5 text-laundrify-blue" />
               </div>
               <span>Trusted by 10,000+ customers</span>
             </div>
