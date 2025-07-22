@@ -292,7 +292,7 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
               )}
               <h2 className="text-lg font-semibold text-center flex-1">
                 <div className="flex items-center justify-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-green-600" />
+                  <MessageSquare className="h-5 w-5 text-laundrify-blue" />
                   {currentStep === "phone"
                     ? "Sign In with Phone"
                     : "Verify OTP"}
@@ -373,7 +373,7 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
                         }}
                         className={`pl-10 ${
                           referralValidation.isValid === true
-                            ? "border-green-500 focus:border-green-500"
+                            ? "border-laundrify-mint focus:border-laundrify-mint"
                             : referralValidation.isValid === false
                               ? "border-red-500 focus:border-red-500"
                               : ""
@@ -381,7 +381,7 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
                       />
                     </div>
                     {referralValidation.isValid === true && (
-                      <p className="text-xs text-green-600 mt-1">
+                      <p className="text-xs text-laundrify-blue mt-1">
                         ✓ {referralValidation.message}
                       </p>
                     )}
@@ -408,8 +408,8 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
                   )}
 
                   {success && (
-                    <div className="bg-green-50 border border-green-200 rounded-md p-3">
-                      <p className="text-sm text-green-600">{success}</p>
+                    <div className="bg-laundrify-mint/20 border border-laundrify-mint rounded-md p-3">
+                      <p className="text-sm text-laundrify-blue">{success}</p>
                     </div>
                   )}
 
@@ -472,8 +472,8 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
                   )}
 
                   {success && (
-                    <div className="bg-green-50 border border-green-200 rounded-md p-3">
-                      <p className="text-sm text-green-600">{success}</p>
+                    <div className="bg-laundrify-mint/20 border border-laundrify-mint rounded-md p-3">
+                      <p className="text-sm text-laundrify-blue">{success}</p>
                     </div>
                   )}
 
