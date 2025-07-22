@@ -1206,7 +1206,7 @@ Confirm this booking?`;
                 {/* Coupon Help Text */}
                 <div className="text-xs text-gray-500 space-y-0.5">
                   <div className="flex items-center gap-1">
-                    <span className="text-green-600 font-medium">FIRST30</span>
+                    <span className="text-laundrify-blue font-medium">FIRST30</span>
                     <span>- 30% off for first order only (up to ₹200)</span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -1218,10 +1218,10 @@ Confirm this booking?`;
             ) : (
               <div className="flex justify-between items-center text-sm">
                 <div className="flex items-center gap-1">
-                  <span className="text-green-700 font-medium text-xs">
+                  <span className="text-laundrify-blue font-medium text-xs">
                     ✓ {appliedCoupon.code}
                   </span>
-                  <span className="text-xs text-green-600">
+                  <span className="text-xs text-laundrify-blue">
                     ({appliedCoupon.discount}%)
                   </span>
                 </div>
@@ -1229,7 +1229,7 @@ Confirm this booking?`;
                   onClick={removeCoupon}
                   variant="ghost"
                   size="sm"
-                  className="h-5 w-5 p-0 text-green-600 hover:bg-green-100"
+                  className="h-5 w-5 p-0 text-laundrify-blue hover:bg-laundrify-mint/20"
                 >
                   ✕
                 </Button>
@@ -1237,7 +1237,7 @@ Confirm this booking?`;
             )}
 
             {appliedCoupon && (
-              <div className="flex justify-between text-green-600 text-sm">
+              <div className="flex justify-between text-laundrify-blue text-sm">
                 <span>Discount</span>
                 <span>-₹{getCouponDiscount()}</span>
               </div>
