@@ -1148,7 +1148,7 @@ Confirm this booking?`;
               <span>₹{getSubtotal()}</span>
             </div>
 
-            <div className="flex justify-between text-sm text-green-600">
+            <div className="flex justify-between text-sm text-laundrify-blue">
               <span>Delivery Fee</span>
               <div className="flex items-center gap-2">
                 <span className="line-through text-gray-400 text-xs">₹30</span>
@@ -1156,7 +1156,7 @@ Confirm this booking?`;
               </div>
             </div>
 
-            <div className="flex justify-between text-sm text-green-600">
+            <div className="flex justify-between text-sm text-laundrify-blue">
               <span>Handling Fee</span>
               <div className="flex items-center gap-2">
                 <span className="line-through text-gray-400 text-xs">₹9</span>
