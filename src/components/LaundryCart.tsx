@@ -417,7 +417,7 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
         addNotification(
           createErrorNotification(
             "Invalid Coupon",
-            "The coupon code you entered is not valid.",
+            "Not a valid coupon. Valid coupons: FIRST30, NEW10",
           ),
         );
       }
