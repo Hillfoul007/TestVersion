@@ -641,7 +641,8 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
           defaultDeliveryDate.setDate(defaultDeliveryDate.getDate() + 2);
           return defaultDeliveryDate;
         })();
-      const finalDeliveryTime = deliveryTime || selectedTime;
+      // Set delivery time to either selected delivery time or default to 6 PM (not pickup time)
+      const finalDeliveryTime = deliveryTime || "6:00 PM";
 
       // Calculate total from services to ensure consistency
       const serviceTotal = services.reduce((total, service) => {
