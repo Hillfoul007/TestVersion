@@ -730,7 +730,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                 onClick={() => setSelectedCategory("all")}
                 className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 ${
                   selectedCategory === "all"
-                    ? "bg-white text-green-600"
+                    ? "bg-white text-laundrify-blue"
                     : "bg-white/10 text-white hover:bg-white/20"
                 }`}
               >
@@ -751,7 +751,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                     onClick={() => setSelectedCategory(category.id)}
                     className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 ${
                       selectedCategory === category.id
-                        ? "bg-white text-green-600"
+                        ? "bg-white text-laundrify-blue"
                         : "bg-white/10 text-white hover:bg-white/20"
                     }`}
                   >
@@ -846,7 +846,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                             </div>
 
                             {service.popular && !service.image && (
-                              <Badge className="bg-green-100 text-green-700 text-xs">
+                              <Badge className="bg-laundrify-yellow/20 text-laundrify-blue text-xs">
                                 Popular
                               </Badge>
                             )}
@@ -855,12 +855,12 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
                         <div className="card-actions">
                           {quantity > 0 ? (
-                            <div className="flex items-center justify-between bg-green-50 rounded-lg p-2 quantity-controls">
+                            <div className="flex items-center justify-between bg-laundrify-mint/20 rounded-lg p-2 quantity-controls">
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => removeFromCart(service.id)}
-                                className="h-6 w-6 p-0 text-green-600 hover:bg-green-100"
+                                className="h-6 w-6 p-0 text-laundrify-blue hover:bg-laundrify-mint/40"
                               >
                                 <Minus className="h-3 w-3" />
                               </Button>
@@ -873,7 +873,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => addToCart(service.id)}
-                                className="h-6 w-6 p-0 text-green-600 hover:bg-green-100"
+                                className="h-6 w-6 p-0 text-laundrify-blue hover:bg-laundrify-mint/40"
                               >
                                 <Plus className="h-3 w-3" />
                               </Button>
