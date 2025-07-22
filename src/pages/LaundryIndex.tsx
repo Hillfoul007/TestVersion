@@ -6,8 +6,10 @@ import PhoneOtpAuthModal from "@/components/PhoneOtpAuthModal";
 import BookingConfirmed from "@/components/BookingConfirmed";
 import ReferralCodeHandler from "@/components/ReferralCodeHandler";
 import ReferralDiscountBanner from "@/components/ReferralDiscountBanner";
+import First30OfferNotification from "@/components/First30OfferNotification";
 import { DVHostingSmsService } from "../services/dvhostingSmsService";
 import PushNotificationService from "../services/pushNotificationService";
+import { ReferralService } from "@/services/referralService";
 import { useNotifications } from "@/contexts/NotificationContext";
 import {
   createSuccessNotification,
@@ -225,7 +227,7 @@ const LaundryIndex = () => {
     };
 
     const handleAuthLogout = () => {
-      console.log("🚪 Auth logout event received");
+      console.log("�� Auth logout event received");
       setIsLoggedIn(false);
       setCurrentUser(null);
       setCurrentView("home");
