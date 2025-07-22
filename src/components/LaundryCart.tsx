@@ -1281,7 +1281,7 @@ Confirm this booking?`;
               }
             }}
             disabled={cartItems.length === 0 || isProcessingCheckout}
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue py-2.5 rounded-lg text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isProcessingCheckout ? (
               <>
