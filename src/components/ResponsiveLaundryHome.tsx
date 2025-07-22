@@ -865,7 +865,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                                 <Minus className="h-3 w-3" />
                               </Button>
 
-                              <span className="font-semibold text-green-700 text-sm">
+                              <span className="font-semibold text-laundrify-blue text-sm">
                                 {quantity}
                               </span>
 
@@ -881,7 +881,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                           ) : (
                             <Button
                               onClick={() => addToCart(service.id)}
-                              className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs py-2 service-add-button mobile-button"
+                              className="w-full bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue rounded-lg text-xs py-2 service-add-button mobile-button"
                             >
                               ADD
                             </Button>
@@ -901,7 +901,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           <div className="fixed bottom-4 left-4 right-4 z-50">
             <Button
               onClick={onViewCart}
-              className="w-full bg-green-600 hover:bg-green-700 text-white rounded-xl py-3 flex items-center justify-between shadow-lg"
+              className="w-full bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue rounded-xl py-3 flex items-center justify-between shadow-lg"
             >
               <div className="flex items-center gap-2">
                 <ShoppingBag className="h-4 w-4" />
@@ -997,8 +997,8 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                 </div>
               </div>
 
-              <div className="hidden lg:flex items-center gap-2 bg-green-50 px-3 py-2 rounded-lg">
-                <Clock className="h-4 w-4 text-green-600" />
+              <div className="hidden lg:flex items-center gap-2 bg-laundrify-mint/20 px-3 py-2 rounded-lg">
+                <Clock className="h-4 w-4 text-laundrify-blue" />
                 <span className="text-sm font-medium text-green-700">
                   Delivery in {deliveryTime}
                 </span>
