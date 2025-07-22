@@ -211,8 +211,10 @@ const LaundryIndex = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<string>("");
+  const [showFirst30Notification, setShowFirst30Notification] = useState(false);
   const authService = DVHostingSmsService.getInstance();
   const pushService = PushNotificationService.getInstance();
+  const referralService = ReferralService.getInstance();
 
   // Initialize PWA and check auth state
   useEffect(() => {
@@ -227,7 +229,7 @@ const LaundryIndex = () => {
     };
 
     const handleAuthLogout = () => {
-      console.log("�� Auth logout event received");
+      console.log("🚪 Auth logout event received");
       setIsLoggedIn(false);
       setCurrentUser(null);
       setCurrentView("home");
