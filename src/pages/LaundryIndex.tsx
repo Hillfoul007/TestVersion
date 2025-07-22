@@ -594,9 +594,9 @@ const LaundryIndex = () => {
           totalAmount: cartData.totalAmount,
           status: "pending" as const,
           pickupDate: cartData.pickupDate,
-          deliveryDate: cartData.deliveryDate || cartData.pickupDate,
+          deliveryDate: cartData.deliveryDate ?? cartData.pickupDate,
           pickupTime: cartData.pickupTime,
-          deliveryTime: cartData.deliveryTime || cartData.pickupTime,
+          deliveryTime: cartData.deliveryTime ?? cartData.pickupTime,
           address:
             typeof cartData.address === "string"
               ? cartData.address
