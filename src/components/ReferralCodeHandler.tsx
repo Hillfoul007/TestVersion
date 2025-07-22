@@ -47,7 +47,7 @@ export function ReferralCodeHandler({
       } else {
         // Show welcome message for non-logged-in users
         toast.success(
-          "🎉 Referral code detected! Sign up to claim your 50% OFF discount!",
+          "🎉 Referral code detected! Sign up to claim your 30% OFF discount!",
         );
       }
     }
@@ -140,7 +140,7 @@ export function ReferralCodeHandler({
           <Gift className="h-4 w-4 text-green-600" />
           <AlertDescription className="text-green-800">
             🎉 You've been invited to join CleanCare Pro! Sign up now and get{" "}
-            <strong>50% OFF</strong> on your first order!
+            <strong>30% OFF</strong> on your first order!
           </AlertDescription>
         </Alert>
       )}
@@ -154,7 +154,7 @@ export function ReferralCodeHandler({
               Apply Referral Code
             </DialogTitle>
             <DialogDescription>
-              Enter a referral code to get 50% OFF on your first order!
+              Enter a referral code to get 30% OFF on your first order!
             </DialogDescription>
           </DialogHeader>
 
