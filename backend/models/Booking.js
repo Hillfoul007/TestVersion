@@ -56,11 +56,11 @@ const bookingSchema = new mongoose.Schema(
     },
     delivery_date: {
       type: String,
-      required: false,
+      required: true,
     },
     delivery_time: {
       type: String,
-      required: false,
+      required: true,
     },
     provider_name: {
       type: String,
