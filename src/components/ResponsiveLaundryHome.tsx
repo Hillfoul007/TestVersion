@@ -519,8 +519,8 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
     <Card className="border-0 shadow-lg rounded-2xl overflow-hidden mx-auto max-w-md">
       <CardContent className="text-center py-12 px-6">
         <div className="mb-6">
-          <div className="w-24 h-24 mx-auto bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mb-4">
-            <ShoppingBag className="h-12 w-12 text-green-600" />
+          <div className="w-24 h-24 mx-auto bg-gradient-to-br from-laundrify-mint/20 to-laundrify-mint/40 rounded-full flex items-center justify-center mb-4">
+            <ShoppingBag className="h-12 w-12 text-laundrify-blue" />
           </div>
         </div>
 
@@ -535,7 +535,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
         <Button
           onClick={handleBookService}
-          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 w-full py-3 rounded-xl text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          className="bg-laundrify-mint hover:bg-laundrify-mint/90 w-full py-3 rounded-xl text-laundrify-blue font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
         >
           <ShoppingBag className="mr-2 h-5 w-5" />
           Browse Services
@@ -581,7 +581,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                 </div>
                 <div>
                   <h1 className="text-lg font-bold">Laundrify</h1>
-                  <div className="flex items-center gap-1 text-xs text-green-100">
+                  <div className="flex items-center gap-1 text-xs text-white/80">
                     <Smartphone className="h-3 w-3" />
                     <span>Mobile</span>
                   </div>
