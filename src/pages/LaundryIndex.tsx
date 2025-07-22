@@ -282,6 +282,11 @@ const LaundryIndex = () => {
   }, []);
 
   const initializeApp = async () => {
+    // Show loader for minimum 2 seconds for better UX
+    setTimeout(() => {
+      setIsInitialLoading(false);
+    }, 2000);
+
     // Initialize PWA features
     await pushService.initializePWA();
 
@@ -297,7 +302,7 @@ const LaundryIndex = () => {
     if (!document.querySelector('meta[name="theme-color"]')) {
       const themeColorMeta = document.createElement("meta");
       themeColorMeta.name = "theme-color";
-      themeColorMeta.content = "#22c55e";
+      themeColorMeta.content = "#C46DD8";
       document.head.appendChild(themeColorMeta);
     }
   };
