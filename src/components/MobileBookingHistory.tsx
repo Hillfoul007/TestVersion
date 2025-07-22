@@ -528,7 +528,9 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
                 deliveryDate: booking.deliveryDate,
                 pickup_date: booking.pickup_date,
                 pickupDate: booking.pickupDate,
-                scheduled_date: booking.scheduled_date
+                scheduled_date: booking.scheduled_date,
+                service: booking.service,
+                service_type: booking.service_type
               });
 
               // Comprehensive data sanitization to prevent object rendering
