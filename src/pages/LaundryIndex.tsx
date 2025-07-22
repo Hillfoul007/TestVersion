@@ -444,6 +444,15 @@ const LaundryIndex = () => {
     console.log("✅ User logged in successfully:", user.name || user.phone);
     console.log("📍 Redirecting to:", targetView);
 
+    // Check if this is a first-time user for FIRST30 notification
+    const isFirstTime = referralService.isFirstTimeUser(user);
+    if (isFirstTime && targetView === "home") {
+      // Show FIRST30 notification for new users after a short delay
+      setTimeout(() => {
+        setShowFirst30Notification(true);
+      }, 2000);
+    }
+
     // Add success notification
     addNotification(
       createSuccessNotification(
