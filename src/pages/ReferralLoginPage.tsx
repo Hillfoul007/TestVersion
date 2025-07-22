@@ -89,7 +89,7 @@ const ReferralLoginPage: React.FC = () => {
 
   const benefits = [
     {
-      icon: <Gift className="h-6 w-6 text-green-600" />,
+      icon: <Gift className="h-6 w-6 text-laundrify-red" />,
       title: "50% Off First Order",
       description: "Get amazing savings on your first laundry service"
     },
@@ -111,29 +111,29 @@ const ReferralLoginPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-laundrify-purple/10 via-laundrify-pink/10 to-laundrify-mint/10">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="bg-gradient-to-r from-green-500 to-blue-500 p-3 rounded-full">
+            <div className="bg-gradient-to-r from-laundrify-purple to-laundrify-pink p-3 rounded-full">
               <Sparkles className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-              CleanCare Pro
+            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-laundrify-purple to-laundrify-pink bg-clip-text text-transparent">
+              Laundrify
             </h1>
           </div>
           
           {referralCode && (
-            <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200 rounded-lg p-4 mb-6">
+            <div className="bg-gradient-to-r from-laundrify-mint/20 to-laundrify-purple/20 border border-laundrify-mint rounded-lg p-4 mb-6">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <Gift className="h-5 w-5 text-green-600" />
-                <span className="font-semibold text-green-800">Special Offer!</span>
+                <Gift className="h-5 w-5 text-laundrify-blue" />
+                <span className="font-semibold text-laundrify-blue">Special Offer!</span>
               </div>
-              <p className="text-green-700">
-                You've been invited with referral code: <span className="font-bold text-green-800">{referralCode}</span>
+              <p className="text-laundrify-blue">
+                You've been invited with referral code: <span className="font-bold text-laundrify-blue">{referralCode}</span>
               </p>
-              <p className="text-green-600 text-sm mt-1">
+              <p className="text-laundrify-blue text-sm mt-1">
                 Sign in to get 50% off your first order!
               </p>
             </div>
@@ -189,7 +189,7 @@ const ReferralLoginPage: React.FC = () => {
                 <CardContent className="space-y-4">
                   <Button
                     onClick={() => setIsAuthModalOpen(true)}
-                    className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all duration-200"
+                    className="w-full bg-gradient-to-r from-laundrify-purple to-laundrify-pink hover:from-laundrify-purple/90 hover:to-laundrify-pink/90 text-white py-3 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all duration-200"
                     size="lg"
                   >
                     <Phone className="mr-2 h-5 w-5" />
@@ -204,8 +204,8 @@ const ReferralLoginPage: React.FC = () => {
                   </div>
 
                   {referralCode && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                      <div className="flex items-center gap-2 text-green-700">
+                    <div className="bg-laundrify-mint/20 border border-laundrify-mint rounded-lg p-3">
+                      <div className="flex items-center gap-2 text-laundrify-blue">
                         <Check className="h-4 w-4" />
                         <span className="text-sm font-medium">
                           Referral code {referralCode} will be automatically applied
@@ -233,8 +233,8 @@ const ReferralLoginPage: React.FC = () => {
         <div className="max-w-2xl mx-auto mt-12 text-center">
           <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
             <div className="flex flex-col items-center gap-2">
-              <div className="bg-green-100 p-2 rounded-full">
-                <Check className="h-5 w-5 text-green-600" />
+              <div className="bg-laundrify-mint/40 p-2 rounded-full">
+                <Check className="h-5 w-5 text-laundrify-blue" />
               </div>
               <span>Trusted by 10,000+ customers</span>
             </div>

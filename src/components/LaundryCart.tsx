@@ -882,7 +882,7 @@ Confirm this booking?`;
             Your cart is empty
           </h2>
           <p className="text-gray-600 mb-6">Add some items to get started</p>
-          <Button onClick={onBack} className="bg-green-600 hover:bg-green-700">
+          <Button onClick={onBack} className="bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue">
             Continue Shopping
           </Button>
         </div>
@@ -918,7 +918,7 @@ Confirm this booking?`;
                 key={service!.id}
                 className="flex items-center gap-2 p-1.5 bg-gray-50 rounded-md"
               >
-                <div className="w-12 h-12 rounded-md overflow-hidden bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 rounded-md overflow-hidden bg-gradient-to-br from-laundrify-mint/20 to-laundrify-mint/40 flex items-center justify-center flex-shrink-0">
                   {service!.image ? (
                     <img
                       src={service!.image}
@@ -941,7 +941,7 @@ Confirm this booking?`;
                   <h4 className="font-medium text-xs break-words leading-tight">
                     {service!.name}
                   </h4>
-                  <p className="text-xs text-green-600">₹{service!.price}</p>
+                  <p className="text-xs text-laundrify-red">₹{service!.price}</p>
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -967,7 +967,7 @@ Confirm this booking?`;
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <span className="font-semibold text-xs text-green-600">
+                  <span className="font-semibold text-xs text-laundrify-red">
                     ₹{service!.price * quantity}
                   </span>
                   <Button
@@ -1006,7 +1006,7 @@ Confirm this booking?`;
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-green-600"
+                className="text-laundrify-blue"
                 onClick={() => setShowZomatoAddressSelector(true)}
               >
                 <ArrowLeft className="h-4 w-4 rotate-180" />
@@ -1062,7 +1062,7 @@ Confirm this booking?`;
                     }
                   }}
                   variant="outline"
-                  className="w-full border-green-600 text-green-600 hover:bg-green-50"
+                  className="w-full border-laundrify-blue text-laundrify-blue hover:bg-laundrify-mint/20"
                 >
                   <MapPin className="h-4 w-4 mr-2" />
                   {!currentUser ? "Login to Add Address" : "Select Address"}
@@ -1148,7 +1148,7 @@ Confirm this booking?`;
               <span>₹{getSubtotal()}</span>
             </div>
 
-            <div className="flex justify-between text-sm text-green-600">
+            <div className="flex justify-between text-sm text-laundrify-blue">
               <span>Delivery Fee</span>
               <div className="flex items-center gap-2">
                 <span className="line-through text-gray-400 text-xs">₹30</span>
@@ -1156,7 +1156,7 @@ Confirm this booking?`;
               </div>
             </div>
 
-            <div className="flex justify-between text-sm text-green-600">
+            <div className="flex justify-between text-sm text-laundrify-blue">
               <span>Handling Fee</span>
               <div className="flex items-center gap-2">
                 <span className="line-through text-gray-400 text-xs">₹9</span>
@@ -1206,7 +1206,7 @@ Confirm this booking?`;
                 {/* Coupon Help Text */}
                 <div className="text-xs text-gray-500 space-y-0.5">
                   <div className="flex items-center gap-1">
-                    <span className="text-green-600 font-medium">FIRST30</span>
+                    <span className="text-laundrify-blue font-medium">FIRST30</span>
                     <span>- 30% off for first order only (up to ₹200)</span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -1218,10 +1218,10 @@ Confirm this booking?`;
             ) : (
               <div className="flex justify-between items-center text-sm">
                 <div className="flex items-center gap-1">
-                  <span className="text-green-700 font-medium text-xs">
+                  <span className="text-laundrify-blue font-medium text-xs">
                     ✓ {appliedCoupon.code}
                   </span>
-                  <span className="text-xs text-green-600">
+                  <span className="text-xs text-laundrify-blue">
                     ({appliedCoupon.discount}%)
                   </span>
                 </div>
@@ -1229,7 +1229,7 @@ Confirm this booking?`;
                   onClick={removeCoupon}
                   variant="ghost"
                   size="sm"
-                  className="h-5 w-5 p-0 text-green-600 hover:bg-green-100"
+                  className="h-5 w-5 p-0 text-laundrify-blue hover:bg-laundrify-mint/20"
                 >
                   ✕
                 </Button>
@@ -1237,7 +1237,7 @@ Confirm this booking?`;
             )}
 
             {appliedCoupon && (
-              <div className="flex justify-between text-green-600 text-sm">
+              <div className="flex justify-between text-laundrify-blue text-sm">
                 <span>Discount</span>
                 <span>-₹{getCouponDiscount()}</span>
               </div>
@@ -1247,7 +1247,7 @@ Confirm this booking?`;
 
             <div className="flex justify-between font-semibold">
               <span>Total</span>
-              <span className="text-green-600">₹{getTotal()}</span>
+              <span className="text-laundrify-red">₹{getTotal()}</span>
             </div>
           </CardContent>
         </Card>
@@ -1281,7 +1281,7 @@ Confirm this booking?`;
               }
             }}
             disabled={cartItems.length === 0 || isProcessingCheckout}
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue py-2.5 rounded-lg text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isProcessingCheckout ? (
               <>

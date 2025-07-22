@@ -64,12 +64,12 @@ const LocationUnavailableModal: React.FC<LocationUnavailableModalProps> = ({
         <div className="text-center py-6 px-2">
           {/* Icon with Green Theme */}
           <div className="mx-auto mb-6 relative">
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg">
+            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-laundrify-purple to-laundrify-pink rounded-full flex items-center justify-center shadow-lg">
               <MapPin className="h-10 w-10 text-white" />
             </div>
             {/* Decorative sparkles */}
             <div className="absolute -top-2 -right-2">
-              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+              <div className="w-6 h-6 bg-laundrify-yellow rounded-full flex items-center justify-center">
                 <Sparkles className="h-3 w-3 text-white" />
               </div>
             </div>
@@ -84,7 +84,7 @@ const LocationUnavailableModal: React.FC<LocationUnavailableModalProps> = ({
               We're not available in your location yet, but we're expanding
               soon!
               {detectedLocation && (
-                <span className="block mt-2 text-sm text-green-600 font-medium">
+                <span className="block mt-2 text-sm text-laundrify-blue font-medium">
                   📍 {detectedLocation}
                 </span>
               )}
@@ -98,7 +98,7 @@ const LocationUnavailableModal: React.FC<LocationUnavailableModalProps> = ({
                 onExplore();
                 onClose();
               }}
-              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-4 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 text-base"
+              className="w-full bg-gradient-to-r from-laundrify-purple to-laundrify-pink hover:from-laundrify-purple/90 hover:to-laundrify-pink/90 text-white font-semibold py-4 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 text-base"
             >
               <Sparkles className="h-5 w-5 mr-2" />
               Explore Available Services
@@ -116,7 +116,7 @@ const LocationUnavailableModal: React.FC<LocationUnavailableModalProps> = ({
 
           {/* Footer Note */}
           <div className="mt-4 text-xs text-gray-500">
-            💚 We'll notify you when we reach your area
+            💜 We'll notify you when we reach your area
           </div>
         </div>
       </DialogContent>

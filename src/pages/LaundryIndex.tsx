@@ -7,6 +7,7 @@ import BookingConfirmed from "@/components/BookingConfirmed";
 import ReferralCodeHandler from "@/components/ReferralCodeHandler";
 import ReferralDiscountBanner from "@/components/ReferralDiscountBanner";
 import First30OfferNotification from "@/components/First30OfferNotification";
+import LaundrifySplashLoader from "@/components/LaundrifySplashLoader";
 import { DVHostingSmsService } from "../services/dvhostingSmsService";
 import PushNotificationService from "../services/pushNotificationService";
 import { ReferralService } from "@/services/referralService";
@@ -212,6 +213,7 @@ const LaundryIndex = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<string>("");
   const [showFirst30Notification, setShowFirst30Notification] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const authService = DVHostingSmsService.getInstance();
   const pushService = PushNotificationService.getInstance();
   const referralService = ReferralService.getInstance();
@@ -280,6 +282,11 @@ const LaundryIndex = () => {
   }, []);
 
   const initializeApp = async () => {
+    // Show loader for minimum 2 seconds for better UX
+    setTimeout(() => {
+      setIsInitialLoading(false);
+    }, 2000);
+
     // Initialize PWA features
     await pushService.initializePWA();
 
@@ -295,7 +302,7 @@ const LaundryIndex = () => {
     if (!document.querySelector('meta[name="theme-color"]')) {
       const themeColorMeta = document.createElement("meta");
       themeColorMeta.name = "theme-color";
-      themeColorMeta.content = "#22c55e";
+      themeColorMeta.content = "#C46DD8";
       document.head.appendChild(themeColorMeta);
     }
   };
@@ -799,6 +806,11 @@ const LaundryIndex = () => {
     }
   };
 
+  // Show splash loader on initial load
+  if (isInitialLoading) {
+    return <LaundrifySplashLoader isVisible={true} message="Initializing Laundrify..." />;
+  }
+
   return (
     <div className="min-h-screen">
       {/* Referral Code Handler - handles URL-based referrals */}
@@ -822,7 +834,7 @@ const LaundryIndex = () => {
 
           {/* Referral Discount Banner */}
           {currentUser && (
-            <div className="px-4 pt-4 bg-gradient-to-r from-green-500 to-green-600">
+            <div className="px-4 pt-4 bg-gradient-to-r from-laundrify-purple to-laundrify-pink">
               <ReferralDiscountBanner user={currentUser} />
             </div>
           )}

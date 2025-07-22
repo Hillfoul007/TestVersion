@@ -12,8 +12,8 @@ export const PRODUCTION_CONFIG = {
     "https://backend-vaxf.onrender.com/api",
 
   // Authentication
-  AUTH_TOKEN_KEY: "cleancare_token",
-  USER_DATA_KEY: "cleancare_user",
+  AUTH_TOKEN_KEY: "laundrify_token",
+  USER_DATA_KEY: "laundrify_user",
 
   // Google Services
   GOOGLE_MAPS_API_KEY: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -22,7 +22,7 @@ export const PRODUCTION_CONFIG = {
   DVHOSTING_API_KEY: import.meta.env.VITE_DVHOSTING_API_KEY,
 
   // App Settings
-  APP_NAME: "CleanCare Pro",
+  APP_NAME: "Laundrify",
   APP_VERSION: "1.0.0",
 
   // Feature Flags

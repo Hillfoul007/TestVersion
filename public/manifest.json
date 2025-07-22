@@ -1,11 +1,11 @@
 {
-  "name": "CleanCare Pro - Laundry & Dry Cleaning",
-  "short_name": "CleanCare",
-  "description": "Professional laundry and dry cleaning services at your doorstep",
+  "name": "Laundrify - Quick clean & convenient",
+  "short_name": "Laundrify",
+  "description": "Quick clean & convenient thats laundrify",
   "start_url": "/?v=1753079645539",
   "display": "standalone",
-  "background_color": "#22c55e",
-  "theme_color": "#22c55e",
+  "background_color": "#C46DD8",
+  "theme_color": "#C46DD8",
   "orientation": "portrait-primary",
   "icons": [
     {

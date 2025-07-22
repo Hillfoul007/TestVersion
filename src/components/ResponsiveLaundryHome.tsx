@@ -519,8 +519,8 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
     <Card className="border-0 shadow-lg rounded-2xl overflow-hidden mx-auto max-w-md">
       <CardContent className="text-center py-12 px-6">
         <div className="mb-6">
-          <div className="w-24 h-24 mx-auto bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mb-4">
-            <ShoppingBag className="h-12 w-12 text-green-600" />
+          <div className="w-24 h-24 mx-auto bg-gradient-to-br from-laundrify-mint/20 to-laundrify-mint/40 rounded-full flex items-center justify-center mb-4">
+            <ShoppingBag className="h-12 w-12 text-laundrify-blue" />
           </div>
         </div>
 
@@ -535,7 +535,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
         <Button
           onClick={handleBookService}
-          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 w-full py-3 rounded-xl text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          className="bg-laundrify-mint hover:bg-laundrify-mint/90 w-full py-3 rounded-xl text-laundrify-blue font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
         >
           <ShoppingBag className="mr-2 h-5 w-5" />
           Browse Services
@@ -547,9 +547,9 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   if (isMobile) {
     // Mobile Interface
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-400 via-green-500 to-green-600">
+      <div className="min-h-screen bg-gradient-to-br from-laundrify-purple via-purple-400 to-laundrify-pink">
         {/* Mobile Header */}
-        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white relative z-40">
+        <div className="bg-gradient-to-r from-laundrify-purple to-laundrify-pink text-white relative z-40">
           <div className="flex items-center justify-between mobile-header-safe">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-3">
@@ -574,16 +574,15 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg overflow-hidden bg-white p-1">
                   <img
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5e4945c9751a4c39baee34b838886324%2Fc48a1aeaf40e4ccbaca98ab712af4040?format=webp&width=800"
-                    alt="CleanCare Pro Logo"
+                    src="https://cdn.builder.io/api/v1/image/assets%2Fb0ac7c2f6e7c46a4a84ce74a0fb98c57%2F4c8fe4f8010c411a9eb989e3b42ef6f3?format=webp&width=800"
+                    alt="Laundrify Logo"
                     className="w-full h-full object-contain"
                   />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold">CleanCare</h1>
-                  <div className="flex items-center gap-1 text-xs text-green-100">
-                    <Smartphone className="h-3 w-3" />
-                    <span>Mobile</span>
+                  <h1 className="text-lg font-bold">Laundrify</h1>
+                  <div className="text-xs text-white/80">
+                    <span>Quick clean & convenient</span>
                   </div>
                 </div>
               </div>
@@ -702,7 +701,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         </div>
 
         {/* Sticky Search and Categories Only */}
-        <div className="sticky top-0 bg-gradient-to-b from-green-500 to-green-600 z-50 shadow-lg">
+        <div className="sticky top-0 bg-gradient-to-b from-laundrify-purple to-laundrify-pink z-50 shadow-lg">
           <div className="px-4 pt-4 pb-2 space-y-3">
             {/* Search Bar */}
             <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search">
@@ -731,7 +730,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                 onClick={() => setSelectedCategory("all")}
                 className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 ${
                   selectedCategory === "all"
-                    ? "bg-white text-green-600"
+                    ? "bg-white text-laundrify-blue"
                     : "bg-white/10 text-white hover:bg-white/20"
                 }`}
               >
@@ -752,7 +751,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                     onClick={() => setSelectedCategory(category.id)}
                     className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 ${
                       selectedCategory === category.id
-                        ? "bg-white text-green-600"
+                        ? "bg-white text-laundrify-blue"
                         : "bg-white/10 text-white hover:bg-white/20"
                     }`}
                   >
@@ -782,7 +781,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                     className="border-0 shadow-lg rounded-2xl overflow-hidden service-card"
                   >
                     <CardContent className="p-3 card-content">
-                      <div className="aspect-square bg-gradient-to-br from-green-100 to-green-200 rounded-xl mb-3 flex items-center justify-center relative overflow-hidden">
+                      <div className="aspect-square bg-gradient-to-br from-laundrify-mint/20 to-laundrify-mint/40 rounded-xl mb-3 flex items-center justify-center relative overflow-hidden">
                         {service.image ? (
                           <>
                             <OptimizedImage
@@ -847,7 +846,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                             </div>
 
                             {service.popular && !service.image && (
-                              <Badge className="bg-green-100 text-green-700 text-xs">
+                              <Badge className="bg-laundrify-yellow/20 text-laundrify-blue text-xs">
                                 Popular
                               </Badge>
                             )}
@@ -856,17 +855,17 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
                         <div className="card-actions">
                           {quantity > 0 ? (
-                            <div className="flex items-center justify-between bg-green-50 rounded-lg p-2 quantity-controls">
+                            <div className="flex items-center justify-between bg-laundrify-mint/20 rounded-lg p-2 quantity-controls">
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => removeFromCart(service.id)}
-                                className="h-6 w-6 p-0 text-green-600 hover:bg-green-100"
+                                className="h-6 w-6 p-0 text-laundrify-blue hover:bg-laundrify-mint/40"
                               >
                                 <Minus className="h-3 w-3" />
                               </Button>
 
-                              <span className="font-semibold text-green-700 text-sm">
+                              <span className="font-semibold text-laundrify-blue text-sm">
                                 {quantity}
                               </span>
 
@@ -874,7 +873,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => addToCart(service.id)}
-                                className="h-6 w-6 p-0 text-green-600 hover:bg-green-100"
+                                className="h-6 w-6 p-0 text-laundrify-blue hover:bg-laundrify-mint/40"
                               >
                                 <Plus className="h-3 w-3" />
                               </Button>
@@ -882,7 +881,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                           ) : (
                             <Button
                               onClick={() => addToCart(service.id)}
-                              className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs py-2 service-add-button mobile-button"
+                              className="w-full bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue rounded-lg text-xs py-2 service-add-button mobile-button"
                             >
                               ADD
                             </Button>
@@ -902,7 +901,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           <div className="fixed bottom-4 left-4 right-4 z-50">
             <Button
               onClick={onViewCart}
-              className="w-full bg-green-600 hover:bg-green-700 text-white rounded-xl py-3 flex items-center justify-between shadow-lg"
+              className="w-full bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue rounded-xl py-3 flex items-center justify-between shadow-lg"
             >
               <div className="flex items-center gap-2">
                 <ShoppingBag className="h-4 w-4" />
@@ -919,15 +918,15 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         {/* Empty State */}
         {!getPopularServices().length && (
           <div className="text-center py-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Welcome to CleanCare Pro
+            <h2 className="text-2xl font-bold text-laundrify-blue mb-4">
+              Welcome to Laundrify
             </h2>
-            <p className="text-gray-600 mb-6">
-              Your trusted home services partner
+            <p className="text-laundrify-blue/80 mb-6">
+              Quick clean & convenient thats laundrify
             </p>
             <Button
               onClick={handleBookService}
-              className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 px-8 py-3 rounded-xl text-lg font-medium"
+              className="bg-laundrify-mint hover:bg-laundrify-mint/90 px-8 py-3 rounded-xl text-lg font-medium text-laundrify-blue"
             >
               Get Started
             </Button>
@@ -955,14 +954,14 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg overflow-hidden">
                   <img
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5e4945c9751a4c39baee34b838886324%2Fc48a1aeaf40e4ccbaca98ab712af4040?format=webp&width=800"
-                    alt="CleanCare Pro Logo"
+                    src="https://cdn.builder.io/api/v1/image/assets%2Fb0ac7c2f6e7c46a4a84ce74a0fb98c57%2F4c8fe4f8010c411a9eb989e3b42ef6f3?format=webp&width=800"
+                    alt="Laundrify Logo"
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
-                    CleanCare Pro
+                    Laundrify
                   </h1>
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <Monitor className="h-3 w-3" />
@@ -998,9 +997,9 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                 </div>
               </div>
 
-              <div className="hidden lg:flex items-center gap-2 bg-green-50 px-3 py-2 rounded-lg">
-                <Clock className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-green-700">
+              <div className="hidden lg:flex items-center gap-2 bg-laundrify-mint/20 px-3 py-2 rounded-lg">
+                <Clock className="h-4 w-4 text-laundrify-blue" />
+                <span className="text-sm font-medium text-laundrify-blue">
                   Delivery in {deliveryTime}
                 </span>
               </div>
@@ -1066,7 +1065,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                     console.log("Desktop signin button clicked");
                     handleLogin();
                   }}
-                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 cursor-pointer"
+                  className="bg-laundrify-mint hover:bg-laundrify-mint/90 cursor-pointer text-laundrify-blue"
                   type="button"
                 >
                   <User className="h-4 w-4 mr-2" />
@@ -1081,18 +1080,18 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
       {/* Desktop Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl text-white p-8 mb-8">
+        <div className="bg-gradient-to-r from-laundrify-purple to-laundrify-pink rounded-2xl text-white p-8 mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h2 className="text-4xl font-bold mb-4">
-                Professional Laundry & Dry Cleaning
+                Laundrify - Quick Clean & Convenient
               </h2>
-              <p className="text-green-100 mb-6 text-lg">
-                Quality service delivered to your doorstep in {deliveryTime}
+              <p className="text-white/90 mb-6 text-lg">
+                Quick clean & convenient thats laundrify - delivered to your doorstep in {deliveryTime}
               </p>
               <Button
                 onClick={handleBookService}
-                className="bg-white text-green-600 hover:bg-gray-100 font-semibold px-8 py-3 rounded-xl"
+                className="bg-laundrify-mint text-laundrify-blue hover:bg-laundrify-mint/90 font-semibold px-8 py-3 rounded-xl"
               >
                 Browse Services
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -1134,9 +1133,9 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                 placeholder="Search for laundry services..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="pl-12 pr-12 py-3 rounded-xl border-gray-200 focus:border-green-500"
+                className="pl-12 pr-12 py-3 rounded-xl border-gray-200 focus:border-laundrify-purple"
               />
-              <Mic className="absolute right-4 top-3 h-5 w-5 text-gray-400 cursor-pointer hover:text-green-500" />
+              <Mic className="absolute right-4 top-3 h-5 w-5 text-gray-400 cursor-pointer hover:text-laundrify-purple" />
             </div>
           </div>
 
@@ -1146,8 +1145,8 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
               onClick={() => setSelectedCategory("all")}
               className={`flex-shrink-0 rounded-xl ${
                 selectedCategory === "all"
-                  ? "bg-green-600 text-white"
-                  : "hover:bg-green-50 hover:border-green-200"
+                  ? "bg-laundrify-purple text-white"
+                  : "hover:bg-laundrify-mint/20 hover:border-laundrify-mint"
               }`}
             >
               <ShoppingBag className="h-4 w-4 mr-2" />
@@ -1168,8 +1167,8 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                   onClick={() => setSelectedCategory(category.id)}
                   className={`flex-shrink-0 rounded-xl ${
                     selectedCategory === category.id
-                      ? "bg-green-600 text-white"
-                      : "hover:bg-green-50 hover:border-green-200"
+                      ? "bg-laundrify-purple text-white"
+                      : "hover:bg-laundrify-mint/20 hover:border-laundrify-mint"
                   }`}
                 >
                   <span className="mr-2">{category.icon}</span>
@@ -1196,7 +1195,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                     className="border-0 shadow-lg rounded-2xl overflow-hidden hover:shadow-xl transition-shadow"
                   >
                     <CardContent className="p-6">
-                      <div className="aspect-square bg-gradient-to-br from-green-100 to-green-200 rounded-xl mb-4 flex items-center justify-center">
+                      <div className="aspect-square bg-gradient-to-br from-laundrify-mint/20 to-laundrify-mint/40 rounded-xl mb-4 flex items-center justify-center">
                         <span className="text-5xl">
                           {getCategoryDisplay(service.category).split(" ")[0]}
                         </span>
@@ -1222,7 +1221,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                           </div>
 
                           {service.popular && (
-                            <Badge className="bg-green-100 text-green-700">
+                            <Badge className="bg-laundrify-yellow/20 text-laundrify-blue">
                               <Star className="w-3 h-3 mr-1 fill-current" />
                               Popular
                             </Badge>
@@ -1237,7 +1236,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                         )}
 
                         {quantity > 0 ? (
-                          <div className="flex items-center justify-between bg-green-50 rounded-lg p-3">
+                          <div className="flex items-center justify-between bg-laundrify-mint/20 rounded-lg p-3">
                             <Button
                               variant="ghost"
                               size="sm"
@@ -1247,7 +1246,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                               <Minus className="h-4 w-4" />
                             </Button>
 
-                            <span className="font-semibold text-green-700 text-lg">
+                            <span className="font-semibold text-laundrify-blue text-lg">
                               {quantity}
                             </span>
 
@@ -1263,7 +1262,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                         ) : (
                           <Button
                             onClick={() => addToCart(service.id)}
-                            className="w-full bg-green-600 hover:bg-green-700 text-white rounded-xl py-3 font-semibold"
+                            className="w-full bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue rounded-xl py-3 font-semibold"
                           >
                             ADD TO CART
                           </Button>
@@ -1282,7 +1281,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           <div className="fixed bottom-8 right-8 z-50">
             <Button
               onClick={onViewCart}
-              className="bg-green-600 hover:bg-green-700 text-white rounded-2xl py-4 px-6 flex items-center gap-3 shadow-lg hover:shadow-xl transition-all"
+              className="bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue rounded-2xl py-4 px-6 flex items-center gap-3 shadow-lg hover:shadow-xl transition-all"
             >
               <ShoppingBag className="h-5 w-5" />
               <div>

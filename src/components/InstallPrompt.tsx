@@ -96,7 +96,7 @@ const InstallPrompt: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-green-500 to-green-600 text-white p-4 shadow-lg z-50 border-t border-green-400">
+    <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-laundrify-purple to-laundrify-pink text-white p-4 shadow-lg z-50 border-t border-laundrify-purple/60">
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0 w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
           <Smartphone className="h-5 w-5" />
@@ -104,16 +104,16 @@ const InstallPrompt: React.FC = () => {
 
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-sm mb-1">
-            Add CleanCare to Home Screen
+            Add Laundrify to Home Screen
           </h3>
 
           {isIOS ? (
-            <p className="text-xs text-green-100 mb-3">
+            <p className="text-xs text-white/80 mb-3">
               Tap the <span className="font-medium">Share</span> button below,
               then tap <span className="font-medium">"Add to Home Screen"</span>
             </p>
           ) : (
-            <p className="text-xs text-green-100 mb-3">
+            <p className="text-xs text-white/80 mb-3">
               Install our app for faster access and better experience
             </p>
           )}
@@ -123,7 +123,7 @@ const InstallPrompt: React.FC = () => {
               <Button
                 onClick={handleInstallClick}
                 size="sm"
-                className="bg-white text-green-600 hover:bg-green-50 h-8 px-3 text-xs font-medium"
+                className="bg-white text-laundrify-blue hover:bg-white/90 h-8 px-3 text-xs font-medium"
               >
                 <Plus className="h-3 w-3 mr-1" />
                 Install

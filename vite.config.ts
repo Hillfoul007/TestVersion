@@ -64,13 +64,13 @@ export default defineConfig(({ mode }) => {
                 "masked-icon.svg",
               ],
               manifest: {
-                name: "CleanCare Pro - Laundry Services",
-                short_name: "CleanCare Pro",
-                description: "Professional laundry and dry cleaning services",
+                name: "Laundrify - Quick clean & convenient",
+                short_name: "Laundrify",
+                description: "Quick clean & convenient thats laundrify",
                 start_url: "/",
                 display: "standalone",
                 background_color: "#ffffff",
-                theme_color: "#22c55e",
+                theme_color: "#C46DD8",
                 icons: [
                   {
                     src: "placeholder.svg",
