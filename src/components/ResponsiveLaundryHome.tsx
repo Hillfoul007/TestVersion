@@ -575,12 +575,12 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                 <div className="w-8 h-8 rounded-lg overflow-hidden bg-white p-1">
                   <img
                     src="https://cdn.builder.io/api/v1/image/assets%2F5e4945c9751a4c39baee34b838886324%2Fc48a1aeaf40e4ccbaca98ab712af4040?format=webp&width=800"
-                    alt="CleanCare Pro Logo"
+                    alt="Laundrify Logo"
                     className="w-full h-full object-contain"
                   />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold">CleanCare</h1>
+                  <h1 className="text-lg font-bold">Laundrify</h1>
                   <div className="flex items-center gap-1 text-xs text-green-100">
                     <Smartphone className="h-3 w-3" />
                     <span>Mobile</span>
@@ -920,7 +920,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         {!getPopularServices().length && (
           <div className="text-center py-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Welcome to CleanCare Pro
+              Welcome to Laundrify
             </h2>
             <p className="text-gray-600 mb-6">
               Your trusted home services partner
@@ -956,13 +956,13 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                 <div className="w-10 h-10 rounded-lg overflow-hidden">
                   <img
                     src="https://cdn.builder.io/api/v1/image/assets%2F5e4945c9751a4c39baee34b838886324%2Fc48a1aeaf40e4ccbaca98ab712af4040?format=webp&width=800"
-                    alt="CleanCare Pro Logo"
+                    alt="Laundrify Logo"
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
-                    CleanCare Pro
+                    Laundrify
                   </h1>
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <Monitor className="h-3 w-3" />
