@@ -416,7 +416,7 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue"
                   >
                     {isLoading ? (
                       <div className="flex items-center gap-2">
@@ -437,7 +437,7 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
               {currentStep === "otp" && (
                 <form onSubmit={handleVerifyOTP} className="space-y-4">
                   <div className="text-center">
-                    <Shield className="h-12 w-12 text-green-600 mx-auto mb-2" />
+                    <Shield className="h-12 w-12 text-laundrify-blue mx-auto mb-2" />
                     <p className="text-sm text-gray-600">
                       Enter the 6-digit code sent to
                     </p>
@@ -480,7 +480,7 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-laundrify-mint hover:bg-laundrify-mint/90 text-laundrify-blue"
                   >
                     {isLoading ? (
                       <div className="flex items-center gap-2">
@@ -545,8 +545,8 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
           {currentStep === "phone" && (
             <div className="space-y-4">
               <div className="text-center">
-                <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
-                  <Phone className="h-6 w-6 text-green-600" />
+                <div className="mx-auto w-12 h-12 bg-laundrify-mint/30 rounded-full flex items-center justify-center mb-3">
+                  <Phone className="h-6 w-6 text-laundrify-blue" />
                 </div>
                 <p className="text-sm text-gray-600">
                   Enter your mobile number to receive OTP via SMS
@@ -615,7 +615,7 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
                     }}
                     className={`pl-10 ${
                       referralValidation.isValid === true
-                        ? "border-green-500 focus:border-green-500"
+                        ? "border-laundrify-mint focus:border-laundrify-mint"
                         : referralValidation.isValid === false
                           ? "border-red-500 focus:border-red-500"
                           : ""
@@ -674,7 +674,7 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
           {currentStep === "otp" && (
             <div className="space-y-4">
               <div className="text-center">
-                <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                <div className="mx-auto w-12 h-12 bg-laundrify-mint/30 rounded-full flex items-center justify-center mb-3">
                   <MessageSquare className="h-6 w-6 text-green-600" />
                 </div>
                 <h3 className="font-medium mb-1">Check your messages</h3>
