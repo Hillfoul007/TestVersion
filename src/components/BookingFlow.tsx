@@ -129,7 +129,7 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
     } else if (code === "") {
       setError("Please enter a coupon code");
     } else {
-      setError("Invalid coupon code");
+      setError("Invalid coupon code. Valid coupons: FIRST30, NEW10");
     }
   };
 

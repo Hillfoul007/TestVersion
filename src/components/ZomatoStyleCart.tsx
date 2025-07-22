@@ -187,8 +187,16 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
   const applyCoupon = () => {
     const referralService = ReferralService.getInstance();
     const validCoupons = {
-      NEW10: { discount: 10, description: "10% off on your order" },
-      FIRST30: { discount: 30, description: "30% off on first order", isFirstOrder: true },
+      NEW10: {
+        discount: 10,
+        description: "10% off on your order (except first order)",
+        excludeFirstOrder: true
+      },
+      FIRST30: {
+        discount: 30,
+        description: "30% off on first order",
+        isFirstOrder: true
+      },
     };
 
     const coupon = validCoupons[couponCode.toUpperCase()];
@@ -199,6 +207,17 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
           createErrorNotification(
             "Invalid Coupon",
             "This coupon is valid for first orders only.",
+          ),
+        );
+        return;
+      }
+
+      // Check if coupon excludes first orders
+      if (coupon.excludeFirstOrder && referralService.isFirstTimeUser(currentUser)) {
+        addNotification(
+          createErrorNotification(
+            "Invalid Coupon",
+            "This coupon is not valid for first orders.",
           ),
         );
         return;
@@ -215,7 +234,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
       addNotification(
         createErrorNotification(
           "Invalid Coupon",
-          "The coupon code you entered is not valid.",
+          "Not a valid coupon. Valid coupons: FIRST30, NEW10",
         ),
       );
     }
@@ -673,7 +692,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
               Processing...
             </>
           ) : (
-            <>Proceed to Pay ₹{getTotal()}</>
+            <>Proceed to Pay ���{getTotal()}</>
           )}
         </Button>
 

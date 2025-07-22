@@ -114,11 +114,12 @@ export const calculateDeliveryDate = (
   deliveryDate?: string,
   deliveryTime?: string,
 ): { date: string; time: string } => {
-  // If delivery date is explicitly provided, use it
+  // If delivery date is explicitly provided and different from pickup, use it
   if (deliveryDate && deliveryDate !== pickupDate) {
+    console.log(`📅 Using provided delivery date: ${deliveryDate}`);
     return {
       date: deliveryDate,
-      time: deliveryTime || "18:00", // Use provided delivery time or default
+      time: deliveryTime || "18:00",
     };
   }
 
@@ -153,6 +154,8 @@ export const calculateDeliveryDate = (
     }
   }
 
+  console.log(`📅 Calculating delivery date: pickup=${pickupDate}, serviceType=${serviceType}, deliveryDays=${deliveryDays}`);
+
   try {
     let pickupDateObj: Date;
 
@@ -176,16 +179,31 @@ export const calculateDeliveryDate = (
     // Format as YYYY-MM-DD
     const formattedDate = deliveryDateObj.toISOString().split("T")[0];
 
+    console.log(`📅 Calculated delivery date: ${formattedDate} (${deliveryDays} days after ${pickupDate})`);
+
     return {
       date: formattedDate,
-      time: deliveryTime || "18:00", // Use provided delivery time or default evening delivery
+      time: deliveryTime || "18:00",
     };
   } catch (error) {
     console.error("Error calculating delivery date:", error);
-    return {
-      date: pickupDate,
-      time: deliveryTime || "18:00",
-    };
+    // Return a default delivery date (pickup + 1 day) instead of same date
+    try {
+      const fallbackDate = new Date();
+      fallbackDate.setDate(fallbackDate.getDate() + 1);
+      const fallbackFormatted = fallbackDate.toISOString().split("T")[0];
+      console.log(`📅 Using fallback delivery date: ${fallbackFormatted}`);
+      return {
+        date: fallbackFormatted,
+        time: deliveryTime || "18:00",
+      };
+    } catch (fallbackError) {
+      console.error("Fallback delivery date calculation failed:", fallbackError);
+      return {
+        date: pickupDate,
+        time: deliveryTime || "18:00",
+      };
+    }
   }
 };
 
@@ -249,25 +267,21 @@ export const mapBookingData = (rawBooking: any): MappedBookingData => {
     });
   }
 
-  // Use delivery date from database if available, otherwise calculate
-  const deliveryInfo = {
-    date:
-      rawBooking.delivery_date ||
-      calculateDeliveryDate(
-        rawBooking.scheduled_date,
-        rawBooking.service_type || rawBooking.service,
-        rawBooking.delivery_date,
-        rawBooking.delivery_time,
-      ).date,
-    time:
-      rawBooking.delivery_time ||
-      calculateDeliveryDate(
-        rawBooking.scheduled_date,
-        rawBooking.service_type || rawBooking.service,
-        rawBooking.delivery_date,
-        rawBooking.delivery_time,
-      ).time,
-  };
+  // Use delivery date from database if available and different from pickup, otherwise calculate
+  const needsCalculation = !rawBooking.delivery_date ||
+                          rawBooking.delivery_date === rawBooking.scheduled_date ||
+                          rawBooking.delivery_date === rawBooking.pickup_date;
+
+  const deliveryInfo = needsCalculation ?
+    calculateDeliveryDate(
+      rawBooking.scheduled_date || rawBooking.pickup_date,
+      rawBooking.service_type || rawBooking.service,
+      undefined, // Don't pass delivery_date to force calculation
+      rawBooking.delivery_time,
+    ) : {
+      date: rawBooking.delivery_date,
+      time: rawBooking.delivery_time || "18:00"
+    };
 
   // Map pricing information
   const pricing = {
