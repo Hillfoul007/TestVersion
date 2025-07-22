@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 293 60% 63%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -128,11 +128,11 @@
 /* Optimize commonly used utilities to reduce bundle size */
 @layer utilities {
   .gradient-primary {
-    @apply bg-gradient-to-r from-blue-500 to-purple-600;
+    @apply bg-gradient-to-r from-laundrify-purple to-laundrify-pink;
   }
 
   .gradient-success {
-    @apply bg-gradient-to-r from-green-500 to-emerald-600;
+    @apply bg-gradient-to-r from-laundrify-mint to-green-400;
   }
 
   .btn-primary {
@@ -181,7 +181,7 @@
 
     /* Prevent status bar overlay issues */
     body {
-      background-color: #22c55e;
+      background-color: #C46DD8;
     }
 
     /* Ensure proper viewport handling in PWA */
