@@ -522,6 +522,15 @@ const MobileBookingHistory: React.FC<MobileBookingHistoryProps> = ({
             };
 
             try {
+              // Debug delivery date mapping
+              console.log(`📅 Debug delivery date for booking ${booking.id || index}:`, {
+                delivery_date: booking.delivery_date,
+                deliveryDate: booking.deliveryDate,
+                pickup_date: booking.pickup_date,
+                pickupDate: booking.pickupDate,
+                scheduled_date: booking.scheduled_date
+              });
+
               // Comprehensive data sanitization to prevent object rendering
               const sanitizeValue = (value: any, fallback: any = "") => {
                 if (value === null || value === undefined) return fallback;
