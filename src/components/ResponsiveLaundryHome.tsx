@@ -919,11 +919,11 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         {/* Empty State */}
         {!getPopularServices().length && (
           <div className="text-center py-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-laundrify-blue mb-4">
               Welcome to Laundrify
             </h2>
-            <p className="text-gray-600 mb-6">
-              Your trusted home services partner
+            <p className="text-laundrify-blue/80 mb-6">
+              Quick clean & convenient thats laundrify
             </p>
             <Button
               onClick={handleBookService}
@@ -1085,14 +1085,14 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h2 className="text-4xl font-bold mb-4">
-                Professional Laundry & Dry Cleaning
+                Laundrify - Quick Clean & Convenient
               </h2>
-              <p className="text-green-100 mb-6 text-lg">
-                Quality service delivered to your doorstep in {deliveryTime}
+              <p className="text-white/90 mb-6 text-lg">
+                Quick clean & convenient thats laundrify - delivered to your doorstep in {deliveryTime}
               </p>
               <Button
                 onClick={handleBookService}
-                className="bg-white text-green-600 hover:bg-gray-100 font-semibold px-8 py-3 rounded-xl"
+                className="bg-laundrify-mint text-laundrify-blue hover:bg-laundrify-mint/90 font-semibold px-8 py-3 rounded-xl"
               >
                 Browse Services
                 <ArrowRight className="ml-2 h-5 w-5" />
