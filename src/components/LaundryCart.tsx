@@ -491,9 +491,12 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
         flatNo: addressData?.flatNo,
       });
 
-      // Check authentication first before validation
-      if (!currentUser) {
-        console.log("❌ User not authenticated, redirecting to login");
+      // Handle authentication with guest session support
+      const sessionManager = SessionManager.getInstance();
+      const session = sessionManager.ensureValidSession();
+
+      if (!session.isAuthenticated) {
+        console.log("❌ Unable to create session, redirecting to login");
 
         // Save current cart state for post-login restore
         const currentCartState = {
@@ -523,6 +526,14 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
           );
         }
         return;
+      }
+
+      // Use session user if no currentUser provided
+      const effectiveUser = currentUser || session.user;
+      console.log(`✅ Using ${session.isGuest ? 'guest' : 'authenticated'} session for checkout`);
+
+      if (session.isGuest && !currentUser) {
+        console.log("👤 Proceeding with guest checkout (limited functionality)");
       }
 
       // Validate form with location availability checking
