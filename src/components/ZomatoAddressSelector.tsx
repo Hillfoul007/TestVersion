@@ -62,12 +62,21 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
   }, [isOpen, currentUser]);
 
   const loadSavedAddresses = async () => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      console.log("No current user, skipping address load");
+      setSavedAddresses([]);
+      return;
+    }
 
     setLoading(true);
     try {
       // Try to load from backend first using apiClient
       const userId = currentUser._id || currentUser.id || currentUser.phone;
+
+      if (!userId) {
+        console.warn("No valid user ID found, falling back to localStorage");
+        throw new Error("No valid user ID");
+      }
 
       const response = await apiClient.getAddresses(userId);
 
@@ -98,13 +107,21 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
       setSavedAddresses(addresses);
     } catch (error) {
       console.error("Error loading addresses:", error);
-      // Fallback to localStorage
-      const userId = currentUser._id || currentUser.id || currentUser.phone;
-      const savedAddressesKey = `addresses_${userId}`;
-      const addresses = JSON.parse(
-        localStorage.getItem(savedAddressesKey) || "[]",
-      );
-      setSavedAddresses(addresses);
+      // Fallback to localStorage if currentUser exists
+      if (currentUser) {
+        const userId = currentUser._id || currentUser.id || currentUser.phone;
+        if (userId) {
+          const savedAddressesKey = `addresses_${userId}`;
+          const addresses = JSON.parse(
+            localStorage.getItem(savedAddressesKey) || "[]",
+          );
+          setSavedAddresses(addresses);
+        } else {
+          setSavedAddresses([]);
+        }
+      } else {
+        setSavedAddresses([]);
+      }
     } finally {
       setLoading(false);
     }
