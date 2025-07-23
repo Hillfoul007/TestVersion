@@ -1477,6 +1477,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
               />
             </div>
 
+            {/* Google Maps Configuration Notice */}
+            <GoogleMapsNotice className="mt-3" />
+
             {/* Search Suggestions */}
             {showSuggestions && suggestions.length > 0 && (
               <div
