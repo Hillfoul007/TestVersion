@@ -191,8 +191,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
     const validCoupons = {
       NEW10: {
         discount: 10,
-        description: "10% off on your order (except first order)",
-        excludeFirstOrder: true
+        description: "10% off on your order"
       },
       FIRST30: {
         discount: 30,
