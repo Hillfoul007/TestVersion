@@ -220,9 +220,8 @@ export class ReferralService {
       {
         code: "NEW10",
         discount: 10,
-        description: "10% off on all orders (except first order)",
+        description: "10% off on all orders",
         type: "general",
-        excludeFirstOrder: true,
       },
       {
         code: "FIRST10",

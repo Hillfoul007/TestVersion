@@ -17,6 +17,7 @@ import {
 import { locationService, Coordinates } from "@/services/locationService";
 import { LocationDetectionService } from "@/services/locationDetectionService";
 import LocationUnavailableModal from "./LocationUnavailableModal";
+import GoogleMapsNotice from "./GoogleMapsNotice";
 import { Loader } from "@googlemaps/js-api-loader";
 
 // Add CSS for bounce animation
@@ -1097,8 +1098,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     try {
       let suggestions = [];
 
-      // Method 1: Google Places API (primary)
-      if (autocompleteService) {
+      // Method 1: Google Places API (primary) - Only if properly configured
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      if (autocompleteService && apiKey && apiKey.trim() !== "") {
         try {
           const { AutocompleteSuggestion, AutocompleteSessionToken } =
             autocompleteService;
@@ -1133,6 +1135,8 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
             placesError,
           );
         }
+      } else {
+        console.log("📍 Google Maps API not configured, using alternative search methods");
       }
 
       // Method 2: Nominatim API fallback with enhanced search
@@ -1171,52 +1175,95 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         }
       }
 
-      // Method 3: Enhanced local suggestions with better city coverage
+      // Method 3: Enhanced local suggestions with better city coverage and areas
       if (suggestions.length === 0) {
-        const indianCities = [
-          { name: "New Delhi", state: "Delhi" },
-          { name: "Gurgaon", state: "Haryana" },
-          { name: "Noida", state: "Uttar Pradesh" },
-          { name: "Mumbai", state: "Maharashtra" },
-          { name: "Bangalore", state: "Karnataka" },
-          { name: "Chennai", state: "Tamil Nadu" },
-          { name: "Hyderabad", state: "Telangana" },
-          { name: "Pune", state: "Maharashtra" },
-          { name: "Kolkata", state: "West Bengal" },
-          { name: "Ahmedabad", state: "Gujarat" },
-          { name: "Jaipur", state: "Rajasthan" },
-          { name: "Chandigarh", state: "Punjab" },
+        const indianLocations = [
+          // Major cities
+          { name: "New Delhi", state: "Delhi", areas: ["Connaught Place", "Karol Bagh", "Lajpat Nagar", "Saket"] },
+          { name: "Gurgaon", state: "Haryana", areas: ["Cyber City", "Sector 14", "Sector 29", "Golf Course Road"] },
+          { name: "Noida", state: "Uttar Pradesh", areas: ["Sector 18", "Sector 62", "Sector 16", "City Centre"] },
+          { name: "Mumbai", state: "Maharashtra", areas: ["Andheri", "Bandra", "Powai", "Malad"] },
+          { name: "Bangalore", state: "Karnataka", areas: ["Koramangala", "Indiranagar", "Whitefield", "HSR Layout"] },
+          { name: "Chennai", state: "Tamil Nadu", areas: ["T Nagar", "Anna Nagar", "Velachery", "OMR"] },
+          { name: "Hyderabad", state: "Telangana", areas: ["Hitech City", "Banjara Hills", "Jubilee Hills", "Kondapur"] },
+          { name: "Pune", state: "Maharashtra", areas: ["Koregaon Park", "Hinjewadi", "Kothrud", "Viman Nagar"] },
+          { name: "Kolkata", state: "West Bengal", areas: ["Salt Lake", "New Town", "Park Street", "Rajarhat"] },
+          { name: "Ahmedabad", state: "Gujarat", areas: ["SG Highway", "Satellite", "Vastrapur", "Bopal"] },
+          { name: "Jaipur", state: "Rajasthan", areas: ["Malviya Nagar", "C Scheme", "Vaishali Nagar", "Mansarovar"] },
+          { name: "Chandigarh", state: "Punjab", areas: ["Sector 17", "Sector 35", "Sector 22", "Elante Mall"] },
         ];
 
-        suggestions = indianCities
-          .filter(
-            (city) =>
-              city.name.toLowerCase().includes(query.toLowerCase()) ||
-              query.toLowerCase().includes(city.name.toLowerCase()),
-          )
-          .map((city) => ({
-            description: `${query}, ${city.name}, ${city.state}, India`,
+        suggestions = [];
+
+        // City name matches
+        indianLocations.forEach((city) => {
+          if (city.name.toLowerCase().includes(query.toLowerCase()) ||
+              query.toLowerCase().includes(city.name.toLowerCase())) {
+            suggestions.push({
+              description: `${query}, ${city.name}, ${city.state}, India`,
+              main_text: query,
+              secondary_text: `${city.name}, ${city.state}, India`,
+              place_id: `local_${query}_${city.name.toLowerCase()}`,
+              source: "local",
+            });
+
+            // Add popular areas in the city
+            city.areas.forEach((area) => {
+              if (area.toLowerCase().includes(query.toLowerCase()) ||
+                  query.toLowerCase().includes(area.toLowerCase())) {
+                suggestions.push({
+                  description: `${query}, ${area}, ${city.name}, ${city.state}, India`,
+                  main_text: `${query}, ${area}`,
+                  secondary_text: `${city.name}, ${city.state}, India`,
+                  place_id: `local_${query}_${area.toLowerCase()}_${city.name.toLowerCase()}`,
+                  source: "local",
+                });
+              }
+            });
+          }
+        });
+
+        // If no matches, provide generic suggestion
+        if (suggestions.length === 0) {
+          suggestions.push({
+            description: `${query}, India`,
             main_text: query,
-            secondary_text: `${city.name}, ${city.state}, India`,
-            place_id: `local_${query}_${city.name.toLowerCase()}`,
-            source: "local",
-          }));
+            secondary_text: "India",
+            place_id: `generic_${query}`,
+            source: "generic",
+          });
+        }
       }
 
-      setSuggestions(suggestions);
+      setSuggestions(suggestions.slice(0, 8)); // Limit to 8 suggestions for better UX
       setShowSuggestions(suggestions.length > 0);
     } catch (error) {
-      console.error("All search methods failed:", error);
-      // Ultimate fallback
-      setSuggestions([
+      console.error("Search failed:", error);
+      // Provide helpful fallback suggestions
+      const fallbackSuggestions = [
         {
-          description: `${query}, India`,
+          description: `${query}, Delhi, India`,
           main_text: query,
-          secondary_text: "India",
-          place_id: `fallback_${query}`,
+          secondary_text: "Delhi, India",
+          place_id: `fallback_${query}_delhi`,
           source: "fallback",
         },
-      ]);
+        {
+          description: `${query}, Mumbai, India`,
+          main_text: query,
+          secondary_text: "Mumbai, India",
+          place_id: `fallback_${query}_mumbai`,
+          source: "fallback",
+        },
+        {
+          description: `${query}, Bangalore, India`,
+          main_text: query,
+          secondary_text: "Bangalore, India",
+          place_id: `fallback_${query}_bangalore`,
+          source: "fallback",
+        },
+      ];
+      setSuggestions(fallbackSuggestions);
       setShowSuggestions(true);
     }
   };
@@ -1225,7 +1272,15 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     setSearchQuery(suggestion.description);
     setShowSuggestions(false);
 
-    if (!suggestion.place_id || suggestion.place_id.startsWith("mock_")) {
+    // Check if this is a fallback suggestion that doesn't need Google Maps API
+    if (!suggestion.place_id ||
+        suggestion.place_id.startsWith("mock_") ||
+        suggestion.place_id.startsWith("local_") ||
+        suggestion.place_id.startsWith("generic_") ||
+        suggestion.place_id.startsWith("fallback_") ||
+        suggestion.source === "local" ||
+        suggestion.source === "generic" ||
+        suggestion.source === "fallback") {
       // Handle mock suggestions or when places service is not available
       let coordinates = { lat: 28.6139, lng: 77.209 }; // Default Delhi coordinates
 
@@ -1257,6 +1312,13 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     }
 
     try {
+      // Check if Google Maps API is available before trying to use it
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      if (!apiKey || !apiKey.trim() || !window.google?.maps) {
+        console.log("🗺️ Google Maps API not available, using fallback method");
+        throw new Error("Google Maps API not available");
+      }
+
       // Use the new autocompleteSuggestionService which already implements the new Place API
       const { getPlaceDetails } = await import(
         "@/utils/autocompleteSuggestionService"
@@ -1286,24 +1348,49 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
           place.formatted_address || suggestion.description,
         );
       } else {
-        console.error("Failed to get place details");
-        // Fallback to geocoding
-        locationService
-          .geocodeAddress(suggestion.description)
-          .then((geocodeResult) => {
-            setSelectedLocation({
-              address: geocodeResult.formatted_address,
-              coordinates: geocodeResult.coordinates,
-            });
-            updateMapLocation(geocodeResult.coordinates);
-            autoFillAddressFields(geocodeResult.formatted_address);
-          })
-          .catch((geocodeError) => {
-            console.error("Geocoding fallback failed:", geocodeError);
-          });
+        console.log("🗺️ No place geometry found, using fallback");
+        throw new Error("No place geometry found");
       }
     } catch (error) {
-      console.error("Place details request failed:", error);
+      console.log("🗺️ Place details failed, using smart fallback:", error.message);
+
+      // Smart fallback based on suggestion content
+      let coordinates = { lat: 28.6139, lng: 77.209 }; // Default Delhi coordinates
+
+      // Better coordinate detection based on city names in description
+      const description = suggestion.description.toLowerCase();
+      if (description.includes("mumbai") || description.includes("bombay")) {
+        coordinates = { lat: 19.076, lng: 72.8777 };
+      } else if (description.includes("bangalore") || description.includes("bengaluru")) {
+        coordinates = { lat: 12.9716, lng: 77.5946 };
+      } else if (description.includes("gurgaon") || description.includes("gurugram")) {
+        coordinates = { lat: 28.4595, lng: 77.0266 };
+      } else if (description.includes("noida")) {
+        coordinates = { lat: 28.5355, lng: 77.391 };
+      } else if (description.includes("chennai") || description.includes("madras")) {
+        coordinates = { lat: 13.0827, lng: 80.2707 };
+      } else if (description.includes("hyderabad")) {
+        coordinates = { lat: 17.385, lng: 78.4867 };
+      } else if (description.includes("pune")) {
+        coordinates = { lat: 18.5204, lng: 73.8567 };
+      } else if (description.includes("kolkata") || description.includes("calcutta")) {
+        coordinates = { lat: 22.5726, lng: 88.3639 };
+      } else if (description.includes("ahmedabad")) {
+        coordinates = { lat: 23.0225, lng: 72.5714 };
+      } else if (description.includes("jaipur")) {
+        coordinates = { lat: 26.9124, lng: 75.7873 };
+      } else if (description.includes("chandigarh")) {
+        coordinates = { lat: 30.7333, lng: 76.7794 };
+      }
+
+      setSelectedLocation({
+        address: suggestion.description,
+        coordinates,
+      });
+      updateMapLocation(coordinates);
+      autoFillAddressFields(suggestion.description);
+
+      console.log(`✅ Used fallback coordinates for: ${suggestion.description}`);
     }
   };
 
@@ -1429,6 +1516,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
                 spellCheck={false}
               />
             </div>
+
+            {/* Google Maps Configuration Notice */}
+            <GoogleMapsNotice className="mt-3" />
 
             {/* Search Suggestions */}
             {showSuggestions && suggestions.length > 0 && (

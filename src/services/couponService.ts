@@ -54,9 +54,8 @@ export class CouponService {
       {
         code: "NEW10",
         discount: 10,
-        description: "10% off on all orders (except first order)",
-        type: "regular",
-        excludeFirstOrder: true,
+        description: "10% off on all orders",
+        type: "general",
         isActive: true,
       },
       {

@@ -909,7 +909,7 @@ Confirm this booking?`;
         </div>
       </div>
 
-      <div className="p-2 space-y-2 pb-24">
+      <div className={`p-2 space-y-2 ${validationErrors.length > 0 ? 'pb-56' : 'pb-24'}`}>
         {/* Cart Items - Compact View */}
         <Card className="shadow-sm">
           <CardHeader className="pb-1 px-3 py-1">
@@ -1216,7 +1216,7 @@ Confirm this booking?`;
                   </div>
                   <div className="flex items-center gap-1">
                     <span className="text-blue-600 font-medium">NEW10</span>
-                    <span>- 10% off on all orders (except first order)</span>
+                    <span>- 10% off on all orders</span>
                   </div>
                 </div>
               </div>
