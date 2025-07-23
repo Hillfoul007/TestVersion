@@ -60,7 +60,7 @@ export const laundryServices: LaundryService[] = [
   },
       {
     id: "steam-press-suit",
-    name: "Steam Press - Men's Suit / Lehenga / Heavy Dresses",
+    name: "Men's Suit / Lehenga / Heavy Dresses",
     description: "Professional steam pressing for men's suits, lehengas, and heavy dresses.",
     price: 150,
     unit: "SET",
@@ -71,7 +71,7 @@ export const laundryServices: LaundryService[] = [
   },
       {
     id: "steam-press-ladies-suit",
-    name: "Steam Press - Ladies Suit / Kurta & Pyjama / Saree",
+    name: "Ladies Suit / Kurta & Pyjama / Saree",
     description: "Expert steam pressing for ladies suits, kurta sets, and sarees.",
     price: 100,
     unit: "SET",
@@ -82,7 +82,7 @@ export const laundryServices: LaundryService[] = [
   },
       {
     id: "steam-press-regular",
-    name: "Steam Press - Regular Items",
+    name: "Regular Items",
     description: "Steam pressing for standard clothing items.",
     price: 40,
     unit: "PC",
