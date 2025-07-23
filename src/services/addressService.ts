@@ -233,20 +233,10 @@ export class AddressService {
       }
 
       // Fallback to localStorage
-      const storageKey = `addresses_${userId}`;
-      const savedAddresses = localStorage.getItem(storageKey);
-
-      if (savedAddresses) {
-        const addresses = JSON.parse(savedAddresses);
-        return {
-          success: true,
-          data: Array.isArray(addresses) ? addresses : [],
-        };
-      }
-
+      const addresses = this.getAddressesFromLocalStorage(userId);
       return {
         success: true,
-        data: [],
+        data: addresses,
       };
     } catch (error) {
       console.error("Failed to get user addresses:", error);
