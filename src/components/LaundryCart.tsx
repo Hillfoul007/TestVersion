@@ -362,45 +362,23 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
         return;
       }
 
-                  // Then check regular coupons
-      const validCoupons = {
-        FIRST30: {
-          discount: 30,
-          maxDiscount: 200,
-          description: "30% off on first order (up to ₹200)",
-          isFirstOrder: true
-        },
-        NEW10: {
-          discount: 10,
-          description: "10% off on all orders (except first order)",
-          excludeFirstOrder: true
-        }
-      };
+      // Use the new CouponService for validation
+      const sessionManager = SessionManager.getInstance();
+      const session = sessionManager.ensureValidSession();
+      const userId = session.userId || "guest";
 
-      const coupon = validCoupons[couponCode.toUpperCase()];
-      console.log("Valid coupons:", Object.keys(validCoupons));
-      console.log("Looking for coupon:", couponCode.toUpperCase());
-      console.log("Found coupon:", coupon);
+      const validation = couponService.validateCoupon(couponCode, userId, getSubtotal());
 
-                  if (coupon) {
-        // Check if coupon is restricted to first orders only
-        if (coupon.isFirstOrder && !referralService.isFirstTimeUser(currentUser)) {
-          setCouponError("This coupon is valid for first orders only.");
-          return;
-        }
-
-        // Check if coupon excludes first orders
-        if (coupon.excludeFirstOrder && referralService.isFirstTimeUser(currentUser)) {
-          setCouponError("This coupon is not valid for first orders.");
-          return;
-        }
+      if (validation.valid && validation.coupon) {
+        const coupon = validation.coupon;
 
         setAppliedCoupon({
-          code: couponCode.toUpperCase(),
+          code: coupon.code,
           discount: coupon.discount,
           maxDiscount: coupon.maxDiscount || undefined,
         });
-        console.log("Coupon applied successfully");
+
+        console.log("✅ Coupon applied successfully:", coupon.code);
         addNotification(
           createSuccessNotification(
             "Coupon Applied",
@@ -408,8 +386,8 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
           ),
         );
       } else {
-        console.log("Invalid coupon code");
-        setCouponError("Invalid coupon. Valid coupons: FIRST30, NEW10");
+        console.log("❌ Invalid coupon:", validation.error);
+        setCouponError(validation.error || "Invalid coupon code");
       }
     } catch (error) {
       console.error("Error in applyCoupon:", error);
