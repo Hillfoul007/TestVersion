@@ -298,8 +298,16 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         defaultMarker.setMap(null);
       }, 3000);
     } catch (error) {
-      console.error("Failed to initialize Google Maps:", error);
+      console.error("❌ Failed to initialize Google Maps:", error);
+      console.warn("🚨 Map functionality will be limited. Please check your Google Maps API key configuration.");
       setIsMapLoading(false);
+
+      // Set a fallback state to allow basic address entry without map
+      const fallbackCenter = { lat: 28.6139, lng: 77.209 }; // Delhi center
+      setSelectedLocation({
+        address: "Current Location (Map unavailable)",
+        coordinates: fallbackCenter
+      });
     }
   };
 
