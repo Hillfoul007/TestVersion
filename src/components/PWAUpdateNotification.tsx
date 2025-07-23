@@ -65,7 +65,7 @@ const PWAUpdateNotification: React.FC = () => {
             <div className="flex-1 pr-4">
               <p className="font-medium mb-1">New version available!</p>
               <p className="text-sm">
-                Update CleanCare Pro to get the latest features and
+                Update Laundrify to get the latest features and
                 improvements.
               </p>
             </div>
