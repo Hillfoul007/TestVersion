@@ -1143,10 +1143,10 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
             <Button
               variant={selectedCategory === "all" ? "default" : "outline"}
               onClick={() => setSelectedCategory("all")}
-              className={`flex-shrink-0 rounded-xl ${
+              className={`flex-shrink-0 rounded-xl font-medium shadow-md border ${
                 selectedCategory === "all"
-                  ? "bg-laundrify-purple text-white"
-                  : "hover:bg-laundrify-mint/20 hover:border-laundrify-mint"
+                  ? "bg-laundrify-purple text-white border-laundrify-purple shadow-lg"
+                  : "bg-laundrify-mint/80 text-laundrify-blue border-laundrify-mint hover:bg-laundrify-mint hover:shadow-lg"
               }`}
             >
               <ShoppingBag className="h-4 w-4 mr-2" />
@@ -1165,10 +1165,10 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                     selectedCategory === category.id ? "default" : "outline"
                   }
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`flex-shrink-0 rounded-xl ${
+                  className={`flex-shrink-0 rounded-xl font-medium shadow-md border ${
                     selectedCategory === category.id
-                      ? "bg-laundrify-purple text-white"
-                      : "hover:bg-laundrify-mint/20 hover:border-laundrify-mint"
+                      ? "bg-laundrify-purple text-white border-laundrify-purple shadow-lg"
+                      : "bg-laundrify-mint/80 text-laundrify-blue border-laundrify-mint hover:bg-laundrify-mint hover:shadow-lg"
                   }`}
                 >
                   <span className="mr-2">{category.icon}</span>
