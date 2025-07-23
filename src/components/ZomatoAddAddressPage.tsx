@@ -1272,7 +1272,15 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     setSearchQuery(suggestion.description);
     setShowSuggestions(false);
 
-    if (!suggestion.place_id || suggestion.place_id.startsWith("mock_")) {
+    // Check if this is a fallback suggestion that doesn't need Google Maps API
+    if (!suggestion.place_id ||
+        suggestion.place_id.startsWith("mock_") ||
+        suggestion.place_id.startsWith("local_") ||
+        suggestion.place_id.startsWith("generic_") ||
+        suggestion.place_id.startsWith("fallback_") ||
+        suggestion.source === "local" ||
+        suggestion.source === "generic" ||
+        suggestion.source === "fallback") {
       // Handle mock suggestions or when places service is not available
       let coordinates = { lat: 28.6139, lng: 77.209 }; // Default Delhi coordinates
 
