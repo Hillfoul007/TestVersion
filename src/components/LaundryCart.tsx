@@ -1216,7 +1216,7 @@ Confirm this booking?`;
                   </div>
                   <div className="flex items-center gap-1">
                     <span className="text-blue-600 font-medium">NEW10</span>
-                    <span>- 10% off on all orders (except first order)</span>
+                    <span>- 10% off on all orders</span>
                   </div>
                 </div>
               </div>
