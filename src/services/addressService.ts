@@ -179,7 +179,11 @@ export class AddressService {
     try {
       const userId = this.getCurrentUserId();
       if (!userId) {
-        throw new Error("User not authenticated");
+        console.warn("⚠️ User not authenticated, checking localStorage only");
+        return {
+          success: true,
+          data: [],
+        };
       }
 
       // Try backend first
