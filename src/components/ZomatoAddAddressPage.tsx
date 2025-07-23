@@ -1097,8 +1097,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     try {
       let suggestions = [];
 
-      // Method 1: Google Places API (primary)
-      if (autocompleteService) {
+      // Method 1: Google Places API (primary) - Only if properly configured
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      if (autocompleteService && apiKey && apiKey.trim() !== "") {
         try {
           const { AutocompleteSuggestion, AutocompleteSessionToken } =
             autocompleteService;
@@ -1133,6 +1134,8 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
             placesError,
           );
         }
+      } else {
+        console.log("📍 Google Maps API not configured, using alternative search methods");
       }
 
       // Method 2: Nominatim API fallback with enhanced search
@@ -1171,52 +1174,95 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         }
       }
 
-      // Method 3: Enhanced local suggestions with better city coverage
+      // Method 3: Enhanced local suggestions with better city coverage and areas
       if (suggestions.length === 0) {
-        const indianCities = [
-          { name: "New Delhi", state: "Delhi" },
-          { name: "Gurgaon", state: "Haryana" },
-          { name: "Noida", state: "Uttar Pradesh" },
-          { name: "Mumbai", state: "Maharashtra" },
-          { name: "Bangalore", state: "Karnataka" },
-          { name: "Chennai", state: "Tamil Nadu" },
-          { name: "Hyderabad", state: "Telangana" },
-          { name: "Pune", state: "Maharashtra" },
-          { name: "Kolkata", state: "West Bengal" },
-          { name: "Ahmedabad", state: "Gujarat" },
-          { name: "Jaipur", state: "Rajasthan" },
-          { name: "Chandigarh", state: "Punjab" },
+        const indianLocations = [
+          // Major cities
+          { name: "New Delhi", state: "Delhi", areas: ["Connaught Place", "Karol Bagh", "Lajpat Nagar", "Saket"] },
+          { name: "Gurgaon", state: "Haryana", areas: ["Cyber City", "Sector 14", "Sector 29", "Golf Course Road"] },
+          { name: "Noida", state: "Uttar Pradesh", areas: ["Sector 18", "Sector 62", "Sector 16", "City Centre"] },
+          { name: "Mumbai", state: "Maharashtra", areas: ["Andheri", "Bandra", "Powai", "Malad"] },
+          { name: "Bangalore", state: "Karnataka", areas: ["Koramangala", "Indiranagar", "Whitefield", "HSR Layout"] },
+          { name: "Chennai", state: "Tamil Nadu", areas: ["T Nagar", "Anna Nagar", "Velachery", "OMR"] },
+          { name: "Hyderabad", state: "Telangana", areas: ["Hitech City", "Banjara Hills", "Jubilee Hills", "Kondapur"] },
+          { name: "Pune", state: "Maharashtra", areas: ["Koregaon Park", "Hinjewadi", "Kothrud", "Viman Nagar"] },
+          { name: "Kolkata", state: "West Bengal", areas: ["Salt Lake", "New Town", "Park Street", "Rajarhat"] },
+          { name: "Ahmedabad", state: "Gujarat", areas: ["SG Highway", "Satellite", "Vastrapur", "Bopal"] },
+          { name: "Jaipur", state: "Rajasthan", areas: ["Malviya Nagar", "C Scheme", "Vaishali Nagar", "Mansarovar"] },
+          { name: "Chandigarh", state: "Punjab", areas: ["Sector 17", "Sector 35", "Sector 22", "Elante Mall"] },
         ];
 
-        suggestions = indianCities
-          .filter(
-            (city) =>
-              city.name.toLowerCase().includes(query.toLowerCase()) ||
-              query.toLowerCase().includes(city.name.toLowerCase()),
-          )
-          .map((city) => ({
-            description: `${query}, ${city.name}, ${city.state}, India`,
+        suggestions = [];
+
+        // City name matches
+        indianLocations.forEach((city) => {
+          if (city.name.toLowerCase().includes(query.toLowerCase()) ||
+              query.toLowerCase().includes(city.name.toLowerCase())) {
+            suggestions.push({
+              description: `${query}, ${city.name}, ${city.state}, India`,
+              main_text: query,
+              secondary_text: `${city.name}, ${city.state}, India`,
+              place_id: `local_${query}_${city.name.toLowerCase()}`,
+              source: "local",
+            });
+
+            // Add popular areas in the city
+            city.areas.forEach((area) => {
+              if (area.toLowerCase().includes(query.toLowerCase()) ||
+                  query.toLowerCase().includes(area.toLowerCase())) {
+                suggestions.push({
+                  description: `${query}, ${area}, ${city.name}, ${city.state}, India`,
+                  main_text: `${query}, ${area}`,
+                  secondary_text: `${city.name}, ${city.state}, India`,
+                  place_id: `local_${query}_${area.toLowerCase()}_${city.name.toLowerCase()}`,
+                  source: "local",
+                });
+              }
+            });
+          }
+        });
+
+        // If no matches, provide generic suggestion
+        if (suggestions.length === 0) {
+          suggestions.push({
+            description: `${query}, India`,
             main_text: query,
-            secondary_text: `${city.name}, ${city.state}, India`,
-            place_id: `local_${query}_${city.name.toLowerCase()}`,
-            source: "local",
-          }));
+            secondary_text: "India",
+            place_id: `generic_${query}`,
+            source: "generic",
+          });
+        }
       }
 
-      setSuggestions(suggestions);
+      setSuggestions(suggestions.slice(0, 8)); // Limit to 8 suggestions for better UX
       setShowSuggestions(suggestions.length > 0);
     } catch (error) {
-      console.error("All search methods failed:", error);
-      // Ultimate fallback
-      setSuggestions([
+      console.error("Search failed:", error);
+      // Provide helpful fallback suggestions
+      const fallbackSuggestions = [
         {
-          description: `${query}, India`,
+          description: `${query}, Delhi, India`,
           main_text: query,
-          secondary_text: "India",
-          place_id: `fallback_${query}`,
+          secondary_text: "Delhi, India",
+          place_id: `fallback_${query}_delhi`,
           source: "fallback",
         },
-      ]);
+        {
+          description: `${query}, Mumbai, India`,
+          main_text: query,
+          secondary_text: "Mumbai, India",
+          place_id: `fallback_${query}_mumbai`,
+          source: "fallback",
+        },
+        {
+          description: `${query}, Bangalore, India`,
+          main_text: query,
+          secondary_text: "Bangalore, India",
+          place_id: `fallback_${query}_bangalore`,
+          source: "fallback",
+        },
+      ];
+      setSuggestions(fallbackSuggestions);
       setShowSuggestions(true);
     }
   };
