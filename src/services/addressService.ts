@@ -263,7 +263,8 @@ export class AddressService {
     try {
       const userId = this.getCurrentUserId();
       if (!userId) {
-        throw new Error("User not authenticated");
+        console.warn("⚠️ User not authenticated, saving to localStorage only");
+        return this.saveAddressToLocalStorage(addressData, "guest");
       }
 
       console.log("💾 Saving address:", addressData);
