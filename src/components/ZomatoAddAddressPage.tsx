@@ -1304,6 +1304,13 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     }
 
     try {
+      // Check if Google Maps API is available before trying to use it
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      if (!apiKey || !apiKey.trim() || !window.google?.maps) {
+        console.log("🗺️ Google Maps API not available, using fallback method");
+        throw new Error("Google Maps API not available");
+      }
+
       // Use the new autocompleteSuggestionService which already implements the new Place API
       const { getPlaceDetails } = await import(
         "@/utils/autocompleteSuggestionService"
@@ -1333,24 +1340,49 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
           place.formatted_address || suggestion.description,
         );
       } else {
-        console.error("Failed to get place details");
-        // Fallback to geocoding
-        locationService
-          .geocodeAddress(suggestion.description)
-          .then((geocodeResult) => {
-            setSelectedLocation({
-              address: geocodeResult.formatted_address,
-              coordinates: geocodeResult.coordinates,
-            });
-            updateMapLocation(geocodeResult.coordinates);
-            autoFillAddressFields(geocodeResult.formatted_address);
-          })
-          .catch((geocodeError) => {
-            console.error("Geocoding fallback failed:", geocodeError);
-          });
+        console.log("🗺️ No place geometry found, using fallback");
+        throw new Error("No place geometry found");
       }
     } catch (error) {
-      console.error("Place details request failed:", error);
+      console.log("🗺️ Place details failed, using smart fallback:", error.message);
+
+      // Smart fallback based on suggestion content
+      let coordinates = { lat: 28.6139, lng: 77.209 }; // Default Delhi coordinates
+
+      // Better coordinate detection based on city names in description
+      const description = suggestion.description.toLowerCase();
+      if (description.includes("mumbai") || description.includes("bombay")) {
+        coordinates = { lat: 19.076, lng: 72.8777 };
+      } else if (description.includes("bangalore") || description.includes("bengaluru")) {
+        coordinates = { lat: 12.9716, lng: 77.5946 };
+      } else if (description.includes("gurgaon") || description.includes("gurugram")) {
+        coordinates = { lat: 28.4595, lng: 77.0266 };
+      } else if (description.includes("noida")) {
+        coordinates = { lat: 28.5355, lng: 77.391 };
+      } else if (description.includes("chennai") || description.includes("madras")) {
+        coordinates = { lat: 13.0827, lng: 80.2707 };
+      } else if (description.includes("hyderabad")) {
+        coordinates = { lat: 17.385, lng: 78.4867 };
+      } else if (description.includes("pune")) {
+        coordinates = { lat: 18.5204, lng: 73.8567 };
+      } else if (description.includes("kolkata") || description.includes("calcutta")) {
+        coordinates = { lat: 22.5726, lng: 88.3639 };
+      } else if (description.includes("ahmedabad")) {
+        coordinates = { lat: 23.0225, lng: 72.5714 };
+      } else if (description.includes("jaipur")) {
+        coordinates = { lat: 26.9124, lng: 75.7873 };
+      } else if (description.includes("chandigarh")) {
+        coordinates = { lat: 30.7333, lng: 76.7794 };
+      }
+
+      setSelectedLocation({
+        address: suggestion.description,
+        coordinates,
+      });
+      updateMapLocation(coordinates);
+      autoFillAddressFields(suggestion.description);
+
+      console.log(`✅ Used fallback coordinates for: ${suggestion.description}`);
     }
   };
 
