@@ -52,6 +52,7 @@ import ZomatoAddressSelector from "./ZomatoAddressSelector";
 import ZomatoAddAddressPage from "./ZomatoAddAddressPage";
 import { AddressService } from "@/services/addressService";
 import { SessionManager } from "@/utils/sessionManager";
+import { CouponService } from "@/services/couponService";
 
 interface LaundryCartProps {
   onBack: () => void;
@@ -90,6 +91,7 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
 
   const authService = OTPAuthService.getInstance();
   const referralService = ReferralService.getInstance();
+  const couponService = CouponService.getInstance();
 
   // Load saved form data on component mount (excluding date autofill)
   useEffect(() => {
@@ -1277,7 +1279,7 @@ Confirm this booking?`;
 
           <Button
             onClick={(e) => {
-              console.log("🚀 Button clicked event triggered");
+              console.log("�� Button clicked event triggered");
               e.preventDefault();
               e.stopPropagation();
               try {
