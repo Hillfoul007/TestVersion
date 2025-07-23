@@ -909,7 +909,7 @@ Confirm this booking?`;
         </div>
       </div>
 
-      <div className={`p-2 space-y-2 ${validationErrors.length > 0 ? 'pb-40' : 'pb-24'}`}>
+      <div className={`p-2 space-y-2 ${validationErrors.length > 0 ? 'pb-56' : 'pb-24'}`}>
         {/* Cart Items - Compact View */}
         <Card className="shadow-sm">
           <CardHeader className="pb-1 px-3 py-1">
