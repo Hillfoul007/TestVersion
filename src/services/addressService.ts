@@ -44,10 +44,53 @@ export class AddressService {
   }
 
   /**
-   * Get user ID for API calls
+   * Get user ID for API calls with better fallback
    */
   private getCurrentUserId(): string | null {
-    return getUserId();
+    const userId = getUserId();
+
+    if (!userId) {
+      // Try to get from current user object
+      const currentUser = getCurrentUser();
+      if (currentUser) {
+        const id = currentUser.id || currentUser._id || currentUser.phone;
+        if (id) {
+          console.log(`🔑 Using user ID from current user object: ${id}`);
+          return id;
+        }
+      }
+
+      console.log(`🔑 No user ID found, using guest mode`);
+      return null;
+    }
+
+    console.log(`🔑 Using user ID from auth utils: ${userId}`);
+    return userId;
+  }
+
+  /**
+   * Get addresses from localStorage with better error handling
+   */
+  private getAddressesFromLocalStorage(userId: string): AddressData[] {
+    try {
+      const storageKey = `addresses_${userId}`;
+      const savedAddresses = localStorage.getItem(storageKey);
+
+      console.log(`💾 Checking localStorage for addresses with key: ${storageKey}`);
+
+      if (savedAddresses) {
+        const addresses = JSON.parse(savedAddresses);
+        const validAddresses = Array.isArray(addresses) ? addresses : [];
+        console.log(`💾 Found ${validAddresses.length} addresses in localStorage`);
+        return validAddresses;
+      }
+
+      console.log(`💾 No addresses found in localStorage for ${storageKey}`);
+      return [];
+    } catch (error) {
+      console.error(`❌ Error reading addresses from localStorage:`, error);
+      return [];
+    }
   }
 
   /**
