@@ -685,18 +685,31 @@ Confirm this booking?`;
 
           console.log("✅ Checkout initiated successfully");
 
-          // Track referral usage if referral code was applied
-          if (appliedCoupon && appliedCoupon.isReferral) {
-            const userId =
-              currentUser._id || currentUser.id || currentUser.phone;
-            referralService.trackReferralUsage(
-              appliedCoupon.code,
-              userId,
-              getCouponDiscount(),
-            );
+          // Track coupon usage for general coupons
+          if (appliedCoupon) {
+            const sessionManager = SessionManager.getInstance();
+            const session = sessionManager.ensureValidSession();
+            const userId = session.userId || "guest";
 
-            // Award bonus to referrer (this would normally be done on backend after payment confirmation)
-            referralService.awardReferralBonus(appliedCoupon.code);
+            if (appliedCoupon.isReferral) {
+              // Track referral usage
+              referralService.trackReferralUsage(
+                appliedCoupon.code,
+                userId,
+                getCouponDiscount(),
+              );
+              // Award bonus to referrer (this would normally be done on backend after payment confirmation)
+              referralService.awardReferralBonus(appliedCoupon.code);
+            } else {
+              // Track general coupon usage
+              couponService.markCouponAsUsed(
+                appliedCoupon.code,
+                userId,
+                getSubtotal(),
+                getCouponDiscount()
+              );
+              console.log(`✅ Marked coupon ${appliedCoupon.code} as used`);
+            }
           }
 
           // Clear cart after successful booking
