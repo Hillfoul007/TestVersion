@@ -315,12 +315,19 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     if (isOpen) {
       // Only populate if editing an existing address
       if (editingAddress) {
-        setSearchQuery(editingAddress.fullAddress);
+        // Don't put the full address in search - populate individual fields instead
+        setSearchQuery(""); // Keep search empty for editing
         setSelectedLocation({
           address: editingAddress.fullAddress,
           coordinates: editingAddress.coordinates || { lat: 0, lng: 0 },
         });
-        setAdditionalDetails(editingAddress.flatNo || "");
+
+        // Populate individual form fields
+        setFlatNo(editingAddress.flatNo || "");
+        setStreet(editingAddress.street || "");
+        setLandmark(editingAddress.landmark || "");
+        setArea(editingAddress.village || editingAddress.city || "");
+        setPincode(editingAddress.pincode || "");
         setAddressType(editingAddress.type);
         setReceiverName(editingAddress.name || "");
         setReceiverPhone(editingAddress.phone || "");
@@ -329,6 +336,13 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         if (mapInstance && editingAddress.coordinates) {
           updateMapLocation(editingAddress.coordinates);
         }
+
+        console.log("✅ Populated address fields for editing:", {
+          flatNo: editingAddress.flatNo,
+          street: editingAddress.street,
+          area: editingAddress.village || editingAddress.city,
+          pincode: editingAddress.pincode
+        });
       } else {
         // Clear all fields for new address and autofill from account
         setSearchQuery("");
