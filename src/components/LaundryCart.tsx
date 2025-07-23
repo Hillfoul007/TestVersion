@@ -51,6 +51,8 @@ import SavedAddressesModal from "./SavedAddressesModal";
 import ZomatoAddressSelector from "./ZomatoAddressSelector";
 import ZomatoAddAddressPage from "./ZomatoAddAddressPage";
 import { AddressService } from "@/services/addressService";
+import { SessionManager } from "@/utils/sessionManager";
+import { CouponService } from "@/services/couponService";
 
 interface LaundryCartProps {
   onBack: () => void;
@@ -89,6 +91,7 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
 
   const authService = OTPAuthService.getInstance();
   const referralService = ReferralService.getInstance();
+  const couponService = CouponService.getInstance();
 
   // Load saved form data on component mount (excluding date autofill)
   useEffect(() => {
@@ -359,45 +362,23 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
         return;
       }
 
-                  // Then check regular coupons
-      const validCoupons = {
-        FIRST30: {
-          discount: 30,
-          maxDiscount: 200,
-          description: "30% off on first order (up to ₹200)",
-          isFirstOrder: true
-        },
-        NEW10: {
-          discount: 10,
-          description: "10% off on all orders (except first order)",
-          excludeFirstOrder: true
-        }
-      };
+      // Use the new CouponService for validation
+      const sessionManager = SessionManager.getInstance();
+      const session = sessionManager.ensureValidSession();
+      const userId = session.userId || "guest";
 
-      const coupon = validCoupons[couponCode.toUpperCase()];
-      console.log("Valid coupons:", Object.keys(validCoupons));
-      console.log("Looking for coupon:", couponCode.toUpperCase());
-      console.log("Found coupon:", coupon);
+      const validation = couponService.validateCoupon(couponCode, userId, getSubtotal());
 
-                  if (coupon) {
-        // Check if coupon is restricted to first orders only
-        if (coupon.isFirstOrder && !referralService.isFirstTimeUser(currentUser)) {
-          setCouponError("This coupon is valid for first orders only.");
-          return;
-        }
-
-        // Check if coupon excludes first orders
-        if (coupon.excludeFirstOrder && referralService.isFirstTimeUser(currentUser)) {
-          setCouponError("This coupon is not valid for first orders.");
-          return;
-        }
+      if (validation.valid && validation.coupon) {
+        const coupon = validation.coupon;
 
         setAppliedCoupon({
-          code: couponCode.toUpperCase(),
+          code: coupon.code,
           discount: coupon.discount,
           maxDiscount: coupon.maxDiscount || undefined,
         });
-        console.log("Coupon applied successfully");
+
+        console.log("✅ Coupon applied successfully:", coupon.code);
         addNotification(
           createSuccessNotification(
             "Coupon Applied",
@@ -405,8 +386,8 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
           ),
         );
       } else {
-        console.log("Invalid coupon code");
-        setCouponError("Invalid coupon. Valid coupons: FIRST30, NEW10");
+        console.log("❌ Invalid coupon:", validation.error);
+        setCouponError(validation.error || "Invalid coupon code");
       }
     } catch (error) {
       console.error("Error in applyCoupon:", error);
@@ -490,9 +471,12 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
         flatNo: addressData?.flatNo,
       });
 
-      // Check authentication first before validation
-      if (!currentUser) {
-        console.log("❌ User not authenticated, redirecting to login");
+      // Handle authentication with guest session support
+      const sessionManager = SessionManager.getInstance();
+      const session = sessionManager.ensureValidSession();
+
+      if (!session.isAuthenticated) {
+        console.log("❌ Unable to create session, redirecting to login");
 
         // Save current cart state for post-login restore
         const currentCartState = {
@@ -522,6 +506,14 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
           );
         }
         return;
+      }
+
+      // Use session user if no currentUser provided
+      const effectiveUser = currentUser || session.user;
+      console.log(`✅ Using ${session.isGuest ? 'guest' : 'authenticated'} session for checkout`);
+
+      if (session.isGuest && !currentUser) {
+        console.log("👤 Proceeding with guest checkout (limited functionality)");
       }
 
       // Validate form with location availability checking
@@ -693,18 +685,31 @@ Confirm this booking?`;
 
           console.log("✅ Checkout initiated successfully");
 
-          // Track referral usage if referral code was applied
-          if (appliedCoupon && appliedCoupon.isReferral) {
-            const userId =
-              currentUser._id || currentUser.id || currentUser.phone;
-            referralService.trackReferralUsage(
-              appliedCoupon.code,
-              userId,
-              getCouponDiscount(),
-            );
+          // Track coupon usage for general coupons
+          if (appliedCoupon) {
+            const sessionManager = SessionManager.getInstance();
+            const session = sessionManager.ensureValidSession();
+            const userId = session.userId || "guest";
 
-            // Award bonus to referrer (this would normally be done on backend after payment confirmation)
-            referralService.awardReferralBonus(appliedCoupon.code);
+            if (appliedCoupon.isReferral) {
+              // Track referral usage
+              referralService.trackReferralUsage(
+                appliedCoupon.code,
+                userId,
+                getCouponDiscount(),
+              );
+              // Award bonus to referrer (this would normally be done on backend after payment confirmation)
+              referralService.awardReferralBonus(appliedCoupon.code);
+            } else {
+              // Track general coupon usage
+              couponService.markCouponAsUsed(
+                appliedCoupon.code,
+                userId,
+                getSubtotal(),
+                getCouponDiscount()
+              );
+              console.log(`✅ Marked coupon ${appliedCoupon.code} as used`);
+            }
           }
 
           // Clear cart after successful booking
@@ -1265,7 +1270,7 @@ Confirm this booking?`;
 
           <Button
             onClick={(e) => {
-              console.log("🚀 Button clicked event triggered");
+              console.log("�� Button clicked event triggered");
               e.preventDefault();
               e.stopPropagation();
               try {

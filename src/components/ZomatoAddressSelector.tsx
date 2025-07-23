@@ -20,6 +20,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { apiClient } from "@/lib/apiClient";
+import { AddressService } from "@/services/addressService";
+import { SessionManager } from "@/utils/sessionManager";
 
 interface SavedAddress {
   id: string;
@@ -56,105 +58,69 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isOpen && currentUser) {
+    if (isOpen) {
+      console.log("🏠 ZomatoAddressSelector opened, currentUser:", {
+        exists: !!currentUser,
+        id: currentUser?._id || currentUser?.id,
+        phone: currentUser?.phone
+      });
       loadSavedAddresses();
     }
   }, [isOpen, currentUser]);
 
   const loadSavedAddresses = async () => {
-    if (!currentUser) return;
+    console.log("📋 Loading saved addresses...");
 
     setLoading(true);
     try {
-      // Try to load from backend first using apiClient
-      const userId = currentUser._id || currentUser.id || currentUser.phone;
+      // Use session manager to handle authentication properly
+      const sessionManager = SessionManager.getInstance();
+      const session = sessionManager.ensureValidSession();
 
-      const response = await apiClient.getAddresses(userId);
-
-      if (response.data) {
-        // Transform backend format to frontend format
-        const transformedAddresses = response.data.map((addr: any) => ({
-          id: addr._id,
-          type: addr.address_type || "other",
-          label: addr.title,
-          flatNo: addr.full_address.split(",")[0] || "",
-          fullAddress: addr.full_address,
-          landmark: addr.landmark || "",
-          phone: addr.contact_phone || currentUser.phone,
-          coordinates: addr.coordinates,
-          createdAt: addr.created_at,
-        }));
-        setSavedAddresses(transformedAddresses);
-        setLoading(false);
+      if (!session.isAuthenticated) {
+        console.log("⚠️ No authenticated session, no addresses to load");
+        setSavedAddresses([]);
         return;
       }
 
-      // Fallback to localStorage if backend fails
-      console.log("Falling back to localStorage for addresses");
-      const savedAddressesKey = `addresses_${userId}`;
-      const addresses = JSON.parse(
-        localStorage.getItem(savedAddressesKey) || "[]",
-      );
-      setSavedAddresses(addresses);
+      // Use AddressService for better error handling
+      const addressService = AddressService.getInstance();
+      const result = await addressService.getUserAddresses();
+
+      if (result.success && result.data) {
+        console.log(`✅ Loaded ${result.data.length} addresses:`, result.data);
+        setSavedAddresses(result.data);
+      } else {
+        console.log("⚠️ No addresses found or failed to load:", result);
+        setSavedAddresses([]);
+      }
+
     } catch (error) {
-      console.error("Error loading addresses:", error);
-      // Fallback to localStorage
-      const userId = currentUser._id || currentUser.id || currentUser.phone;
-      const savedAddressesKey = `addresses_${userId}`;
-      const addresses = JSON.parse(
-        localStorage.getItem(savedAddressesKey) || "[]",
-      );
-      setSavedAddresses(addresses);
+      console.error("❌ Error loading addresses:", error);
+      setSavedAddresses([]);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteAddress = async (addressId: string) => {
-    if (!currentUser) return;
-
     try {
-      const userId = currentUser._id || currentUser.id || currentUser.phone;
-      const response = await apiClient.deleteAddress(userId, addressId);
+      console.log("🗑️ Deleting address:", addressId);
 
-      if (response.data) {
+      const addressService = AddressService.getInstance();
+      const result = await addressService.deleteAddress(addressId);
+
+      if (result.success) {
         // Remove from state
         setSavedAddresses((prev) =>
           prev.filter((addr) => addr.id !== addressId),
         );
-
-        // Also remove from localStorage as backup
-        const savedAddressesKey = `addresses_${userId}`;
-        const localAddresses = JSON.parse(
-          localStorage.getItem(savedAddressesKey) || "[]",
-        );
-        const updatedLocalAddresses = localAddresses.filter(
-          (addr: any) => addr.id !== addressId,
-        );
-        localStorage.setItem(
-          savedAddressesKey,
-          JSON.stringify(updatedLocalAddresses),
-        );
+        console.log("✅ Address deleted successfully");
       } else {
-        console.error("Failed to delete address from backend");
-        // Still try to remove from localStorage
-        const savedAddressesKey = `addresses_${userId}`;
-        const localAddresses = JSON.parse(
-          localStorage.getItem(savedAddressesKey) || "[]",
-        );
-        const updatedLocalAddresses = localAddresses.filter(
-          (addr: any) => addr.id !== addressId,
-        );
-        localStorage.setItem(
-          savedAddressesKey,
-          JSON.stringify(updatedLocalAddresses),
-        );
-        setSavedAddresses((prev) =>
-          prev.filter((addr) => addr.id !== addressId),
-        );
+        console.error("❌ Failed to delete address:", result.error);
       }
     } catch (error) {
-      console.error("Error deleting address:", error);
+      console.error("❌ Error deleting address:", error);
     }
   };
 

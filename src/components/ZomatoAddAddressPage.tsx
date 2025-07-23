@@ -170,10 +170,13 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     try {
       const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
       if (!apiKey) {
-        console.warn("Google Maps API key not configured");
+        console.warn("❌ Google Maps API key not configured. Please set VITE_GOOGLE_MAPS_API_KEY in your .env file");
+        console.warn("🔧 Address search will work with limited functionality");
         setIsMapLoading(false);
         return;
       }
+
+      console.log("✅ Google Maps API key found, initializing map...");
 
       const loader = new Loader({
         apiKey,
@@ -295,8 +298,16 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         defaultMarker.setMap(null);
       }, 3000);
     } catch (error) {
-      console.error("Failed to initialize Google Maps:", error);
+      console.error("❌ Failed to initialize Google Maps:", error);
+      console.warn("🚨 Map functionality will be limited. Please check your Google Maps API key configuration.");
       setIsMapLoading(false);
+
+      // Set a fallback state to allow basic address entry without map
+      const fallbackCenter = { lat: 28.6139, lng: 77.209 }; // Delhi center
+      setSelectedLocation({
+        address: "Current Location (Map unavailable)",
+        coordinates: fallbackCenter
+      });
     }
   };
 
@@ -304,12 +315,19 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     if (isOpen) {
       // Only populate if editing an existing address
       if (editingAddress) {
-        setSearchQuery(editingAddress.fullAddress);
+        // Don't put the full address in search - populate individual fields instead
+        setSearchQuery(""); // Keep search empty for editing
         setSelectedLocation({
           address: editingAddress.fullAddress,
           coordinates: editingAddress.coordinates || { lat: 0, lng: 0 },
         });
-        setAdditionalDetails(editingAddress.flatNo || "");
+
+        // Populate individual form fields
+        setFlatNo(editingAddress.flatNo || "");
+        setStreet(editingAddress.street || "");
+        setLandmark(editingAddress.landmark || "");
+        setArea(editingAddress.village || editingAddress.city || "");
+        setPincode(editingAddress.pincode || "");
         setAddressType(editingAddress.type);
         setReceiverName(editingAddress.name || "");
         setReceiverPhone(editingAddress.phone || "");
@@ -318,6 +336,13 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         if (mapInstance && editingAddress.coordinates) {
           updateMapLocation(editingAddress.coordinates);
         }
+
+        console.log("✅ Populated address fields for editing:", {
+          flatNo: editingAddress.flatNo,
+          street: editingAddress.street,
+          area: editingAddress.village || editingAddress.city,
+          pincode: editingAddress.pincode
+        });
       } else {
         // Clear all fields for new address and autofill from account
         setSearchQuery("");
