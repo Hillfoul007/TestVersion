@@ -20,6 +20,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { apiClient } from "@/lib/apiClient";
+import { AddressService } from "@/services/addressService";
+import { SessionManager } from "@/utils/sessionManager";
 
 interface SavedAddress {
   id: string;
@@ -62,66 +64,35 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
   }, [isOpen, currentUser]);
 
   const loadSavedAddresses = async () => {
-    if (!currentUser) {
-      console.log("No current user, skipping address load");
-      setSavedAddresses([]);
-      return;
-    }
+    console.log("📋 Loading saved addresses...");
 
     setLoading(true);
     try {
-      // Try to load from backend first using apiClient
-      const userId = currentUser._id || currentUser.id || currentUser.phone;
+      // Use session manager to handle authentication properly
+      const sessionManager = SessionManager.getInstance();
+      const session = sessionManager.ensureValidSession();
 
-      if (!userId) {
-        console.warn("No valid user ID found, falling back to localStorage");
-        throw new Error("No valid user ID");
-      }
-
-      const response = await apiClient.getAddresses(userId);
-
-      if (response.data) {
-        // Transform backend format to frontend format
-        const transformedAddresses = response.data.map((addr: any) => ({
-          id: addr._id,
-          type: addr.address_type || "other",
-          label: addr.title,
-          flatNo: addr.full_address.split(",")[0] || "",
-          fullAddress: addr.full_address,
-          landmark: addr.landmark || "",
-          phone: addr.contact_phone || currentUser.phone,
-          coordinates: addr.coordinates,
-          createdAt: addr.created_at,
-        }));
-        setSavedAddresses(transformedAddresses);
-        setLoading(false);
+      if (!session.isAuthenticated) {
+        console.log("⚠️ No authenticated session, no addresses to load");
+        setSavedAddresses([]);
         return;
       }
 
-      // Fallback to localStorage if backend fails
-      console.log("Falling back to localStorage for addresses");
-      const savedAddressesKey = `addresses_${userId}`;
-      const addresses = JSON.parse(
-        localStorage.getItem(savedAddressesKey) || "[]",
-      );
-      setSavedAddresses(addresses);
-    } catch (error) {
-      console.error("Error loading addresses:", error);
-      // Fallback to localStorage if currentUser exists
-      if (currentUser) {
-        const userId = currentUser._id || currentUser.id || currentUser.phone;
-        if (userId) {
-          const savedAddressesKey = `addresses_${userId}`;
-          const addresses = JSON.parse(
-            localStorage.getItem(savedAddressesKey) || "[]",
-          );
-          setSavedAddresses(addresses);
-        } else {
-          setSavedAddresses([]);
-        }
+      // Use AddressService for better error handling
+      const addressService = AddressService.getInstance();
+      const result = await addressService.getUserAddresses();
+
+      if (result.success && result.data) {
+        console.log(`✅ Loaded ${result.data.length} addresses`);
+        setSavedAddresses(result.data);
       } else {
+        console.log("⚠️ No addresses found or failed to load");
         setSavedAddresses([]);
       }
+
+    } catch (error) {
+      console.error("❌ Error loading addresses:", error);
+      setSavedAddresses([]);
     } finally {
       setLoading(false);
     }
