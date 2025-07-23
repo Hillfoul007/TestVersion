@@ -80,21 +80,37 @@ const SavedAddressesModal: React.FC<SavedAddressesModalProps> = React.memo(
 
     useEffect(() => {
       if (isOpen) {
-        loadSavedAddresses();
+        // Add a small delay to ensure user context is properly loaded
+        const loadTimer = setTimeout(() => {
+          loadSavedAddresses();
+        }, 100);
+
+        return () => clearTimeout(loadTimer);
       }
     }, [isOpen, currentUser]);
 
     const loadSavedAddresses = async () => {
-      if (!currentUser?.id && !currentUser?._id && !currentUser?.phone) return;
-
       try {
         console.log("📍 Loading saved addresses from AddressService...");
+        console.log("🔍 Current user for address loading:", {
+          hasUser: !!currentUser,
+          id: currentUser?.id,
+          _id: currentUser?._id,
+          phone: currentUser?.phone,
+          name: currentUser?.name || currentUser?.full_name
+        });
+
         const addressService = AddressService.getInstance();
         const result = await addressService.getUserAddresses();
 
         if (result.success && result.data) {
-          setAddresses(Array.isArray(result.data) ? result.data : []);
-          console.log(`✅ Loaded ${result.data.length} saved addresses`);
+          const addressList = Array.isArray(result.data) ? result.data : [];
+          setAddresses(addressList);
+          console.log(`✅ Loaded ${addressList.length} saved addresses:`, addressList.map(addr => ({
+            id: addr.id || addr._id,
+            type: addr.type,
+            fullAddress: addr.fullAddress
+          })));
         } else {
           console.warn("⚠️ Failed to load addresses:", result.error);
           setAddresses([]);
@@ -423,15 +439,19 @@ const SavedAddressesModal: React.FC<SavedAddressesModalProps> = React.memo(
                 No saved addresses
               </h3>
               <p className="text-gray-600 mb-6">
-                Add your first address to get started
+                {currentUser ? "Add your first address to get started" : "Sign in to save and manage addresses"}
               </p>
-              <Button
-                onClick={() => setShowAddAddressPage(true)}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Address
-              </Button>
+              {currentUser ? (
+                <Button
+                  onClick={() => setShowAddAddressPage(true)}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Address
+                </Button>
+              ) : (
+                <p className="text-sm text-blue-600">Please log in to save addresses</p>
+              )}
             </div>
           )}
 
