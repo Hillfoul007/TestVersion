@@ -1,4 +1,5 @@
 import { config } from "../config/env";
+import { getCurrentUser, getUserId, isUserAuthenticated } from "../utils/authUtils";
 
 export interface AddressData {
   id?: string;
@@ -46,29 +47,7 @@ export class AddressService {
    * Get user ID for API calls
    */
   private getCurrentUserId(): string | null {
-    // Try to get from localStorage auth
-    const authData = localStorage.getItem("cleancare_auth_token");
-    if (authData) {
-      try {
-        const parsed = JSON.parse(authData);
-        return parsed.userId || parsed.id || parsed._id;
-      } catch (error) {
-        console.warn("Failed to parse auth data:", error);
-      }
-    }
-
-    // Fallback to user data
-    const userData = localStorage.getItem("current_user");
-    if (userData) {
-      try {
-        const user = JSON.parse(userData);
-        return user._id || user.id || user.phone;
-      } catch (error) {
-        console.warn("Failed to parse user data:", error);
-      }
-    }
-
-    return null;
+    return getUserId();
   }
 
   /**
