@@ -553,6 +553,21 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           <div className="flex items-center justify-between mobile-header-safe">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 sm:w-14 sm:h-10 rounded-lg overflow-hidden bg-white p-1">
+                    <img
+                      src="https://cdn.builder.io/api/v1/image/assets%2Fb0ac7c2f6e7c46a4a84ce74a0fb98c57%2F4c8fe4f8010c411a9eb989e3b42ef6f3?format=webp&width=800"
+                      alt="Laundrify Logo"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <div>
+                    <h1 className="text-lg font-bold">Laundrify</h1>
+                    <div className="text-xs text-white/80">
+                      <span>Quick clean & convenient</span>
+                    </div>
+                  </div>
+                </div>
                 {currentUser && (
                   <>
                     <Button
@@ -569,22 +584,6 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                     </div>
                   </>
                 )}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg overflow-hidden bg-white p-1">
-                  <img
-                    src="https://cdn.builder.io/api/v1/image/assets%2Fb0ac7c2f6e7c46a4a84ce74a0fb98c57%2F4c8fe4f8010c411a9eb989e3b42ef6f3?format=webp&width=800"
-                    alt="Laundrify Logo"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div>
-                  <h1 className="text-lg font-bold">Laundrify</h1>
-                  <div className="text-xs text-white/80">
-                    <span>Quick clean & convenient</span>
-                  </div>
-                </div>
               </div>
             </div>
 
