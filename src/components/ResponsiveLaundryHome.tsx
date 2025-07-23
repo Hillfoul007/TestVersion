@@ -240,7 +240,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
     // Load cart from localStorage on initialization
     return getCartData();
   });
-  const [deliveryTime, setDeliveryTime] = useState("2-3 hours");
+  const [deliveryTime, setDeliveryTime] = useState("45 min");
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
@@ -659,7 +659,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">
-                🕐 Delivery in {deliveryTime}
+                🕐 Pick up in {deliveryTime}
               </span>
               <Badge className="bg-white/20 text-white">Available</Badge>
             </div>
