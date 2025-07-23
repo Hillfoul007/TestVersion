@@ -99,50 +99,23 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
   };
 
   const handleDeleteAddress = async (addressId: string) => {
-    if (!currentUser) return;
-
     try {
-      const userId = currentUser._id || currentUser.id || currentUser.phone;
-      const response = await apiClient.deleteAddress(userId, addressId);
+      console.log("🗑️ Deleting address:", addressId);
 
-      if (response.data) {
+      const addressService = AddressService.getInstance();
+      const result = await addressService.deleteAddress(addressId);
+
+      if (result.success) {
         // Remove from state
         setSavedAddresses((prev) =>
           prev.filter((addr) => addr.id !== addressId),
         );
-
-        // Also remove from localStorage as backup
-        const savedAddressesKey = `addresses_${userId}`;
-        const localAddresses = JSON.parse(
-          localStorage.getItem(savedAddressesKey) || "[]",
-        );
-        const updatedLocalAddresses = localAddresses.filter(
-          (addr: any) => addr.id !== addressId,
-        );
-        localStorage.setItem(
-          savedAddressesKey,
-          JSON.stringify(updatedLocalAddresses),
-        );
+        console.log("✅ Address deleted successfully");
       } else {
-        console.error("Failed to delete address from backend");
-        // Still try to remove from localStorage
-        const savedAddressesKey = `addresses_${userId}`;
-        const localAddresses = JSON.parse(
-          localStorage.getItem(savedAddressesKey) || "[]",
-        );
-        const updatedLocalAddresses = localAddresses.filter(
-          (addr: any) => addr.id !== addressId,
-        );
-        localStorage.setItem(
-          savedAddressesKey,
-          JSON.stringify(updatedLocalAddresses),
-        );
-        setSavedAddresses((prev) =>
-          prev.filter((addr) => addr.id !== addressId),
-        );
+        console.error("❌ Failed to delete address:", result.error);
       }
     } catch (error) {
-      console.error("Error deleting address:", error);
+      console.error("❌ Error deleting address:", error);
     }
   };
 
