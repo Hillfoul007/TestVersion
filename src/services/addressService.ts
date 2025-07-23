@@ -179,10 +179,13 @@ export class AddressService {
     try {
       const userId = this.getCurrentUserId();
       if (!userId) {
-        console.warn("⚠️ User not authenticated, checking localStorage only");
+        console.warn("⚠️ User not authenticated, checking guest localStorage...");
+
+        // Check guest localStorage
+        const guestAddresses = this.getAddressesFromLocalStorage("guest");
         return {
           success: true,
-          data: [],
+          data: guestAddresses,
         };
       }
 
