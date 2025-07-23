@@ -57,7 +57,8 @@ export class AddressService {
     try {
       const userId = this.getCurrentUserId();
       if (!userId) {
-        throw new Error("User not authenticated");
+        console.warn("⚠️ User not authenticated, using localStorage only");
+        return this.deleteAddressFromLocalStorage(addressId, "guest");
       }
 
       console.log("🗑️ Deleting address:", { addressId, userId });
