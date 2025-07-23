@@ -58,7 +58,12 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isOpen && currentUser) {
+    if (isOpen) {
+      console.log("🏠 ZomatoAddressSelector opened, currentUser:", {
+        exists: !!currentUser,
+        id: currentUser?._id || currentUser?.id,
+        phone: currentUser?.phone
+      });
       loadSavedAddresses();
     }
   }, [isOpen, currentUser]);
@@ -83,10 +88,10 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
       const result = await addressService.getUserAddresses();
 
       if (result.success && result.data) {
-        console.log(`✅ Loaded ${result.data.length} addresses`);
+        console.log(`✅ Loaded ${result.data.length} addresses:`, result.data);
         setSavedAddresses(result.data);
       } else {
-        console.log("⚠️ No addresses found or failed to load");
+        console.log("⚠️ No addresses found or failed to load:", result);
         setSavedAddresses([]);
       }
 
