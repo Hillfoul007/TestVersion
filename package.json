@@ -17,7 +17,7 @@
     "start": "npm run start:prod",
     "start:prod": "npm run build:pwa && cd backend && npm install --production && NODE_ENV=production node server-laundry.js",
     "start:backend": "NODE_ENV=production node backend/server-laundry.js",
-    "start:frontend": "npx serve -s dist -p 8080",
+    "start:frontend": "npx serve -s dist -p 8080 --single",
     "deploy": "chmod +x deploy.sh && ./deploy.sh",
     "deploy:pwa": "npm run build:pwa && chmod +x deploy.sh && ./deploy.sh",
             "render:build": "NODE_OPTIONS=--max-old-space-size=300 npm install && NODE_OPTIONS=--max-old-space-size=300 npm run build:minimal && cd backend && npm install --production && echo 'Build completed successfully'",
