@@ -43,6 +43,8 @@ export interface Booking extends Document {
     base_price: number;
     tax_amount: number;
     service_fee: number;
+    delivery_fee: number;
+    handling_fee: number;
     discount: number;
   };
 }
