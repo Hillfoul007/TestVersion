@@ -1479,7 +1479,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-white z-50 flex flex-col">
+    <div className="fixed inset-0 bg-white z-[60] flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-4 p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
         <Button
