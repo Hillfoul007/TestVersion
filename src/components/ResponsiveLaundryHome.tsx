@@ -564,7 +564,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                   <div>
                     <h1 className="text-lg font-bold">Laundrify</h1>
                     <div className="text-xs text-white/80">
-                      <span>Quick clean & convenient</span>
+                      <span>Quick Clean & Convenient</span>
                     </div>
                   </div>
                 </div>
@@ -921,7 +921,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
               Welcome to Laundrify
             </h2>
             <p className="text-laundrify-blue/80 mb-6">
-              Quick clean & convenient thats laundrify
+              Quick Clean & Convenient thats laundrify
             </p>
             <Button
               onClick={handleBookService}
@@ -1086,7 +1086,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                 Laundrify - Quick Clean & Convenient
               </h2>
               <p className="text-white/90 mb-6 text-lg">
-                Quick clean & convenient thats laundrify - delivered to your doorstep in {deliveryTime}
+                Quick Clean & Convenient thats laundrify - delivered to your doorstep in {deliveryTime}
               </p>
               <Button
                 onClick={handleBookService}
