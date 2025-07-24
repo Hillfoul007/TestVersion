@@ -23,6 +23,15 @@
     z-index: 61 !important; /* Above modal overlay */
   }
 
+  /* Nested modal layers for stacked modals */
+  .modal-overlay-nested {
+    z-index: 70 !important; /* Above other modals */
+  }
+
+  .modal-content-nested {
+    z-index: 71 !important; /* Above nested modal overlay */
+  }
+
   /* Hide sticky search when modal is open */
   body:has(.modal-overlay) .mobile-sticky-container {
     opacity: 0.3;
