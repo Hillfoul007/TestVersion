@@ -32,7 +32,7 @@ const LaundrifySplashLoader: React.FC<LaundrifySplashLoaderProps> = ({
             Laundrify
           </h1>
           <p className="text-white/90 text-lg font-medium drop-shadow">
-            Quick clean & convenient
+            Quick Clean & Convenient
           </p>
         </div>
 
