@@ -706,7 +706,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
             <div className="bg-gray-800 rounded-xl flex items-center px-4 py-3 mobile-sticky-search">
               <Search className="h-5 w-5 text-gray-400 mr-3" />
               <Input
-                placeholder="Search laundry services"
+                placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="bg-transparent border-none text-white placeholder-gray-400 focus:ring-0 p-0 text-sm"
