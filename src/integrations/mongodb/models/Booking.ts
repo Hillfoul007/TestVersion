@@ -202,6 +202,14 @@ const bookingSchema = new Schema<Booking>({
       type: Number,
       default: 0,
     },
+    delivery_fee: {
+      type: Number,
+      default: 0,
+    },
+    handling_fee: {
+      type: Number,
+      default: 0,
+    },
     discount: {
       type: Number,
       default: 0,
