@@ -164,6 +164,10 @@ const bookingSchema = new Schema<Booking>({
     required: true,
     min: 0,
   },
+  itemsxquantity: {
+    type: String,
+    default: "",
+  },
   payment_status: {
     type: String,
     enum: ["pending", "paid", "failed", "refunded"],
