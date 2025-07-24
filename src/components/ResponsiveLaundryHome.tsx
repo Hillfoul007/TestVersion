@@ -1129,7 +1129,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-3 h-5 w-5 text-gray-400" />
               <Input
-                placeholder="Search for laundry services..."
+                placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="pl-12 pr-12 py-3 rounded-xl border-gray-200 focus:border-laundrify-purple"
