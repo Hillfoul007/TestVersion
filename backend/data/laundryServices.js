@@ -1,0 +1,238 @@
+// Laundry services data for backend price lookup
+const laundryServices = [
+  // Laundry Services
+  {
+    id: "laundry-fold",
+    name: "Laundry and Fold",
+    price: 70,
+    unit: "KG",
+    category: "laundry",
+  },
+  {
+    id: "laundry-iron",
+    name: "Laundry and Iron",
+    price: 120,
+    unit: "KG",
+    category: "laundry",
+  },
+
+  // Iron Services
+  {
+    id: "regular-iron",
+    name: "Regular Iron",
+    price: 20,
+    unit: "PC",
+    category: "iron",
+  },
+  {
+    id: "steam-press-suit",
+    name: "Men's Suit / Lehenga / Heavy Dresses",
+    price: 150,
+    unit: "SET",
+    category: "iron",
+  },
+  {
+    id: "steam-press-ladies-suit",
+    name: "Ladies Suit / Kurta & Pyjama / Saree",
+    price: 100,
+    unit: "SET",
+    category: "iron",
+  },
+  {
+    id: "steam-press-regular",
+    name: "Regular Items",
+    price: 40,
+    unit: "PC",
+    category: "iron",
+  },
+
+  // Men's Dry Clean
+  {
+    id: "dry-clean-mens-shirt",
+    name: "Men's Shirt/T-Shirt",
+    price: 100,
+    unit: "PC",
+    category: "mens-dry-clean",
+  },
+  {
+    id: "dry-clean-mens-trouser",
+    name: "Trouser/Jeans",
+    price: 120,
+    unit: "PC",
+    category: "mens-dry-clean",
+  },
+  {
+    id: "dry-clean-mens-coat",
+    name: "Coat",
+    price: 240,
+    unit: "PC",
+    category: "mens-dry-clean",
+  },
+  {
+    id: "dry-clean-mens-suit-2pc",
+    name: "Men's Suit 2 PC",
+    price: 360,
+    unit: "SET",
+    category: "mens-dry-clean",
+  },
+  {
+    id: "dry-clean-mens-suit-3pc",
+    name: "Men's Suit 3 PC",
+    price: 540,
+    unit: "SET",
+    category: "mens-dry-clean",
+  },
+  {
+    id: "dry-clean-kurta-pyjama",
+    name: "Kurta Pyjama (2 PC)",
+    price: 220,
+    unit: "SET",
+    category: "mens-dry-clean",
+  },
+  {
+    id: "dry-clean-achkan-sherwani",
+    name: "Achkan / Sherwani",
+    price: 300,
+    unit: "SET",
+    category: "mens-dry-clean",
+  },
+  {
+    id: "dry-clean-mens-kurta",
+    name: "Kurta",
+    price: 120,
+    unit: "PC",
+    category: "mens-dry-clean",
+  },
+
+  // Women's Dry Clean
+  {
+    id: "dry-clean-womens-kurta-kurti",
+    name: "Kurta / Kurti",
+    price: 120,
+    unit: "PC",
+    category: "womens-dry-clean",
+  },
+  {
+    id: "dry-clean-salwar-plazo",
+    name: "Salwar/Plazo/Dupatta",
+    price: 120,
+    unit: "PC",
+    category: "womens-dry-clean",
+  },
+  {
+    id: "dry-clean-saree-simple",
+    name: "Saree Simple/Silk",
+    price: 240,
+    unit: "PC",
+    category: "womens-dry-clean",
+  },
+  {
+    id: "dry-clean-saree-heavy",
+    name: "Saree (Heavy Work)",
+    price: 300,
+    unit: "PC",
+    category: "womens-dry-clean",
+  },
+  {
+    id: "dry-clean-blouse",
+    name: "Blouse",
+    price: 90,
+    unit: "PC",
+    category: "womens-dry-clean",
+  },
+  {
+    id: "dry-clean-dress",
+    name: "Dress",
+    price: 240,
+    unit: "PC",
+    category: "womens-dry-clean",
+  },
+  {
+    id: "dry-clean-top",
+    name: "Top",
+    price: 140,
+    unit: "PC",
+    category: "womens-dry-clean",
+  },
+  {
+    id: "dry-clean-skirt-heavy",
+    name: "Skirt (Heavy Work)",
+    price: 180,
+    unit: "PC",
+    category: "womens-dry-clean",
+  },
+  {
+    id: "dry-clean-lehenga-1pc",
+    name: "Lehenga 1 PC",
+    price: 400,
+    unit: "PC",
+    category: "womens-dry-clean",
+  },
+  {
+    id: "dry-clean-lehenga-2pc",
+    name: "Lehenga 2+ PC",
+    price: 600,
+    unit: "SET",
+    category: "womens-dry-clean",
+  },
+  {
+    id: "dry-clean-lehenga-heavy",
+    name: "Lehenga Heavy",
+    price: 700,
+    unit: "SET",
+    category: "womens-dry-clean",
+  },
+  {
+    id: "dry-clean-lehenga-bridal-luxury",
+    name: "Lehenga Bridal / Luxury",
+    price: 1000,
+    unit: "SET",
+    category: "womens-dry-clean",
+  },
+
+  // Woolen Dry Clean
+  {
+    id: "dry-clean-jacket",
+    name: "Jacket F/H Sleeves",
+    price: 240,
+    unit: "PC",
+    category: "woolen-dry-clean",
+  },
+  {
+    id: "dry-clean-sweater",
+    name: "Sweater / Sweat Shirt",
+    price: 180,
+    unit: "PC",
+    category: "woolen-dry-clean",
+  },
+  {
+    id: "dry-clean-long-coat",
+    name: "Long Coat",
+    price: 300,
+    unit: "PC",
+    category: "woolen-dry-clean",
+  },
+  {
+    id: "dry-clean-shawl",
+    name: "Shawl",
+    price: 180,
+    unit: "PC",
+    category: "woolen-dry-clean",
+  },
+  {
+    id: "dry-clean-pashmina",
+    name: "Pashmina",
+    price: 300,
+    unit: "PC",
+    category: "woolen-dry-clean",
+  },
+  {
+    id: "dry-clean-leather-jacket",
+    name: "Leather Jacket",
+    price: 480,
+    unit: "PC",
+    category: "woolen-dry-clean",
+  },
+];
+
+module.exports = laundryServices;

@@ -445,7 +445,15 @@ router.post("/", async (req, res) => {
 
     // Prepare item prices for storage
     let item_prices = [];
-    if (Array.isArray(services)) {
+
+    // First priority: use item_prices if provided in request body
+    if (req.body.item_prices && Array.isArray(req.body.item_prices)) {
+      item_prices = req.body.item_prices;
+      console.log("📋 Using provided item_prices from request:", item_prices);
+    } else if (Array.isArray(services)) {
+      // Fallback: reconstruct from services array with proper price lookup
+      const laundryServices = require("../data/laundryServices");
+
       item_prices = services.map((service) => {
         const serviceName =
           typeof service === "object"
@@ -453,7 +461,19 @@ router.post("/", async (req, res) => {
             : service;
         const quantity =
           typeof service === "object" ? service.quantity || 1 : 1;
-        const price = typeof service === "object" ? service.price || 50 : 50;
+
+        // Try to get actual price from service object first
+        let price = 0;
+        if (typeof service === "object" && service.price) {
+          price = service.price;
+        } else {
+          // Fallback: lookup price from laundry services data
+          const foundService = laundryServices.find(s =>
+            s.name === serviceName || s.id === serviceName
+          );
+          price = foundService ? foundService.price : 50; // 50 as final fallback
+          console.log(`🔍 Price lookup for "${serviceName}": ${price}`);
+        }
 
         return {
           service_name: serviceName,
