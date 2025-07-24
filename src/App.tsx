@@ -9,6 +9,7 @@ import InstallPrompt from "@/components/InstallPrompt";
 import PWAUpdateNotification from "@/components/PWAUpdateNotification";
 import AddressSearchDemo from "@/components/AddressSearchDemo";
 import ReferralLoginPage from "@/pages/ReferralLoginPage";
+import ForceLoginPage from "@/pages/ForceLoginPage";
 import {
   initializeAuthPersistence,
   restoreAuthState,
@@ -50,6 +51,7 @@ function App() {
             <Routes>
               <Route path="/" element={<LaundryIndex />} />
               <Route path="/login" element={<ReferralLoginPage />} />
+              <Route path="/force-login" element={<ForceLoginPage />} />
               <Route path="/refer" element={<ReferralLoginPage />} />
               <Route path="/address-demo" element={<AddressSearchDemo />} />
               <Route

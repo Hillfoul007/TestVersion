@@ -43,6 +43,8 @@ export interface Booking extends Document {
     base_price: number;
     tax_amount: number;
     service_fee: number;
+    delivery_fee: number;
+    handling_fee: number;
     discount: number;
   };
 }
@@ -197,6 +199,14 @@ const bookingSchema = new Schema<Booking>({
       default: 0,
     },
     service_fee: {
+      type: Number,
+      default: 0,
+    },
+    delivery_fee: {
+      type: Number,
+      default: 0,
+    },
+    handling_fee: {
       type: Number,
       default: 0,
     },
