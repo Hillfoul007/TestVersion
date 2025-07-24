@@ -26,6 +26,8 @@ export default defineConfig(({ mode }) => {
           secure: false,
         },
       },
+      // Enable SPA fallback for client-side routing
+      historyApiFallback: true,
     },
             build: {
       chunkSizeWarningLimit: 1000,

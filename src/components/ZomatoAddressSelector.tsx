@@ -154,8 +154,8 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end">
-      <div className="w-full bg-white rounded-t-2xl max-h-[80vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-end modal-overlay">
+      <div className="w-full bg-white rounded-t-2xl max-h-[80vh] overflow-y-auto modal-content">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-900">

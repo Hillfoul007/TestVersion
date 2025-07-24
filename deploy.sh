@@ -117,19 +117,19 @@ echo "✅ Backend server started (PID: $BACKEND_PID)"
 # Wait for backend to start
 sleep 3
 
-# Serve frontend (using a simple HTTP server)
+# Serve frontend (using a simple HTTP server with SPA support)
 cd ..
 if command -v serve &> /dev/null; then
     echo "📦 Serving frontend with 'serve'..."
-    serve -s dist -p 8080 &
+    serve -s dist -p 8080 --single &
     FRONTEND_PID=$!
-    echo "✅ Frontend server started (PID: $FRONTEND_PID)"
+    echo "✅ Frontend server started with SPA routing (PID: $FRONTEND_PID)"
 else
     echo "⚠️ 'serve' not found. Installing..."
     npm install -g serve
-    serve -s dist -p 8080 &
+    serve -s dist -p 8080 --single &
     FRONTEND_PID=$!
-    echo "✅ Frontend server started (PID: $FRONTEND_PID)"
+    echo "✅ Frontend server started with SPA routing (PID: $FRONTEND_PID)"
 fi
 
 echo ""
@@ -201,7 +201,7 @@ EXPOSE 3001 8080
 # Create startup script
 RUN echo '#!/bin/sh' > start.sh && \
     echo 'cd backend && node server-laundry.js &' >> start.sh && \
-    echo 'cd / && npx serve -s dist -p 8080' >> start.sh && \
+    echo 'cd / && npx serve -s dist -p 8080 --single' >> start.sh && \
     echo 'wait' >> start.sh && \
     chmod +x start.sh
 

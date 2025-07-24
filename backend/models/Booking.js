@@ -107,6 +107,10 @@ const bookingSchema = new mongoose.Schema(
       default: 0,
       min: [0, "Discount amount must be non-negative"],
     },
+    itemsxquantity: {
+      type: String,
+      default: "",
+    },
     final_amount: {
       type: Number,
       required: [true, "Final amount is required"],
@@ -318,6 +322,26 @@ bookingSchema.pre("save", async function (next) {
           }
         }
       }
+    }
+
+    // Generate itemsxquantity field from item_prices
+    if (this.item_prices && this.item_prices.length > 0) {
+      this.itemsxquantity = this.item_prices.map(item =>
+        `${item.service_name} x ${item.quantity}`
+      ).join(', ');
+    } else if (this.services && this.services.length > 0) {
+      // Fallback: generate from services array
+      this.itemsxquantity = this.services.map(service => {
+        if (typeof service === 'object') {
+          return `${service.name || service.service || service} x ${service.quantity || 1}`;
+        }
+        return `${service} x 1`;
+      }).join(', ');
+    }
+
+    // Ensure discount is properly set from charges_breakdown if missing
+    if (this.discount_amount === 0 && this.charges_breakdown && this.charges_breakdown.discount > 0) {
+      this.discount_amount = this.charges_breakdown.discount;
     }
 
     // Calculate final amount if not already set

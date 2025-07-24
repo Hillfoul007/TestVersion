@@ -281,8 +281,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl border border-blue-100 p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4 modal-overlay">
+      <div className="bg-white rounded-2xl shadow-xl border border-blue-100 p-8 max-w-md w-full max-h-[90vh] overflow-y-auto modal-content">
         <div className="flex items-center justify-between mb-6">
           {currentView !== "signin" && (
             <Button

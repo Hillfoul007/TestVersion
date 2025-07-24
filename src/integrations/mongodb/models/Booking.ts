@@ -33,6 +33,7 @@ export interface Booking extends Document {
   total_price: number;
   discount_amount?: number;
   final_amount: number;
+  itemsxquantity?: string;
   payment_status: "pending" | "paid" | "failed" | "refunded";
   status: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
   created_at: Date;
@@ -163,6 +164,10 @@ const bookingSchema = new Schema<Booking>({
     required: true,
     min: 0,
   },
+  itemsxquantity: {
+    type: String,
+    default: "",
+  },
   payment_status: {
     type: String,
     enum: ["pending", "paid", "failed", "refunded"],
@@ -217,9 +222,21 @@ const bookingSchema = new Schema<Booking>({
   },
 });
 
-// Calculate final amount before saving
+// Calculate final amount and generate itemsxquantity before saving
 bookingSchema.pre("save", function (next) {
   this.updated_at = new Date();
+
+  // Generate itemsxquantity field from services
+  if (this.services && this.services.length > 0) {
+    this.itemsxquantity = this.services.map(service =>
+      `${service.name} x ${service.quantity}`
+    ).join(', ');
+  }
+
+  // Ensure discount is properly set from charges_breakdown if missing
+  if (this.discount_amount === 0 && this.charges_breakdown && this.charges_breakdown.discount > 0) {
+    this.discount_amount = this.charges_breakdown.discount;
+  }
 
   // Calculate final amount if not already set
   if (!this.final_amount) {
