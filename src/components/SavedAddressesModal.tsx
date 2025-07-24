@@ -243,7 +243,7 @@ const SavedAddressesModal: React.FC<SavedAddressesModalProps> = React.memo(
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end" style={{ paddingTop: '120px' }}>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-end" style={{ paddingTop: '120px' }}>
         <div className="w-full bg-white rounded-t-2xl h-full overflow-y-auto relative" style={{ maxHeight: 'calc(100vh - 120px)' }}>
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-100">
