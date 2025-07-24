@@ -201,7 +201,7 @@ EXPOSE 3001 8080
 # Create startup script
 RUN echo '#!/bin/sh' > start.sh && \
     echo 'cd backend && node server-laundry.js &' >> start.sh && \
-    echo 'cd / && npx serve -s dist -p 8080' >> start.sh && \
+    echo 'cd / && npx serve -s dist -p 8080 --single' >> start.sh && \
     echo 'wait' >> start.sh && \
     chmod +x start.sh
 
