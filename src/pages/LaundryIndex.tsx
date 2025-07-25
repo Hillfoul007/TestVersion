@@ -458,6 +458,22 @@ const LaundryIndex = () => {
           }));
         }
       } else {
+        // For iOS, be more aggressive about auth checking but don't auto-logout
+        if (isIOS && !isLoggedIn) {
+          console.log("🍎 iOS device - attempting comprehensive auth restoration");
+
+          // Try one more time with a delay for iOS
+          setTimeout(async () => {
+            const { restoreIosAuth } = await import("../utils/iosAuthFix");
+            const restored = await restoreIosAuth();
+            if (restored) {
+              console.log("🍎 iOS delayed auth restoration successful");
+              // Recheck auth state after restoration
+              checkAuthState();
+            }
+          }, 500);
+        }
+
         // Only log state, never automatically clear login
         console.log("ℹ️ No valid authentication data found");
         console.log("🔒 Preserving current login state to prevent auto-logout");
@@ -858,7 +874,7 @@ const LaundryIndex = () => {
           // Show booking confirmation screen
           setCurrentView("booking-confirmed");
         } else {
-          console.error("�� Local booking also failed:", localResult.error);
+          console.error("❌ Local booking also failed:", localResult.error);
 
           // Google Sheets backup removed - continue with local-only booking
 
