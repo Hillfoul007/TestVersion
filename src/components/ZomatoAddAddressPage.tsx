@@ -148,6 +148,15 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     }
   }, [isOpen]);
 
+  // Cleanup search timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutId) {
+        clearTimeout(searchTimeoutId);
+      }
+    };
+  }, [searchTimeoutId]);
+
   // Handle clicking outside suggestions to close them
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -1073,7 +1082,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       setStreet(cleanParts[0]);
       setArea(cleanParts[1]);
       console.log("🛣️ Street:", cleanParts[0]);
-      console.log("��️ Area:", cleanParts[1]);
+      console.log("🏘️ Area:", cleanParts[1]);
     } else if (cleanParts.length >= 3) {
       // Multiple parts - first as street, rest as area
       setStreet(cleanParts[0]);
