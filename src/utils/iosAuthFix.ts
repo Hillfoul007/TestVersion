@@ -94,6 +94,17 @@ export const isIosPWA = (): boolean => {
   return isIosDevice() && isPWAMode();
 };
 
+/**
+ * Clear the intentional logout flag when user logs in successfully
+ */
+export const clearIosLogoutFlag = (): void => {
+  if (!isIosDevice()) return;
+
+  localStorage.removeItem("ios_intentional_logout");
+  localStorage.removeItem("ios_logout_timestamp");
+  console.log("🍎✅ Cleared iOS logout flag - restoration re-enabled");
+};
+
 export const addIosOtpDelay = async (): Promise<void> => {
   if (isIosDevice()) {
     // Add 2-3 second delay for iOS to prevent DVHosting rate limiting
@@ -245,7 +256,7 @@ export const preventIosAutoLogout = (): void => {
         console.log("🍎📱 PWA focus - auth missing, attempting restoration");
         const restored = await restoreIosAuth();
         if (restored) {
-          console.log("🍎��� PWA focus - auth restored");
+          console.log("🍎📱 PWA focus - auth restored");
           window.dispatchEvent(
             new CustomEvent("ios-session-restored", {
               detail: {
