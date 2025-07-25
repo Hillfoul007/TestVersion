@@ -90,7 +90,7 @@ const ReferralLoginPage: React.FC = () => {
   const benefits = [
     {
       icon: <Gift className="h-6 w-6 text-laundrify-red" />,
-      title: "50% Off First Order",
+      title: "30% Off First Order",
       description: "Get amazing savings on your first laundry service"
     },
     {
@@ -134,7 +134,7 @@ const ReferralLoginPage: React.FC = () => {
                 You've been invited with referral code: <span className="font-bold text-laundrify-blue">{referralCode}</span>
               </p>
               <p className="text-laundrify-blue text-sm mt-1">
-                Sign in to get 50% off your first order!
+                Sign in to get 30% off your first order!
               </p>
             </div>
           )}
@@ -180,7 +180,7 @@ const ReferralLoginPage: React.FC = () => {
                   </CardTitle>
                   <p className="text-gray-600 text-sm">
                     {referralCode 
-                      ? "Login to claim your 50% discount!"
+                      ? "Login to claim your 30% discount!"
                       : "Quick sign-in with your phone number"
                     }
                   </p>
