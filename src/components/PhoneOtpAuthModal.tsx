@@ -252,6 +252,13 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
           }
         }
 
+        // For iOS devices, ensure auth state is fully persisted before calling success callback
+        if (isIosDevice()) {
+          // Give iOS extra time to persist auth data to localStorage and IndexedDB
+          await new Promise(resolve => setTimeout(resolve, 300));
+          console.log("🍎 iOS auth persistence delay completed");
+        }
+
         onSuccess(result.user);
         onClose();
         resetForm();
