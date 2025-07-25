@@ -271,32 +271,49 @@ const LaundryIndex = () => {
     let iosCleanupFunctions: (() => void)[] = [];
 
     if (isIOS) {
+      // More aggressive iOS auth checking after navigation
       const handleIOSVisibilityChange = () => {
-        if (document.visibilityState === 'visible' && !isLoggedIn) {
-          // On iOS, when page becomes visible and user isn't logged in,
-          // check auth state with a delay to handle race conditions
+        if (document.visibilityState === 'visible') {
+          // Always check auth state when page becomes visible on iOS, not just when logged out
           setTimeout(() => {
             console.log("🍎 iOS visibility change detected - rechecking auth state");
             checkAuthState();
-          }, 300);
+          }, 100); // Reduced delay for faster response
         }
       };
 
       const handleIOSFocus = () => {
-        if (!isLoggedIn) {
-          setTimeout(() => {
-            console.log("🍎 iOS focus detected - rechecking auth state");
-            checkAuthState();
-          }, 200);
-        }
+        // Always check auth on focus for iOS, regardless of current login state
+        setTimeout(() => {
+          console.log("🍎 iOS focus detected - rechecking auth state");
+          checkAuthState();
+        }, 100); // Reduced delay for faster response
+      };
+
+      // Also check auth state immediately on page load for iOS
+      const handleIOSPageShow = () => {
+        setTimeout(() => {
+          console.log("🍎 iOS page show detected - rechecking auth state");
+          checkAuthState();
+        }, 200);
       };
 
       document.addEventListener('visibilitychange', handleIOSVisibilityChange);
       window.addEventListener('focus', handleIOSFocus);
+      window.addEventListener('pageshow', handleIOSPageShow);
+
+      // Additional aggressive check after initial load for iOS
+      setTimeout(() => {
+        if (isIOS) {
+          console.log("🍎 iOS additional auth check after page load");
+          checkAuthState();
+        }
+      }, 1000);
 
       iosCleanupFunctions = [
         () => document.removeEventListener('visibilitychange', handleIOSVisibilityChange),
-        () => window.removeEventListener('focus', handleIOSFocus)
+        () => window.removeEventListener('focus', handleIOSFocus),
+        () => window.removeEventListener('pageshow', handleIOSPageShow)
       ];
     }
 
