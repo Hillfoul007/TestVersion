@@ -450,6 +450,13 @@ const LaundryIndex = () => {
           name: user.name,
           isVerified: user.isVerified,
         });
+
+        // For iOS, also trigger an auth event
+        if (isIOS) {
+          window.dispatchEvent(new CustomEvent("auth-login", {
+            detail: { user }
+          }));
+        }
       } else {
         // Only log state, never automatically clear login
         console.log("ℹ️ No valid authentication data found");
@@ -851,7 +858,7 @@ const LaundryIndex = () => {
           // Show booking confirmation screen
           setCurrentView("booking-confirmed");
         } else {
-          console.error("❌ Local booking also failed:", localResult.error);
+          console.error("�� Local booking also failed:", localResult.error);
 
           // Google Sheets backup removed - continue with local-only booking
 
