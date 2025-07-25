@@ -23,6 +23,9 @@ const ForceLoginPage: React.FC = () => {
   const handleAuthSuccess = async (user: any) => {
     console.log("🎉 Auth successful:", user);
 
+    // Close the auth modal first to prevent any UI conflicts
+    setIsAuthModalOpen(false);
+
     addNotification(
       createSuccessNotification(
         "Welcome to Laundrify!",
@@ -30,38 +33,60 @@ const ForceLoginPage: React.FC = () => {
       )
     );
 
-    // For iOS devices, add a longer delay and verify auth state is persisted
-    // before navigation to prevent race conditions
+    // For iOS devices, add enhanced auth persistence and navigation handling
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                   (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-    if (isIOS) {
-      console.log("🍎 iOS device detected - ensuring robust auth persistence before navigation");
+    try {
+      // Always ensure auth data is properly saved regardless of platform
+      const authToken = `user_token_${user.phone || user.id}_persistent`;
+      const userStr = JSON.stringify(user);
 
-      // Longer delay for iOS - 1500ms instead of 500ms
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Set all auth data with multiple redundancy
+      localStorage.setItem("current_user", userStr);
+      localStorage.setItem("cleancare_user", userStr);
+      localStorage.setItem("auth_token", authToken);
+      localStorage.setItem("cleancare_auth_token", authToken);
 
-      // Verify auth state is properly saved before navigating
-      const authToken = localStorage.getItem("auth_token") || localStorage.getItem("cleancare_auth_token");
-      const userStr = localStorage.getItem("current_user") || localStorage.getItem("cleancare_user");
+      // Clear any iOS logout flags that might interfere
+      localStorage.removeItem("ios_intentional_logout");
+      localStorage.removeItem("ios_logout_timestamp");
 
-      if (!authToken || !userStr) {
-        console.warn("🍎⚠️ Auth state not found after delay, attempting manual save");
-        // Manual save as backup
-        localStorage.setItem("current_user", JSON.stringify(user));
-        localStorage.setItem("cleancare_user", JSON.stringify(user));
-        localStorage.setItem("auth_token", `user_token_${user.phone || user.id}_persistent`);
-        localStorage.setItem("cleancare_auth_token", `user_token_${user.phone || user.id}_persistent`);
+      console.log("✅ Auth state saved with redundancy");
 
-        // Additional delay after manual save
-        await new Promise(resolve => setTimeout(resolve, 500));
+      if (isIOS) {
+        console.log("🍎 iOS device detected - using enhanced navigation strategy");
+
+        // For iOS, use a more reliable navigation method
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        // Verify auth persisted properly
+        const savedUser = localStorage.getItem("current_user");
+        const savedToken = localStorage.getItem("auth_token");
+
+        if (!savedUser || !savedToken) {
+          console.warn("🍎⚠️ Re-attempting auth save...");
+          localStorage.setItem("current_user", userStr);
+          localStorage.setItem("cleancare_user", userStr);
+          localStorage.setItem("auth_token", authToken);
+          localStorage.setItem("cleancare_auth_token", authToken);
+        }
+
+        // Use window.location.href for more reliable iOS navigation
+        console.log("🍎 Navigating to home page...");
+        window.location.href = "/";
+        return;
       }
 
-      console.log("🍎✅ iOS auth persistence verified - proceeding with navigation");
-    }
+      // For non-iOS devices, use standard navigation after short delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+      navigate("/");
 
-    // Navigate to home
-    navigate("/");
+    } catch (error) {
+      console.error("❌ Error in auth success handler:", error);
+      // Fallback navigation
+      window.location.href = "/";
+    }
   };
 
   const benefits = [
