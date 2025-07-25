@@ -112,18 +112,27 @@ class LocationService {
     // Method 1: Google Maps API with multiple result types for maximum detail
     if (this.GOOGLE_MAPS_API_KEY) {
       try {
-        // Make multiple requests prioritizing street-level detail
+        // Import the API base URL
+        const { getApiBaseUrl } = await import('../config/env');
+        const apiBaseUrl = getApiBaseUrl();
+
+        if (!apiBaseUrl) {
+          console.warn("🌐 Backend not available, skipping Google Maps API");
+          return null;
+        }
+
+        // Make multiple requests prioritizing street-level detail using backend proxy
         const requests = [
           // Ultra-high detail request for street addresses
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinates.lat},${coordinates.lng}&result_type=street_address&language=en&region=IN&key=${this.GOOGLE_MAPS_API_KEY}`,
+          `${apiBaseUrl}/google-maps/geocode?latlng=${coordinates.lat},${coordinates.lng}&result_type=street_address&language=en&region=IN`,
           // Building/premise detail request
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinates.lat},${coordinates.lng}&result_type=premise|subpremise|establishment&language=en&region=IN&key=${this.GOOGLE_MAPS_API_KEY}`,
+          `${apiBaseUrl}/google-maps/geocode?latlng=${coordinates.lat},${coordinates.lng}&result_type=premise|subpremise|establishment&language=en&region=IN`,
           // Street-level detail request
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinates.lat},${coordinates.lng}&result_type=route|intersection&language=en&region=IN&key=${this.GOOGLE_MAPS_API_KEY}`,
+          `${apiBaseUrl}/google-maps/geocode?latlng=${coordinates.lat},${coordinates.lng}&result_type=route|intersection&language=en&region=IN`,
           // Neighborhood detail request
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinates.lat},${coordinates.lng}&result_type=neighborhood|sublocality_level_1|sublocality_level_2&language=en&region=IN&key=${this.GOOGLE_MAPS_API_KEY}`,
+          `${apiBaseUrl}/google-maps/geocode?latlng=${coordinates.lat},${coordinates.lng}&result_type=neighborhood|sublocality_level_1|sublocality_level_2&language=en&region=IN`,
           // Comprehensive fallback request
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinates.lat},${coordinates.lng}&language=en&region=IN&key=${this.GOOGLE_MAPS_API_KEY}`,
+          `${apiBaseUrl}/google-maps/geocode?latlng=${coordinates.lat},${coordinates.lng}&language=en&region=IN`,
         ];
 
         for (const requestUrl of requests) {
