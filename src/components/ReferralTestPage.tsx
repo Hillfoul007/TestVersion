@@ -65,7 +65,7 @@ export function ReferralTestPage({ currentUser }: ReferralTestPageProps) {
         const shareLink = {
           share_url: `${window.location.origin}/refer?ref=${referralCode}`,
           referral_code: referralCode,
-          discount_percentage: 50,
+          discount_percentage: 30,
         };
         setShareData(shareLink);
         results.push({
