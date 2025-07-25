@@ -1073,7 +1073,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       setStreet(cleanParts[0]);
       setArea(cleanParts[1]);
       console.log("🛣️ Street:", cleanParts[0]);
-      console.log("🏘️ Area:", cleanParts[1]);
+      console.log("��️ Area:", cleanParts[1]);
     } else if (cleanParts.length >= 3) {
       // Multiple parts - first as street, rest as area
       setStreet(cleanParts[0]);
@@ -1291,6 +1291,22 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       // Clear error after a few seconds so it doesn't persist
       setTimeout(() => setSearchError(null), 3000);
     }
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+
+    // Clear existing timeout
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId);
+    }
+
+    // Set new timeout for debounced search
+    const timeoutId = setTimeout(() => {
+      performSearch(query);
+    }, 300); // 300ms debounce
+
+    setSearchTimeoutId(timeoutId);
   };
 
   const handleSuggestionSelect = async (suggestion: any) => {
