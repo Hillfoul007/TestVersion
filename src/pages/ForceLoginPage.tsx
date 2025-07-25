@@ -124,6 +124,7 @@ const ForceLoginPage: React.FC = () => {
     } catch (error) {
       console.error("❌ Error in auth success handler:", error);
       // Fallback navigation
+      isNavigatingRef.current = true;
       window.location.href = "/";
     }
   };
