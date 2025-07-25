@@ -39,6 +39,15 @@
     transition: opacity 0.2s ease;
   }
 
+  /* Ensure modal overlays are above sticky elements */
+  .modal-overlay {
+    z-index: 70 !important; /* Above sticky search (z-50) */
+  }
+
+  .modal-content {
+    z-index: 71 !important; /* Above modal overlay */
+  }
+
   /* Ensure scrollable content has proper spacing */
   .mobile-services-content {
     margin-top: 16px;
