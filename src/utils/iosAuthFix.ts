@@ -371,6 +371,13 @@ export const preventIosAutoLogout = (): void => {
 export const restoreIosAuth = async (): Promise<boolean> => {
   if (!isIosDevice()) return false;
 
+  // Check if force login is active (prevents restoration during login flow)
+  const forceLoginActive = localStorage.getItem("force_login_active");
+  if (forceLoginActive === "true") {
+    console.log("🍎🚫 Skipping auth restore - force login page active");
+    return false;
+  }
+
   // Check if user intentionally logged out
   const intentionalLogout = localStorage.getItem("ios_intentional_logout");
   if (intentionalLogout === "true") {
