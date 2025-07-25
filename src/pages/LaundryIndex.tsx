@@ -386,7 +386,11 @@ const LaundryIndex = () => {
 
       if (isIOS) {
         // Import iOS auth restoration utility
-        const { restoreIosAuth } = await import("../utils/iosAuthFix");
+        const { restoreIosAuth, clearIosLogoutFlag } = await import("../utils/iosAuthFix");
+
+        // Clear any logout flags to ensure restoration works
+        clearIosLogoutFlag();
+
         const restored = await restoreIosAuth();
         if (restored) {
           console.log("🍎 iOS auth restored successfully during check");
@@ -440,7 +444,7 @@ const LaundryIndex = () => {
         });
       } else {
         // Only log state, never automatically clear login
-        console.log("ℹ️ No valid authentication data found");
+        console.log("ℹ��� No valid authentication data found");
         console.log("🔒 Preserving current login state to prevent auto-logout");
         // Don't call setIsLoggedIn(false) or setCurrentUser(null) here
       }
