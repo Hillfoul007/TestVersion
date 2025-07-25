@@ -118,6 +118,7 @@ const ForceLoginPage: React.FC = () => {
 
       // For non-iOS devices, use standard navigation after short delay
       await new Promise(resolve => setTimeout(resolve, 300));
+      isNavigatingRef.current = true;
       navigate("/");
 
     } catch (error) {
