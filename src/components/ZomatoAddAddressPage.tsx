@@ -1542,6 +1542,13 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
               />
             </div>
 
+            {/* Search Error Indicator */}
+            {searchError && (
+              <div className="mt-2 text-xs text-orange-600 bg-orange-50 border border-orange-200 rounded px-2 py-1">
+                {searchError} - showing suggested locations
+              </div>
+            )}
+
             {/* Google Maps Configuration Notice */}
             <GoogleMapsNotice className="mt-3" />
 
