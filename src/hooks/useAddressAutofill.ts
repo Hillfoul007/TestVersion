@@ -89,50 +89,14 @@ export const useAddressAutofill = (
     [enableValidation],
   );
 
-  // Search for address suggestions
+  // Search for address suggestions - DISABLED to prevent errors
   const searchAddresses = useCallback(
     async (query: string) => {
-      if (query.length < 2) {
-        setState((prev) => ({ ...prev, suggestions: [], error: null }));
-        return;
-      }
-
-      // Clear previous timeout
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-
-      // Debounce search
-      searchTimeoutRef.current = setTimeout(async () => {
-        setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-        try {
-          if (!sessionTokenRef.current) {
-            await initializeSessionToken();
-          }
-
-          const suggestions = await autocompleteSuggestionService.searchInIndia(
-            query,
-            sessionTokenRef.current,
-          );
-
-          setState((prev) => ({
-            ...prev,
-            suggestions,
-            isLoading: false,
-          }));
-        } catch (error) {
-          console.error("Address search error:", error);
-          setState((prev) => ({
-            ...prev,
-            error: "Failed to search addresses",
-            suggestions: [],
-            isLoading: false,
-          }));
-        }
-      }, 300);
+      // Search suggestions disabled - return empty suggestions immediately
+      setState((prev) => ({ ...prev, suggestions: [], error: null, isLoading: false }));
+      return;
     },
-    [initializeSessionToken],
+    [],
   );
 
   // Autofill from selected suggestion
