@@ -704,13 +704,22 @@ class LocationService {
    * Geocode address to coordinates
    */
   async geocodeAddress(address: string): Promise<GeocodeResult> {
-    if (!this.GOOGLE_MAPS_API_KEY) {
-      throw new Error("Google Maps API key not configured");
-    }
-
     try {
+      // Import the API base URL
+      const { getApiBaseUrl } = await import('../config/env');
+      const apiBaseUrl = getApiBaseUrl();
+
+      if (!apiBaseUrl) {
+        throw new Error("Backend not available for geocoding");
+      }
+
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${this.GOOGLE_MAPS_API_KEY}`,
+        `${apiBaseUrl}/google-maps/geocode-address?address=${encodeURIComponent(address)}&language=en&region=IN`,
+        {
+          headers: {
+            Accept: "application/json",
+          },
+        }
       );
 
       const data = await response.json();
