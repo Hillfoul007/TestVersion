@@ -4,12 +4,19 @@
 
 export const clearIosAuthState = (): void => {
   try {
-    // Only clear auth-related keys, preserve cart and other user data
+    // Set intentional logout flag FIRST to prevent restoration
+    localStorage.setItem("ios_intentional_logout", "true");
+    localStorage.setItem("ios_logout_timestamp", Date.now().toString());
+
+    // Clear all backup and restoration data
     const keysToRemove = [
       "current_user",
       "cleancare_user",
       "cleancare_auth_token",
       "auth_token",
+      "ios_backup_user",
+      "ios_backup_token",
+      "ios_auth_timestamp"
     ];
 
     keysToRemove.forEach((key) => {
@@ -18,6 +25,16 @@ export const clearIosAuthState = (): void => {
 
     // Clear sessionStorage completely for iOS
     sessionStorage.clear();
+
+    // Clear IndexedDB auth data
+    clearIosAuthFromIndexedDB();
+
+    // Clear auth cookies
+    try {
+      document.cookie = "ios_auth_backup=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    } catch (e) {
+      // Cookie clearing failed, continue
+    }
 
     // Clear any cached form data in iOS Safari
     const forms = document.querySelectorAll("form");
@@ -37,7 +54,7 @@ export const clearIosAuthState = (): void => {
       }
     });
 
-    console.log("✅ iOS auth state cleared (explicit logout)");
+    console.log("✅ iOS auth state cleared (explicit logout) - restoration disabled");
   } catch (error) {
     console.error("❌ Error clearing iOS auth state:", error);
   }
