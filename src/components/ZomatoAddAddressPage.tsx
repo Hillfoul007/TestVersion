@@ -1252,32 +1252,44 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       setShowSuggestions(suggestions.length > 0);
     } catch (error) {
       console.error("Search failed:", error);
-      // Provide helpful fallback suggestions
+      setSearchError("Search temporarily unavailable");
+
+      // Always provide helpful fallback suggestions, even if there's an error
       const fallbackSuggestions = [
         {
           description: `${query}, Delhi, India`,
           main_text: query,
-          secondary_text: "Delhi, India",
+          secondary_text: "Delhi, India (Suggested)",
           place_id: `fallback_${query}_delhi`,
           source: "fallback",
         },
         {
           description: `${query}, Mumbai, India`,
           main_text: query,
-          secondary_text: "Mumbai, India",
+          secondary_text: "Mumbai, India (Suggested)",
           place_id: `fallback_${query}_mumbai`,
           source: "fallback",
         },
         {
           description: `${query}, Bangalore, India`,
           main_text: query,
-          secondary_text: "Bangalore, India",
+          secondary_text: "Bangalore, India (Suggested)",
           place_id: `fallback_${query}_bangalore`,
+          source: "fallback",
+        },
+        {
+          description: `${query}, India`,
+          main_text: query,
+          secondary_text: "India (Manual Entry)",
+          place_id: `fallback_${query}_manual`,
           source: "fallback",
         },
       ];
       setSuggestions(fallbackSuggestions);
       setShowSuggestions(true);
+
+      // Clear error after a few seconds so it doesn't persist
+      setTimeout(() => setSearchError(null), 3000);
     }
   };
 
@@ -1923,7 +1935,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         detectedLocation={unavailableAddressText}
         onExplore={() => {
           console.log(
-            "�� User chose to explore available services instead of saving address",
+            "🔍 User chose to explore available services instead of saving address",
           );
           // Clear the form to allow user to try a different address
           setArea("");
