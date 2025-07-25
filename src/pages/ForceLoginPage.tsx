@@ -20,15 +20,26 @@ const ForceLoginPage: React.FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(true); // Auto-open auth modal
   const { addNotification } = useNotifications();
 
-  const handleAuthSuccess = (user: any) => {
+  const handleAuthSuccess = async (user: any) => {
     console.log("🎉 Auth successful:", user);
-    
+
     addNotification(
       createSuccessNotification(
         "Welcome to Laundrify!",
         "You're all set to book your first service!"
       )
     );
+
+    // For iOS devices, add a small delay to ensure auth state is persisted
+    // before navigation to prevent race conditions
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    if (isIOS) {
+      // Give extra time for iOS localStorage persistence and IndexedDB saves
+      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log("🍎 iOS device detected - delayed navigation for auth persistence");
+    }
 
     // Navigate to home
     navigate("/");
