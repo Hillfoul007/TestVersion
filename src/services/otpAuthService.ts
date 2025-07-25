@@ -237,6 +237,16 @@ export class OTPAuthService {
         localStorage.setItem("auth_token", token);
         localStorage.setItem("current_user", JSON.stringify(user));
 
+        // Clear iOS logout flag on successful login
+        if (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) {
+          import("../utils/iosAuthFix").then(({ clearIosLogoutFlag }) => {
+            clearIosLogoutFlag();
+          }).catch(() => {
+            // Ignore import error
+          });
+        }
+
         // Clear session data
         sessionStorage.removeItem("otp_phone");
         sessionStorage.removeItem("otp_timestamp");
