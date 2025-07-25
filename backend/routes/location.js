@@ -131,72 +131,19 @@ router.get("/geocode/:lat/:lng", async (req, res) => {
 
 // Search for places/addresses
 router.get("/search/:query", async (req, res) => {
-  try {
-    const { query } = req.params;
-    log(`Location search request: ${query}`);
+  // Address search suggestions disabled to prevent errors
+  const { query } = req.params;
+  log(`Location search request (disabled): ${query}`);
 
-    if (!query || query.trim().length < 3) {
-      return res.status(400).json({
-        success: false,
-        message: "Search query must be at least 3 characters long",
-      });
-    }
-
-    // Use Nominatim for place search
-    try {
-      const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=10&countrycodes=in&addressdetails=1`;
-
-      const response = await fetch(nominatimUrl, {
-        headers: {
-          "User-Agent": "CleanCare-Pro/1.0",
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-
-        const results = data.map((item) => ({
-          display_name: item.display_name,
-          address: item.address,
-          coordinates: {
-            lat: parseFloat(item.lat),
-            lng: parseFloat(item.lon),
-          },
-          type: item.type,
-          importance: item.importance,
-        }));
-
-        log(`Search found ${results.length} results`);
-
-        return res.json({
-          success: true,
-          data: {
-            query,
-            results,
-            count: results.length,
-          },
-        });
-      }
-    } catch (searchError) {
-      log(`Search API error: ${searchError.message}`);
-    }
-
-    // Fallback response
-    res.json({
-      success: true,
-      data: {
-        query,
-        results: [],
-        count: 0,
-      },
-    });
-  } catch (error) {
-    log(`Search error: ${error.message}`, error.stack);
-    res.status(500).json({
-      success: false,
-      message: "Failed to search locations",
-    });
-  }
+  return res.json({
+    success: true,
+    data: {
+      query,
+      results: [],
+      count: 0,
+    },
+    message: "Search suggestions temporarily disabled",
+  });
 });
 
 // Get service areas (mock data for now)
