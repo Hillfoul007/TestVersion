@@ -131,6 +131,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     google.maps.marker.AdvancedMarkerElement | google.maps.Marker | null
   >(null);
   const [isMapLoading, setIsMapLoading] = useState(true);
+  const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   // Location availability modal state
   const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
