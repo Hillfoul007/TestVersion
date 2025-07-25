@@ -1114,21 +1114,24 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
           const response =
             await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
-          const predictions = response.suggestions;
 
-          suggestions = predictions.map((suggestion: any) => {
-            const placePrediction = suggestion.placePrediction;
-            return {
-              description: placePrediction.text,
-              main_text:
-                placePrediction.structuredFormat?.mainText ||
-                placePrediction.text,
-              secondary_text:
-                placePrediction.structuredFormat?.secondaryText || "",
-              place_id: placePrediction.placeId,
-              source: "google_places",
-            };
-          });
+          if (response && response.suggestions) {
+            const predictions = response.suggestions;
+
+            suggestions = predictions.map((suggestion: any) => {
+              const placePrediction = suggestion.placePrediction;
+              return {
+                description: placePrediction.text,
+                main_text:
+                  placePrediction.structuredFormat?.mainText ||
+                  placePrediction.text,
+                secondary_text:
+                  placePrediction.structuredFormat?.secondaryText || "",
+                place_id: placePrediction.placeId,
+                source: "google_places",
+              };
+            });
+          }
         } catch (placesError) {
           console.warn(
             "Google Places API failed, trying alternatives:",
@@ -1142,33 +1145,41 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       // Method 2: Nominatim API fallback with enhanced search
       if (suggestions.length === 0) {
         try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
           const nominatimResponse = await fetch(
             `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, India&limit=10&addressdetails=1&countrycodes=in&extratags=1`,
             {
+              signal: controller.signal,
               headers: {
                 "User-Agent": "CleanCare-App/1.0",
               },
             },
           );
 
-          const nominatimData = await nominatimResponse.json();
+          clearTimeout(timeoutId);
 
-          if (nominatimData && nominatimData.length > 0) {
-            suggestions = nominatimData.map((item: any, index: number) => ({
-              description: item.display_name,
-              main_text: item.name || item.display_name.split(",")[0],
-              secondary_text: item.display_name
-                .split(",")
-                .slice(1)
-                .join(",")
-                .trim(),
-              place_id: `nominatim_${item.osm_id || index}`,
-              coordinates: {
-                lat: parseFloat(item.lat),
-                lng: parseFloat(item.lon),
-              },
-              source: "nominatim",
-            }));
+          if (nominatimResponse.ok) {
+            const nominatimData = await nominatimResponse.json();
+
+            if (nominatimData && Array.isArray(nominatimData) && nominatimData.length > 0) {
+              suggestions = nominatimData.map((item: any, index: number) => ({
+                description: item.display_name,
+                main_text: item.name || item.display_name.split(",")[0],
+                secondary_text: item.display_name
+                  .split(",")
+                  .slice(1)
+                  .join(",")
+                  .trim(),
+                place_id: `nominatim_${item.osm_id || index}`,
+                coordinates: {
+                  lat: parseFloat(item.lat),
+                  lng: parseFloat(item.lon),
+                },
+                source: "nominatim",
+              }));
+            }
           }
         } catch (nominatimError) {
           console.warn("Nominatim API failed:", nominatimError);
