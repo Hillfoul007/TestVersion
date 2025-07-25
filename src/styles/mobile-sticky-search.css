@@ -14,22 +14,13 @@
     backdrop-filter: blur(8px);
   }
 
-  /* Modal z-index layers */
-  .modal-overlay {
-    z-index: 60 !important; /* Above sticky search (z-50) */
-  }
-
-  .modal-content {
-    z-index: 61 !important; /* Above modal overlay */
-  }
-
   /* Nested modal layers for stacked modals */
   .modal-overlay-nested {
-    z-index: 70 !important; /* Above other modals */
+    z-index: 80 !important; /* Above other modals */
   }
 
   .modal-content-nested {
-    z-index: 71 !important; /* Above nested modal overlay */
+    z-index: 81 !important; /* Above nested modal overlay */
   }
 
   /* Hide sticky search when modal is open */
@@ -37,6 +28,15 @@
     opacity: 0.3;
     pointer-events: none;
     transition: opacity 0.2s ease;
+  }
+
+  /* Ensure modal overlays are above sticky elements */
+  .modal-overlay {
+    z-index: 70 !important; /* Above sticky search (z-50) */
+  }
+
+  .modal-content {
+    z-index: 71 !important; /* Above modal overlay */
   }
 
   /* Ensure scrollable content has proper spacing */

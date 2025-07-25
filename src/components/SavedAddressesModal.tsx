@@ -189,7 +189,7 @@ const SavedAddressesModal: React.FC<SavedAddressesModalProps> = React.memo(
       try {
         console.log("🗑️ Deleting address with ID:", id);
 
-        console.log("🗑️ Deleting address with AddressService...");
+        console.log("����️ Deleting address with AddressService...");
         const addressService = AddressService.getInstance();
         const result = await addressService.deleteAddress(id);
 
@@ -243,8 +243,8 @@ const SavedAddressesModal: React.FC<SavedAddressesModalProps> = React.memo(
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-end modal-overlay" style={{ paddingTop: '120px' }}>
-        <div className="w-full bg-white rounded-t-2xl h-full overflow-y-auto relative modal-content" style={{ maxHeight: 'calc(100vh - 120px)' }}>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-[70] flex items-center justify-center modal-overlay">
+        <div className="w-full max-w-lg bg-white rounded-lg h-[85vh] overflow-y-auto relative modal-content mx-4 my-8">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-100">
             <h2 className="text-lg font-semibold text-gray-900">
