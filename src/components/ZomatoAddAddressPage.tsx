@@ -1099,11 +1099,10 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
   const performSearch = async (query: string) => {
     setSearchError(null); // Clear any previous errors
 
-    if (query.length < 2) {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      return;
-    }
+    // Search suggestions disabled to prevent errors
+    setSuggestions([]);
+    setShowSuggestions(false);
+    return;
 
     // Try multiple search methods for better suggestions
     try {
