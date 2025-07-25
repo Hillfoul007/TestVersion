@@ -322,7 +322,7 @@ export const preventIosAutoLogout = (): void => {
 
     if (!user || !token) {
       console.log(
-        `🍎🚨 iPhone ${isPWAMode() ? "PWA" : "Safari"} session lost detected - attempting restoration`,
+        `��🚨 iPhone ${isPWAMode() ? "PWA" : "Safari"} session lost detected - attempting restoration`,
       );
       const restored = await restoreIosAuth();
       if (restored) {
@@ -353,6 +353,24 @@ export const preventIosAutoLogout = (): void => {
  */
 export const restoreIosAuth = async (): Promise<boolean> => {
   if (!isIosDevice()) return false;
+
+  // Check if user intentionally logged out
+  const intentionalLogout = localStorage.getItem("ios_intentional_logout");
+  if (intentionalLogout === "true") {
+    const logoutTimestamp = localStorage.getItem("ios_logout_timestamp");
+    const logoutAge = logoutTimestamp ? Date.now() - parseInt(logoutTimestamp) : 0;
+
+    // Allow restoration after 1 hour (user might want to login again)
+    if (logoutAge < 60 * 60 * 1000) {
+      console.log("🍎🚫 Skipping auth restore - user intentionally logged out recently");
+      return false;
+    } else {
+      // Clear the logout flag after 1 hour
+      localStorage.removeItem("ios_intentional_logout");
+      localStorage.removeItem("ios_logout_timestamp");
+      console.log("🍎✅ Logout flag expired after 1 hour - allowing restore");
+    }
+  }
 
   const user =
     localStorage.getItem("current_user") ||
