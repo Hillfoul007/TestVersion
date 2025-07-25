@@ -140,9 +140,7 @@ class LocationService {
             const response = await fetch(requestUrl, {
               headers: {
                 Accept: "application/json",
-                "Content-Type": "application/json",
               },
-              mode: "cors",
             });
 
             if (!response.ok) {
