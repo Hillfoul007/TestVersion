@@ -1087,8 +1087,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     }
   };
 
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
+  const performSearch = async (query: string) => {
     setSearchError(null); // Clear any previous errors
 
     if (query.length < 2) {
