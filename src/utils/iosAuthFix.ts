@@ -377,15 +377,29 @@ export const restoreIosAuth = async (): Promise<boolean> => {
     const logoutTimestamp = localStorage.getItem("ios_logout_timestamp");
     const logoutAge = logoutTimestamp ? Date.now() - parseInt(logoutTimestamp) : 0;
 
-    // Allow restoration after 1 hour (user might want to login again)
-    if (logoutAge < 60 * 60 * 1000) {
-      console.log("🍎🚫 Skipping auth restore - user intentionally logged out recently");
+    // Configurable logout duration (default: 15 minutes for better UX)
+    // Options: 5 min, 15 min, 30 min, 1 hour, 24 hours, never expire
+    const LOGOUT_DURATION_OPTIONS = {
+      QUICK: 5 * 60 * 1000,      // 5 minutes - for quick privacy
+      DEFAULT: 15 * 60 * 1000,   // 15 minutes - good balance
+      MEDIUM: 30 * 60 * 1000,    // 30 minutes - moderate security
+      LONG: 60 * 60 * 1000,      // 1 hour - higher security
+      DAY: 24 * 60 * 60 * 1000,  // 24 hours - maximum security
+      NEVER: Infinity            // Never expire - permanent logout until manual login
+    };
+
+    // Use DEFAULT (15 minutes) - better UX than 1 hour
+    const logoutDuration = LOGOUT_DURATION_OPTIONS.DEFAULT;
+
+    if (logoutAge < logoutDuration) {
+      const remainingTime = Math.ceil((logoutDuration - logoutAge) / (60 * 1000));
+      console.log(`🍎🚫 Skipping auth restore - user intentionally logged out (${remainingTime} min remaining)`);
       return false;
     } else {
-      // Clear the logout flag after 1 hour
+      // Clear the logout flag after duration expires
       localStorage.removeItem("ios_intentional_logout");
       localStorage.removeItem("ios_logout_timestamp");
-      console.log("🍎✅ Logout flag expired after 1 hour - allowing restore");
+      console.log(`🍎✅ Logout flag expired after ${logoutDuration / (60 * 1000)} minutes - allowing restore`);
     }
   }
 
