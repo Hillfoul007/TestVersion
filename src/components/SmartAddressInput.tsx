@@ -70,12 +70,13 @@ export const SmartAddressInput: React.FC<SmartAddressInputProps> = ({
     onValidationChange?.(validation.isValid, validation.missingFields);
   }, [validation, onValidationChange]);
 
-  // Handle search input change
+  // Handle search input change - suggestions disabled
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
-    searchAddresses(value);
-    setShowSuggestions(true);
+    // Search suggestions disabled to prevent errors
+    // searchAddresses(value);
+    setShowSuggestions(false);
   };
 
   // Handle suggestion selection
