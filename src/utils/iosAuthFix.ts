@@ -245,7 +245,7 @@ export const preventIosAutoLogout = (): void => {
         console.log("🍎📱 PWA focus - auth missing, attempting restoration");
         const restored = await restoreIosAuth();
         if (restored) {
-          console.log("🍎📱 PWA focus - auth restored");
+          console.log("🍎��� PWA focus - auth restored");
           window.dispatchEvent(
             new CustomEvent("ios-session-restored", {
               detail: {
@@ -313,6 +313,12 @@ export const preventIosAutoLogout = (): void => {
 
   // Aggressive session monitoring for iPhone - more frequent for PWA
   setInterval(async () => {
+    // Skip monitoring if user intentionally logged out
+    const intentionalLogout = localStorage.getItem("ios_intentional_logout");
+    if (intentionalLogout === "true") {
+      return; // Don't try to restore if user logged out intentionally
+    }
+
     const user =
       localStorage.getItem("current_user") ||
       localStorage.getItem("cleancare_user");
@@ -322,7 +328,7 @@ export const preventIosAutoLogout = (): void => {
 
     if (!user || !token) {
       console.log(
-        `��🚨 iPhone ${isPWAMode() ? "PWA" : "Safari"} session lost detected - attempting restoration`,
+        `🍎🚨 iPhone ${isPWAMode() ? "PWA" : "Safari"} session lost detected - attempting restoration`,
       );
       const restored = await restoreIosAuth();
       if (restored) {
