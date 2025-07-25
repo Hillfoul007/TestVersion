@@ -19,6 +19,43 @@ const ForceLoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(true); // Auto-open auth modal
   const { addNotification } = useNotifications();
+  const isNavigatingRef = useRef(false);
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+              (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  // Prevent iOS auto-refresh and session restoration interference
+  useEffect(() => {
+    if (isIOS) {
+      console.log("🍎 ForceLoginPage: Initializing iOS stability measures");
+
+      // Prevent automatic auth restoration on this page
+      localStorage.setItem("force_login_active", "true");
+
+      // Disable page restoration from cache
+      if ('pageshow' in window) {
+        const handlePageShow = (event: PageTransitionEvent) => {
+          if (event.persisted && !isNavigatingRef.current) {
+            console.log("🍎 ForceLoginPage: Preventing iOS page cache restoration");
+            // Prevent cache restoration by forcing a clean load
+            window.location.reload();
+          }
+        };
+
+        window.addEventListener('pageshow', handlePageShow);
+
+        return () => {
+          window.removeEventListener('pageshow', handlePageShow);
+        };
+      }
+    }
+  }, [isIOS]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("force_login_active");
+    };
+  }, []);
 
   const handleAuthSuccess = async (user: any) => {
     console.log("🎉 Auth successful:", user);
