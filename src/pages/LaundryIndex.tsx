@@ -423,6 +423,14 @@ const LaundryIndex = () => {
 
             // Ensure auth service has the latest data
             authService.setCurrentUser(storedUser, token);
+
+            // For iOS, also trigger an auth event to update other components
+            if (isIOS) {
+              window.dispatchEvent(new CustomEvent("auth-login", {
+                detail: { user: storedUser }
+              }));
+            }
+
             return; // Exit early - user is authenticated
           }
         } catch (parseError) {
@@ -444,7 +452,7 @@ const LaundryIndex = () => {
         });
       } else {
         // Only log state, never automatically clear login
-        console.log("ℹ��� No valid authentication data found");
+        console.log("ℹ️ No valid authentication data found");
         console.log("🔒 Preserving current login state to prevent auto-logout");
         // Don't call setIsLoggedIn(false) or setCurrentUser(null) here
       }
