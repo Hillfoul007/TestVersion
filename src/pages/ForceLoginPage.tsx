@@ -111,6 +111,7 @@ const ForceLoginPage: React.FC = () => {
 
         // Use window.location.href for more reliable iOS navigation
         console.log("🍎 Navigating to home page...");
+        isNavigatingRef.current = true;
         window.location.href = "/";
         return;
       }
