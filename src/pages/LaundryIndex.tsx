@@ -99,18 +99,23 @@ const getReverseGeocodedLocation = async (
     return `Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
   }
 
-  // Method 1: Try Google Maps API if available
-  const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  if (googleApiKey) {
-    try {
-      console.log("🗺️ Trying Google Maps API...");
+  // Method 1: Try Google Maps API via backend proxy
+  try {
+    console.log("🗺️ Trying Google Maps API via backend proxy...");
+    const { getApiBaseUrl } = await import('../config/env');
+    const apiBaseUrl = getApiBaseUrl();
+
+    if (apiBaseUrl) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
 
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${googleApiKey}`,
+        `${apiBaseUrl}/google-maps/geocode?latlng=${latitude},${longitude}&language=en&region=IN`,
         {
           signal: controller.signal,
+          headers: {
+            Accept: "application/json",
+          },
         },
       );
 
@@ -144,9 +149,9 @@ const getReverseGeocodedLocation = async (
           }
         }
       }
-    } catch (error) {
-      console.log("❌ Google Maps geocoding failed:", error);
     }
+  } catch (error) {
+    console.log("❌ Google Maps geocoding failed:", error);
   }
 
   // Method 2: Try OpenStreetMap with better error handling

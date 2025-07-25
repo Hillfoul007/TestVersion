@@ -190,6 +190,15 @@ try {
   console.error("❌ Failed to load Address routes:", error.message);
 }
 
+// Google Maps proxy routes
+try {
+  const googleMapsRoutes = require("./routes/google-maps");
+  app.use("/api/google-maps", googleMapsRoutes);
+  console.log("🔗 Google Maps proxy routes registered at /api/google-maps");
+} catch (error) {
+  console.error("❌ Failed to load Google Maps proxy routes:", error.message);
+}
+
 // Google Sheets routes removed
 
 // Dynamic Services routes
