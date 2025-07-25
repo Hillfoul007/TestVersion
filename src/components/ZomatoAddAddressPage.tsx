@@ -124,12 +124,14 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
   const [receiverPhone, setReceiverPhone] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [autocompleteService, setAutocompleteService] = useState<any>(null);
   const [marker, setMarker] = useState<
     google.maps.marker.AdvancedMarkerElement | google.maps.Marker | null
   >(null);
   const [isMapLoading, setIsMapLoading] = useState(true);
+  const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   // Location availability modal state
   const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
@@ -145,6 +147,15 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       initializeMap();
     }
   }, [isOpen]);
+
+  // Cleanup search timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutId) {
+        clearTimeout(searchTimeoutId);
+      }
+    };
+  }, [searchTimeoutId]);
 
   // Handle clicking outside suggestions to close them
   useEffect(() => {
@@ -1085,8 +1096,8 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     }
   };
 
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
+  const performSearch = async (query: string) => {
+    setSearchError(null); // Clear any previous errors
 
     if (query.length < 2) {
       setSuggestions([]);
@@ -1114,21 +1125,24 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
           const response =
             await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
-          const predictions = response.suggestions;
 
-          suggestions = predictions.map((suggestion: any) => {
-            const placePrediction = suggestion.placePrediction;
-            return {
-              description: placePrediction.text,
-              main_text:
-                placePrediction.structuredFormat?.mainText ||
-                placePrediction.text,
-              secondary_text:
-                placePrediction.structuredFormat?.secondaryText || "",
-              place_id: placePrediction.placeId,
-              source: "google_places",
-            };
-          });
+          if (response && response.suggestions) {
+            const predictions = response.suggestions;
+
+            suggestions = predictions.map((suggestion: any) => {
+              const placePrediction = suggestion.placePrediction;
+              return {
+                description: placePrediction.text,
+                main_text:
+                  placePrediction.structuredFormat?.mainText ||
+                  placePrediction.text,
+                secondary_text:
+                  placePrediction.structuredFormat?.secondaryText || "",
+                place_id: placePrediction.placeId,
+                source: "google_places",
+              };
+            });
+          }
         } catch (placesError) {
           console.warn(
             "Google Places API failed, trying alternatives:",
@@ -1142,33 +1156,41 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       // Method 2: Nominatim API fallback with enhanced search
       if (suggestions.length === 0) {
         try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
           const nominatimResponse = await fetch(
             `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, India&limit=10&addressdetails=1&countrycodes=in&extratags=1`,
             {
+              signal: controller.signal,
               headers: {
                 "User-Agent": "CleanCare-App/1.0",
               },
             },
           );
 
-          const nominatimData = await nominatimResponse.json();
+          clearTimeout(timeoutId);
 
-          if (nominatimData && nominatimData.length > 0) {
-            suggestions = nominatimData.map((item: any, index: number) => ({
-              description: item.display_name,
-              main_text: item.name || item.display_name.split(",")[0],
-              secondary_text: item.display_name
-                .split(",")
-                .slice(1)
-                .join(",")
-                .trim(),
-              place_id: `nominatim_${item.osm_id || index}`,
-              coordinates: {
-                lat: parseFloat(item.lat),
-                lng: parseFloat(item.lon),
-              },
-              source: "nominatim",
-            }));
+          if (nominatimResponse.ok) {
+            const nominatimData = await nominatimResponse.json();
+
+            if (nominatimData && Array.isArray(nominatimData) && nominatimData.length > 0) {
+              suggestions = nominatimData.map((item: any, index: number) => ({
+                description: item.display_name,
+                main_text: item.name || item.display_name.split(",")[0],
+                secondary_text: item.display_name
+                  .split(",")
+                  .slice(1)
+                  .join(",")
+                  .trim(),
+                place_id: `nominatim_${item.osm_id || index}`,
+                coordinates: {
+                  lat: parseFloat(item.lat),
+                  lng: parseFloat(item.lon),
+                },
+                source: "nominatim",
+              }));
+            }
           }
         } catch (nominatimError) {
           console.warn("Nominatim API failed:", nominatimError);
@@ -1239,33 +1261,61 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       setShowSuggestions(suggestions.length > 0);
     } catch (error) {
       console.error("Search failed:", error);
-      // Provide helpful fallback suggestions
+      setSearchError("Search temporarily unavailable");
+
+      // Always provide helpful fallback suggestions, even if there's an error
       const fallbackSuggestions = [
         {
           description: `${query}, Delhi, India`,
           main_text: query,
-          secondary_text: "Delhi, India",
+          secondary_text: "Delhi, India (Suggested)",
           place_id: `fallback_${query}_delhi`,
           source: "fallback",
         },
         {
           description: `${query}, Mumbai, India`,
           main_text: query,
-          secondary_text: "Mumbai, India",
+          secondary_text: "Mumbai, India (Suggested)",
           place_id: `fallback_${query}_mumbai`,
           source: "fallback",
         },
         {
           description: `${query}, Bangalore, India`,
           main_text: query,
-          secondary_text: "Bangalore, India",
+          secondary_text: "Bangalore, India (Suggested)",
           place_id: `fallback_${query}_bangalore`,
+          source: "fallback",
+        },
+        {
+          description: `${query}, India`,
+          main_text: query,
+          secondary_text: "India (Manual Entry)",
+          place_id: `fallback_${query}_manual`,
           source: "fallback",
         },
       ];
       setSuggestions(fallbackSuggestions);
       setShowSuggestions(true);
+
+      // Clear error after a few seconds so it doesn't persist
+      setTimeout(() => setSearchError(null), 3000);
     }
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+
+    // Clear existing timeout
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId);
+    }
+
+    // Set new timeout for debounced search
+    const timeoutId = setTimeout(() => {
+      performSearch(query);
+    }, 300); // 300ms debounce
+
+    setSearchTimeoutId(timeoutId);
   };
 
   const handleSuggestionSelect = async (suggestion: any) => {
@@ -1516,6 +1566,13 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
                 spellCheck={false}
               />
             </div>
+
+            {/* Search Error Indicator */}
+            {searchError && (
+              <div className="mt-2 text-xs text-orange-600 bg-orange-50 border border-orange-200 rounded px-2 py-1">
+                {searchError} - showing suggested locations
+              </div>
+            )}
 
             {/* Google Maps Configuration Notice */}
             <GoogleMapsNotice className="mt-3" />

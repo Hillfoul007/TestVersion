@@ -4,12 +4,19 @@
 
 export const clearIosAuthState = (): void => {
   try {
-    // Only clear auth-related keys, preserve cart and other user data
+    // Set intentional logout flag FIRST to prevent restoration
+    localStorage.setItem("ios_intentional_logout", "true");
+    localStorage.setItem("ios_logout_timestamp", Date.now().toString());
+
+    // Clear all backup and restoration data
     const keysToRemove = [
       "current_user",
       "cleancare_user",
       "cleancare_auth_token",
       "auth_token",
+      "ios_backup_user",
+      "ios_backup_token",
+      "ios_auth_timestamp"
     ];
 
     keysToRemove.forEach((key) => {
@@ -18,6 +25,16 @@ export const clearIosAuthState = (): void => {
 
     // Clear sessionStorage completely for iOS
     sessionStorage.clear();
+
+    // Clear IndexedDB auth data
+    clearIosAuthFromIndexedDB();
+
+    // Clear auth cookies
+    try {
+      document.cookie = "ios_auth_backup=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    } catch (e) {
+      // Cookie clearing failed, continue
+    }
 
     // Clear any cached form data in iOS Safari
     const forms = document.querySelectorAll("form");
@@ -37,7 +54,7 @@ export const clearIosAuthState = (): void => {
       }
     });
 
-    console.log("✅ iOS auth state cleared (explicit logout)");
+    console.log("✅ iOS auth state cleared (explicit logout) - restoration disabled");
   } catch (error) {
     console.error("❌ Error clearing iOS auth state:", error);
   }
@@ -75,6 +92,17 @@ export const isPWAMode = (): boolean => {
 
 export const isIosPWA = (): boolean => {
   return isIosDevice() && isPWAMode();
+};
+
+/**
+ * Clear the intentional logout flag when user logs in successfully
+ */
+export const clearIosLogoutFlag = (): void => {
+  if (!isIosDevice()) return;
+
+  localStorage.removeItem("ios_intentional_logout");
+  localStorage.removeItem("ios_logout_timestamp");
+  console.log("🍎✅ Cleared iOS logout flag - restoration re-enabled");
 };
 
 export const addIosOtpDelay = async (): Promise<void> => {
@@ -296,6 +324,12 @@ export const preventIosAutoLogout = (): void => {
 
   // Aggressive session monitoring for iPhone - more frequent for PWA
   setInterval(async () => {
+    // Skip monitoring if user intentionally logged out
+    const intentionalLogout = localStorage.getItem("ios_intentional_logout");
+    if (intentionalLogout === "true") {
+      return; // Don't try to restore if user logged out intentionally
+    }
+
     const user =
       localStorage.getItem("current_user") ||
       localStorage.getItem("cleancare_user");
@@ -336,6 +370,38 @@ export const preventIosAutoLogout = (): void => {
  */
 export const restoreIosAuth = async (): Promise<boolean> => {
   if (!isIosDevice()) return false;
+
+  // Check if user intentionally logged out
+  const intentionalLogout = localStorage.getItem("ios_intentional_logout");
+  if (intentionalLogout === "true") {
+    const logoutTimestamp = localStorage.getItem("ios_logout_timestamp");
+    const logoutAge = logoutTimestamp ? Date.now() - parseInt(logoutTimestamp) : 0;
+
+    // Configurable logout duration (default: 15 minutes for better UX)
+    // Options: 5 min, 15 min, 30 min, 1 hour, 24 hours, never expire
+    const LOGOUT_DURATION_OPTIONS = {
+      QUICK: 5 * 60 * 1000,      // 5 minutes - for quick privacy
+      DEFAULT: 15 * 60 * 1000,   // 15 minutes - good balance
+      MEDIUM: 30 * 60 * 1000,    // 30 minutes - moderate security
+      LONG: 60 * 60 * 1000,      // 1 hour - higher security
+      DAY: 24 * 60 * 60 * 1000,  // 24 hours - maximum security
+      NEVER: Infinity            // Never expire - permanent logout until manual login
+    };
+
+    // Use DEFAULT (15 minutes) - better UX than 1 hour
+    const logoutDuration = LOGOUT_DURATION_OPTIONS.DEFAULT;
+
+    if (logoutAge < logoutDuration) {
+      const remainingTime = Math.ceil((logoutDuration - logoutAge) / (60 * 1000));
+      console.log(`🍎🚫 Skipping auth restore - user intentionally logged out (${remainingTime} min remaining)`);
+      return false;
+    } else {
+      // Clear the logout flag after duration expires
+      localStorage.removeItem("ios_intentional_logout");
+      localStorage.removeItem("ios_logout_timestamp");
+      console.log(`🍎✅ Logout flag expired after ${logoutDuration / (60 * 1000)} minutes - allowing restore`);
+    }
+  }
 
   const user =
     localStorage.getItem("current_user") ||
@@ -453,8 +519,30 @@ export const saveIosAuthToIndexedDB = async (
   }
 };
 
+export const clearIosAuthFromIndexedDB = async (): Promise<void> => {
+  if (!isIosDevice()) return;
+
+  try {
+    const db = await openIosAuthDB();
+    const transaction = db.transaction([IOS_AUTH_STORE], "readwrite");
+    const store = transaction.objectStore(IOS_AUTH_STORE);
+
+    await store.delete("ios_auth");
+    console.log("🍎🗑️ Cleared iPhone auth from IndexedDB");
+  } catch (error) {
+    console.warn("🍎⚠️ Failed to clear IndexedDB:", error);
+  }
+};
+
 export const restoreIosAuthFromIndexedDB = async (): Promise<boolean> => {
   if (!isIosDevice()) return false;
+
+  // Check if user intentionally logged out
+  const intentionalLogout = localStorage.getItem("ios_intentional_logout");
+  if (intentionalLogout === "true") {
+    console.log("🍎🚫 Skipping IndexedDB restore - user intentionally logged out");
+    return false;
+  }
 
   try {
     const db = await openIosAuthDB();

@@ -392,7 +392,7 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
                     )}
                     {referralValidation.isValid === null && (
                       <p className="text-xs text-gray-500 mt-1">
-                        Get 50% off on your first order with a valid referral
+                        Get 30% off on your first order with a valid referral
                         code
                       </p>
                     )}

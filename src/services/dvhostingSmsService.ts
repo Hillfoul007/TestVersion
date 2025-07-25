@@ -725,7 +725,9 @@ export class DVHostingSmsService {
           /iPad|iPhone|iPod/.test(navigator.userAgent) ||
           (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
         ) {
-          import("../utils/iosAuthFix").then(({ saveIosAuthToIndexedDB }) => {
+          import("../utils/iosAuthFix").then(({ saveIosAuthToIndexedDB, clearIosLogoutFlag }) => {
+            // Clear logout flag since user is logging in successfully
+            clearIosLogoutFlag();
             const currentToken =
               token ||
               localStorage.getItem("auth_token") ||
