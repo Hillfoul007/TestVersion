@@ -470,8 +470,30 @@ export const saveIosAuthToIndexedDB = async (
   }
 };
 
+export const clearIosAuthFromIndexedDB = async (): Promise<void> => {
+  if (!isIosDevice()) return;
+
+  try {
+    const db = await openIosAuthDB();
+    const transaction = db.transaction([IOS_AUTH_STORE], "readwrite");
+    const store = transaction.objectStore(IOS_AUTH_STORE);
+
+    await store.delete("ios_auth");
+    console.log("🍎🗑️ Cleared iPhone auth from IndexedDB");
+  } catch (error) {
+    console.warn("🍎⚠️ Failed to clear IndexedDB:", error);
+  }
+};
+
 export const restoreIosAuthFromIndexedDB = async (): Promise<boolean> => {
   if (!isIosDevice()) return false;
+
+  // Check if user intentionally logged out
+  const intentionalLogout = localStorage.getItem("ios_intentional_logout");
+  if (intentionalLogout === "true") {
+    console.log("🍎🚫 Skipping IndexedDB restore - user intentionally logged out");
+    return false;
+  }
 
   try {
     const db = await openIosAuthDB();
