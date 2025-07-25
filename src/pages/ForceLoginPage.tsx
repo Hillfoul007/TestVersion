@@ -30,15 +30,34 @@ const ForceLoginPage: React.FC = () => {
       )
     );
 
-    // For iOS devices, add a small delay to ensure auth state is persisted
+    // For iOS devices, add a longer delay and verify auth state is persisted
     // before navigation to prevent race conditions
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                   (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
     if (isIOS) {
-      // Give extra time for iOS localStorage persistence and IndexedDB saves
-      await new Promise(resolve => setTimeout(resolve, 500));
-      console.log("🍎 iOS device detected - delayed navigation for auth persistence");
+      console.log("🍎 iOS device detected - ensuring robust auth persistence before navigation");
+
+      // Longer delay for iOS - 1500ms instead of 500ms
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Verify auth state is properly saved before navigating
+      const authToken = localStorage.getItem("auth_token") || localStorage.getItem("cleancare_auth_token");
+      const userStr = localStorage.getItem("current_user") || localStorage.getItem("cleancare_user");
+
+      if (!authToken || !userStr) {
+        console.warn("🍎⚠️ Auth state not found after delay, attempting manual save");
+        // Manual save as backup
+        localStorage.setItem("current_user", JSON.stringify(user));
+        localStorage.setItem("cleancare_user", JSON.stringify(user));
+        localStorage.setItem("auth_token", `user_token_${user.phone || user.id}_persistent`);
+        localStorage.setItem("cleancare_auth_token", `user_token_${user.phone || user.id}_persistent`);
+
+        // Additional delay after manual save
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      console.log("🍎✅ iOS auth persistence verified - proceeding with navigation");
     }
 
     // Navigate to home

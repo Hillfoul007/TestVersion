@@ -271,32 +271,49 @@ const LaundryIndex = () => {
     let iosCleanupFunctions: (() => void)[] = [];
 
     if (isIOS) {
+      // More aggressive iOS auth checking after navigation
       const handleIOSVisibilityChange = () => {
-        if (document.visibilityState === 'visible' && !isLoggedIn) {
-          // On iOS, when page becomes visible and user isn't logged in,
-          // check auth state with a delay to handle race conditions
+        if (document.visibilityState === 'visible') {
+          // Always check auth state when page becomes visible on iOS, not just when logged out
           setTimeout(() => {
             console.log("🍎 iOS visibility change detected - rechecking auth state");
             checkAuthState();
-          }, 300);
+          }, 100); // Reduced delay for faster response
         }
       };
 
       const handleIOSFocus = () => {
-        if (!isLoggedIn) {
-          setTimeout(() => {
-            console.log("🍎 iOS focus detected - rechecking auth state");
-            checkAuthState();
-          }, 200);
-        }
+        // Always check auth on focus for iOS, regardless of current login state
+        setTimeout(() => {
+          console.log("🍎 iOS focus detected - rechecking auth state");
+          checkAuthState();
+        }, 100); // Reduced delay for faster response
+      };
+
+      // Also check auth state immediately on page load for iOS
+      const handleIOSPageShow = () => {
+        setTimeout(() => {
+          console.log("🍎 iOS page show detected - rechecking auth state");
+          checkAuthState();
+        }, 200);
       };
 
       document.addEventListener('visibilitychange', handleIOSVisibilityChange);
       window.addEventListener('focus', handleIOSFocus);
+      window.addEventListener('pageshow', handleIOSPageShow);
+
+      // Additional aggressive check after initial load for iOS
+      setTimeout(() => {
+        if (isIOS) {
+          console.log("🍎 iOS additional auth check after page load");
+          checkAuthState();
+        }
+      }, 1000);
 
       iosCleanupFunctions = [
         () => document.removeEventListener('visibilitychange', handleIOSVisibilityChange),
-        () => window.removeEventListener('focus', handleIOSFocus)
+        () => window.removeEventListener('focus', handleIOSFocus),
+        () => window.removeEventListener('pageshow', handleIOSPageShow)
       ];
     }
 
@@ -369,7 +386,11 @@ const LaundryIndex = () => {
 
       if (isIOS) {
         // Import iOS auth restoration utility
-        const { restoreIosAuth } = await import("../utils/iosAuthFix");
+        const { restoreIosAuth, clearIosLogoutFlag } = await import("../utils/iosAuthFix");
+
+        // Clear any logout flags to ensure restoration works
+        clearIosLogoutFlag();
+
         const restored = await restoreIosAuth();
         if (restored) {
           console.log("🍎 iOS auth restored successfully during check");
@@ -402,6 +423,14 @@ const LaundryIndex = () => {
 
             // Ensure auth service has the latest data
             authService.setCurrentUser(storedUser, token);
+
+            // For iOS, also trigger an auth event to update other components
+            if (isIOS) {
+              window.dispatchEvent(new CustomEvent("auth-login", {
+                detail: { user: storedUser }
+              }));
+            }
+
             return; // Exit early - user is authenticated
           }
         } catch (parseError) {
@@ -421,7 +450,30 @@ const LaundryIndex = () => {
           name: user.name,
           isVerified: user.isVerified,
         });
+
+        // For iOS, also trigger an auth event
+        if (isIOS) {
+          window.dispatchEvent(new CustomEvent("auth-login", {
+            detail: { user }
+          }));
+        }
       } else {
+        // For iOS, be more aggressive about auth checking but don't auto-logout
+        if (isIOS && !isLoggedIn) {
+          console.log("🍎 iOS device - attempting comprehensive auth restoration");
+
+          // Try one more time with a delay for iOS
+          setTimeout(async () => {
+            const { restoreIosAuth } = await import("../utils/iosAuthFix");
+            const restored = await restoreIosAuth();
+            if (restored) {
+              console.log("🍎 iOS delayed auth restoration successful");
+              // Recheck auth state after restoration
+              checkAuthState();
+            }
+          }, 500);
+        }
+
         // Only log state, never automatically clear login
         console.log("ℹ️ No valid authentication data found");
         console.log("🔒 Preserving current login state to prevent auto-logout");

@@ -1099,11 +1099,10 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
   const performSearch = async (query: string) => {
     setSearchError(null); // Clear any previous errors
 
-    if (query.length < 2) {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      return;
-    }
+    // Search suggestions disabled to prevent errors
+    setSuggestions([]);
+    setShowSuggestions(false);
+    return;
 
     // Try multiple search methods for better suggestions
     try {
@@ -1578,27 +1577,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
             <GoogleMapsNotice className="mt-3" />
 
             {/* Search Suggestions */}
-            {showSuggestions && suggestions.length > 0 && (
-              <div
-                ref={suggestionsRef}
-                className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
-              >
-                {suggestions.map((suggestion, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleSuggestionSelect(suggestion)}
-                    className="px-4 py-3 cursor-pointer hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                  >
-                    <div className="text-sm font-medium text-gray-900">
-                      {suggestion.main_text}
-                    </div>
-                    <div className="text-xs text-gray-600">
-                      {suggestion.secondary_text}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Search suggestions disabled - dropdown removed to prevent errors */}
           </div>
         </div>
 

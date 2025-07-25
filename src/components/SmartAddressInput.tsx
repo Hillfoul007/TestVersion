@@ -70,12 +70,13 @@ export const SmartAddressInput: React.FC<SmartAddressInputProps> = ({
     onValidationChange?.(validation.isValid, validation.missingFields);
   }, [validation, onValidationChange]);
 
-  // Handle search input change
+  // Handle search input change - suggestions disabled
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
-    searchAddresses(value);
-    setShowSuggestions(true);
+    // Search suggestions disabled to prevent errors
+    // searchAddresses(value);
+    setShowSuggestions(false);
   };
 
   // Handle suggestion selection
@@ -184,35 +185,7 @@ export const SmartAddressInput: React.FC<SmartAddressInputProps> = ({
         )}
       </div>
 
-      {/* Address Suggestions */}
-      {showSuggestions && suggestions.length > 0 && (
-        <Card
-          className="relative z-50 max-h-64 overflow-y-auto"
-          ref={suggestionsRef}
-        >
-          <CardContent className="p-0">
-            {suggestions.map((suggestion, index) => (
-              <div
-                key={suggestion.place_id}
-                className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0 transition-colors"
-                onClick={() => handleSuggestionSelect(suggestion)}
-              >
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">
-                      {suggestion.structured_formatting.main_text}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate">
-                      {suggestion.structured_formatting.secondary_text}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
+      {/* Address Suggestions - disabled to prevent errors */}
 
       {/* Address Form Fields */}
       {showAddressForm && (

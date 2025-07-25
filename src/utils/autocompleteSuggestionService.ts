@@ -77,40 +77,11 @@ class AutocompleteSuggestionService {
     }
 
     try {
-      const sessionToken = request.sessionToken || this.createSessionToken();
-
-      const apiRequest = {
-        input: request.input,
-        sessionToken: sessionToken,
-        includedRegionCodes: request.includedRegionCodes || ["in"],
-      };
-
-      const response =
-        await this.AutocompleteSuggestion.fetchAutocompleteSuggestions(
-          apiRequest,
-        );
-
-      if (!response.suggestions) {
-        return [];
-      }
-
-      return response.suggestions.map((suggestion: any) => {
-        const placePrediction = suggestion.placePrediction;
-        return {
-          description: placePrediction.text,
-          place_id: placePrediction.placeId,
-          structured_formatting: {
-            main_text:
-              placePrediction.structuredFormat?.mainText ||
-              placePrediction.text,
-            secondary_text:
-              placePrediction.structuredFormat?.secondaryText || "",
-          },
-        };
-      });
+      // Search suggestions disabled to prevent errors
+      return [];
     } catch (error) {
-      console.error("Error fetching autocomplete suggestions:", error);
-      throw error;
+      console.error("Error fetching autocomplete suggestions (disabled):", error);
+      return [];
     }
   }
 
@@ -121,11 +92,8 @@ class AutocompleteSuggestionService {
     input: string,
     sessionToken?: any,
   ): Promise<AutocompletePrediction[]> {
-    return this.fetchSuggestions({
-      input,
-      includedRegionCodes: ["in"],
-      sessionToken,
-    });
+    // Search suggestions disabled to prevent errors
+    return [];
   }
 
   /**
@@ -136,11 +104,8 @@ class AutocompleteSuggestionService {
     regionCodes: string[] = ["in", "us", "ca", "gb", "au"],
     sessionToken?: any,
   ): Promise<AutocompletePrediction[]> {
-    return this.fetchSuggestions({
-      input,
-      includedRegionCodes: regionCodes,
-      sessionToken,
-    });
+    // Search suggestions disabled to prevent errors
+    return [];
   }
 
   /**

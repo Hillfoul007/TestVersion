@@ -37,7 +37,21 @@ function App() {
       initializePWAUpdates();
 
       // Restore authentication state from localStorage
-      await restoreAuthState();
+      const restored = await restoreAuthState();
+
+      // For iOS devices, ensure auth state is properly broadcasted after restoration
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+      if (isIOS && restored) {
+        console.log("🍎 iOS auth restored in App - broadcasting auth event");
+        // Trigger auth event to ensure all components are updated
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent("auth-login", {
+            detail: { restored: true }
+          }));
+        }, 100);
+      }
     };
 
     initializeAuth();
