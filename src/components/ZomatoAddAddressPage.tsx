@@ -1088,6 +1088,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
+    setSearchError(null); // Clear any previous errors
 
     if (query.length < 2) {
       setSuggestions([]);
@@ -1922,7 +1923,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         detectedLocation={unavailableAddressText}
         onExplore={() => {
           console.log(
-            "🔍 User chose to explore available services instead of saving address",
+            "�� User chose to explore available services instead of saving address",
           );
           // Clear the form to allow user to try a different address
           setArea("");
