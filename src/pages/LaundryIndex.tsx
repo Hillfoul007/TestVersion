@@ -264,6 +264,42 @@ const LaundryIndex = () => {
 
     window.addEventListener("ios-session-restored", handleIOSSessionRestore);
 
+    // iOS-specific: Handle potential auth persistence issues after navigation
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    let iosCleanupFunctions: (() => void)[] = [];
+
+    if (isIOS) {
+      const handleIOSVisibilityChange = () => {
+        if (document.visibilityState === 'visible' && !isLoggedIn) {
+          // On iOS, when page becomes visible and user isn't logged in,
+          // check auth state with a delay to handle race conditions
+          setTimeout(() => {
+            console.log("🍎 iOS visibility change detected - rechecking auth state");
+            checkAuthState();
+          }, 300);
+        }
+      };
+
+      const handleIOSFocus = () => {
+        if (!isLoggedIn) {
+          setTimeout(() => {
+            console.log("🍎 iOS focus detected - rechecking auth state");
+            checkAuthState();
+          }, 200);
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleIOSVisibilityChange);
+      window.addEventListener('focus', handleIOSFocus);
+
+      iosCleanupFunctions = [
+        () => document.removeEventListener('visibilitychange', handleIOSVisibilityChange),
+        () => window.removeEventListener('focus', handleIOSFocus)
+      ];
+    }
+
     return () => {
       window.removeEventListener(
         "auth-login",
@@ -278,6 +314,9 @@ const LaundryIndex = () => {
         "ios-session-restored",
         handleIOSSessionRestore,
       );
+
+      // Clean up iOS-specific listeners
+      iosCleanupFunctions.forEach(cleanup => cleanup());
     };
   }, []);
 
