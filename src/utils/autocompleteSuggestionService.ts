@@ -121,11 +121,8 @@ class AutocompleteSuggestionService {
     input: string,
     sessionToken?: any,
   ): Promise<AutocompletePrediction[]> {
-    return this.fetchSuggestions({
-      input,
-      includedRegionCodes: ["in"],
-      sessionToken,
-    });
+    // Search suggestions disabled to prevent errors
+    return [];
   }
 
   /**
