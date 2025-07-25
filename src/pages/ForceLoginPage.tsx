@@ -1,18 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PhoneOtpAuthModal from "@/components/PhoneOtpAuthModal";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { createSuccessNotification } from "@/utils/notificationUtils";
-import { 
-  Gift, 
-  Phone, 
-  Users, 
-  ArrowRight, 
+import {
+  Gift,
+  Phone,
+  Users,
+  ArrowRight,
   Star,
   Check,
-  Sparkles 
+  Sparkles
 } from "lucide-react";
 
 const ForceLoginPage: React.FC = () => {
