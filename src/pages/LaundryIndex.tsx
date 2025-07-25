@@ -363,6 +363,19 @@ const LaundryIndex = () => {
     try {
       console.log("🔍 Checking authentication state...");
 
+      // iOS-specific: Try to restore auth from iOS backups if main storage is empty
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+      if (isIOS) {
+        // Import iOS auth restoration utility
+        const { restoreIosAuth } = await import("../utils/iosAuthFix");
+        const restored = await restoreIosAuth();
+        if (restored) {
+          console.log("🍎 iOS auth restored successfully during check");
+        }
+      }
+
       // First, always check localStorage directly for auth data
       const token =
         localStorage.getItem("auth_token") ||
