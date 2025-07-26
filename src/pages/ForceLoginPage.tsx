@@ -31,13 +31,26 @@ const ForceLoginPage: React.FC = () => {
       // Prevent automatic auth restoration on this page
       localStorage.setItem("force_login_active", "true");
 
-      // Disable page restoration from cache
+      // Disable page restoration from cache - but avoid infinite reload
       if ('pageshow' in window) {
         const handlePageShow = (event: PageTransitionEvent) => {
           if (event.persisted && !isNavigatingRef.current) {
-            console.log("🍎 ForceLoginPage: Preventing iOS page cache restoration");
-            // Prevent cache restoration by forcing a clean load
-            window.location.reload();
+            console.log("🍎 ForceLoginPage: iOS page cache restoration detected");
+
+            // Check if we just reloaded recently to prevent infinite loops
+            const lastReload = localStorage.getItem('ios_force_login_reload');
+            const now = Date.now();
+            if (lastReload && (now - parseInt(lastReload)) < 3000) {
+              console.log("🍎 ForceLoginPage: Skipping reload - too recent");
+              return;
+            }
+
+            // Mark reload timestamp to prevent loops
+            localStorage.setItem('ios_force_login_reload', now.toString());
+            console.log("🍎 ForceLoginPage: Performing controlled reload to clear cache");
+
+            // Use replace instead of reload to avoid history stack issues
+            window.location.replace(window.location.href);
           }
         };
 
@@ -54,6 +67,7 @@ const ForceLoginPage: React.FC = () => {
   useEffect(() => {
     return () => {
       localStorage.removeItem("force_login_active");
+      localStorage.removeItem("ios_force_login_reload");
     };
   }, []);
 
@@ -94,8 +108,8 @@ const ForceLoginPage: React.FC = () => {
       if (isIOS) {
         console.log("🍎 iOS device detected - using enhanced navigation strategy");
 
-        // For iOS, use a more reliable navigation method
-        await new Promise(resolve => setTimeout(resolve, 800));
+        // For iOS, use a more reliable navigation method with better timing
+        await new Promise(resolve => setTimeout(resolve, 1200));
 
         // Verify auth persisted properly
         const savedUser = localStorage.getItem("current_user");
@@ -107,12 +121,36 @@ const ForceLoginPage: React.FC = () => {
           localStorage.setItem("cleancare_user", userStr);
           localStorage.setItem("auth_token", authToken);
           localStorage.setItem("cleancare_auth_token", authToken);
+
+          // Wait a bit more after re-save
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
 
-        // Use window.location.href for more reliable iOS navigation
-        console.log("🍎 Navigating to home page...");
+        // Clear force login flags before navigation
+        localStorage.removeItem("force_login_active");
+        localStorage.removeItem("ios_force_login_reload");
+
+        // Mark that we're navigating
         isNavigatingRef.current = true;
-        window.location.href = "/";
+
+        console.log("🍎 Navigating to home page via React Router...");
+
+        // Try React Router first for better SPA experience
+        try {
+          navigate("/", { replace: true });
+
+          // Fallback to window.location if React Router fails
+          setTimeout(() => {
+            if (window.location.pathname === "/force-login") {
+              console.log("🍎 React Router navigation failed, using window.location");
+              window.location.href = "/";
+            }
+          }, 1000);
+        } catch (navError) {
+          console.warn("🍎 React Router failed, using window.location:", navError);
+          window.location.href = "/";
+        }
+
         return;
       }
 
