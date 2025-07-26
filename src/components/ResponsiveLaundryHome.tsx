@@ -481,10 +481,11 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
     }
   };
 
-  const handleAuthSuccess = (user: any) => {
-    setShowAuthModal(false);
-    onLoginSuccess(user);
-  };
+  // Remove handleAuthSuccess - auth success now handled by parent
+  // const handleAuthSuccess = (user: any) => {
+  //   setShowAuthModal(false);
+  //   onLoginSuccess(user);
+  // };
 
   const handleLogout = () => {
     // Use iOS fixes for logout
