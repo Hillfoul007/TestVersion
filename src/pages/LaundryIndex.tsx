@@ -541,6 +541,14 @@ const LaundryIndex = () => {
               isRecentLogin: isRecentLogin || postLoginNavigation
             });
 
+            // For iOS: If we successfully restore auth, also clear loading state as safety net
+            if (isIOS && isInitialLoading) {
+              console.log("🍎 Auth restored on iOS - clearing loading state as safety net");
+              setTimeout(() => {
+                setIsInitialLoading(false);
+              }, 500);
+            }
+
             // Ensure auth service has the latest data
             authService.setCurrentUser(storedUser, token);
 
