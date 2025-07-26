@@ -1146,6 +1146,7 @@ const LaundryIndex = () => {
             onViewCart={handleViewCart}
             onViewBookings={handleViewBookings}
             onLogout={handleLogout}
+            onLoginRequired={() => setIsAuthModalOpen(true)}
           />
         </>
       )}
