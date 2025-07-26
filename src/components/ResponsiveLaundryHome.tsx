@@ -73,7 +73,8 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   onLoginRequired,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  // Remove internal auth modal state - now handled by parent
+  // const [showAuthModal, setShowAuthModal] = useState(false);
   const [showDebugPanel, setShowDebugPanel] = useState(false);
   const [showBookingDebugPanel, setShowBookingDebugPanel] = useState(false);
   const [showAdminServices, setShowAdminServices] = useState(false);
@@ -337,7 +338,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         preloadCriticalImages(services).catch(console.warn);
       } catch (error) {
         console.warn(
-          "���️ Failed to load dynamic services, using static fallback:",
+          "⚠️ Failed to load dynamic services, using static fallback:",
           error,
         );
         setDynamicServices(laundryServices);
