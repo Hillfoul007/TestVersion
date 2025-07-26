@@ -131,25 +131,32 @@ const ForceLoginPage: React.FC = () => {
         // Clear force login flags before navigation
         localStorage.removeItem("force_login_active");
         localStorage.removeItem("ios_force_login_reload");
+        logAuthEvent('force_login_flags_cleared');
 
         // Mark that we're navigating
         isNavigatingRef.current = true;
 
         console.log("🍎 Navigating to home page via React Router...");
+        logAuthEvent('force_login_navigation_start', { method: 'react_router' });
 
         // Try React Router first for better SPA experience
         try {
           navigate("/", { replace: true });
+          logAuthEvent('force_login_react_router_called');
 
           // Fallback to window.location if React Router fails
           setTimeout(() => {
             if (window.location.pathname === "/force-login") {
               console.log("🍎 React Router navigation failed, using window.location");
+              logAuthEvent('force_login_fallback_to_window_location');
               window.location.href = "/";
+            } else {
+              logAuthEvent('force_login_react_router_success');
             }
           }, 1000);
         } catch (navError) {
           console.warn("🍎 React Router failed, using window.location:", navError);
+          logAuthEvent('force_login_react_router_error', { error: navError?.toString() });
           window.location.href = "/";
         }
 
