@@ -74,6 +74,7 @@ const ForceLoginPage: React.FC = () => {
 
   const handleAuthSuccess = async (user: any) => {
     console.log("🎉 Auth successful:", user);
+    logAuthEvent('force_login_auth_success', { user });
 
     // Close the auth modal first to prevent any UI conflicts
     setIsAuthModalOpen(false);
