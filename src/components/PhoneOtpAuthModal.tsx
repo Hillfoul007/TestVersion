@@ -26,6 +26,7 @@ import {
   addIosOtpDelay,
   isIosDevice,
 } from "@/utils/iosAuthFix";
+import { logAuthEvent } from "@/utils/iosAuthDebug";
 import { apiClient } from "@/lib/apiClient";
 
 interface PhoneOtpAuthModalProps {
