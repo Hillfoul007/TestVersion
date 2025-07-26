@@ -225,6 +225,18 @@ const LaundryIndex = () => {
 
   // Initialize PWA and check auth state
   useEffect(() => {
+    console.log("🔄 LaundryIndex component mounted");
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    if (isIOS) {
+      console.log("🍎 iOS device detected in LaundryIndex");
+      console.log("🍎 User agent:", navigator.userAgent);
+      console.log("🍎 Platform:", navigator.platform);
+      console.log("🍎 Current loading state:", isInitialLoading);
+    }
+
     initializeApp();
     checkAuthState();
     getUserLocation();
@@ -823,7 +835,7 @@ const LaundryIndex = () => {
       };
 
       // Save to MongoDB backend first
-      console.log("��� Saving to MongoDB backend...");
+      console.log("💾 Saving to MongoDB backend...");
       console.log(
         "📤 MongoDB booking data:",
         JSON.stringify(mongoBookingData, null, 2),
