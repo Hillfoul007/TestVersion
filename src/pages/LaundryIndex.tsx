@@ -296,9 +296,6 @@ const LaundryIndex = () => {
     window.addEventListener("ios-session-restored", handleIOSSessionRestore);
 
     // iOS-specific: Handle potential auth persistence issues after navigation
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
     let iosCleanupFunctions: (() => void)[] = [];
 
     if (isIOS) {
@@ -459,7 +456,7 @@ const LaundryIndex = () => {
         document.head.appendChild(themeColorMeta);
       }
 
-      console.log("��� PWA initialization complete");
+      console.log("✅ PWA initialization complete");
 
       // For iOS, trigger immediate loading end if PWA init is fast enough
       if (isIOS) {
@@ -497,7 +494,7 @@ const LaundryIndex = () => {
 
       // iOS-specific: Try to restore auth from iOS backups if main storage is empty
       if (isIOS) {
-        console.log("�� iOS checkAuthState - current state:", {
+        console.log("🍎 iOS checkAuthState - current state:", {
           isInitialLoading,
           isLoggedIn,
           hasCurrentUser: !!currentUser
