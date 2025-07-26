@@ -10,7 +10,6 @@ const RouteDebugger: React.FC = () => {
   const testRoutes = [
     '/',
     '/login',
-    '/force-login',
     '/refer',
     '/address-demo',
     '/admin/location-config'
@@ -50,12 +49,12 @@ const RouteDebugger: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={() => {
-                  const shareUrl = `${window.location.origin}/force-login`;
+                  const shareUrl = `${window.location.origin}/`;
                   navigator.clipboard.writeText(shareUrl);
                   alert(`Copied to clipboard: ${shareUrl}`);
                 }}
               >
-                Copy Force Login URL
+                Copy Home URL
               </Button>
             </div>
           </div>
