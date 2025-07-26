@@ -504,7 +504,9 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
       // Use parent navigation to go to bookings view
       onViewBookings();
     } else {
-      setShowAuthModal(true);
+      if (onLoginRequired) {
+        onLoginRequired();
+      }
     }
   };
 
