@@ -315,6 +315,16 @@ const LaundryIndex = () => {
         }
       }, 1000);
 
+      // Check for post-login navigation flag
+      const postLoginNavigation = localStorage.getItem("ios_post_login_navigation");
+      if (postLoginNavigation && isIOS) {
+        console.log("🍎 iOS post-login navigation detected - forcing auth check");
+        setTimeout(() => {
+          checkAuthState();
+          localStorage.removeItem("ios_post_login_navigation");
+        }, 100);
+      }
+
       iosCleanupFunctions = [
         () => document.removeEventListener('visibilitychange', handleIOSVisibilityChange),
         () => window.removeEventListener('focus', handleIOSFocus),
