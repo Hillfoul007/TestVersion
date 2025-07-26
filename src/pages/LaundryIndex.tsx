@@ -218,6 +218,11 @@ const LaundryIndex = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<string>("");
   const [showFirst30Notification, setShowFirst30Notification] = useState(false);
+
+  // Single iOS detection for the entire component
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
   const [isInitialLoading, setIsInitialLoading] = useState(() => {
     // Check if this is a post-login navigation - skip initial loading
     const postLoginNavigation = localStorage.getItem("ios_post_login_navigation");
@@ -322,7 +327,7 @@ const LaundryIndex = () => {
       // Also check auth state immediately on page load for iOS
       const handleIOSPageShow = () => {
         setTimeout(() => {
-          console.log("���� iOS page show detected - rechecking auth state");
+          console.log("🍎 iOS page show detected - rechecking auth state");
           checkAuthState();
         }, 200);
       };
