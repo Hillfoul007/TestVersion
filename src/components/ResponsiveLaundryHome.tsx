@@ -60,7 +60,6 @@ interface ResponsiveLaundryHomeProps {
   onViewCart: () => void;
   onViewBookings: () => void;
   onLogout?: () => void;
-  onLoginRequired?: () => void;
 }
 
 const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
@@ -70,11 +69,9 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   onViewCart,
   onViewBookings,
   onLogout,
-  onLoginRequired,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  // Remove internal auth modal state - now handled by parent
-  // const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [showDebugPanel, setShowDebugPanel] = useState(false);
   const [showBookingDebugPanel, setShowBookingDebugPanel] = useState(false);
   const [showAdminServices, setShowAdminServices] = useState(false);
@@ -86,13 +83,6 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
   // Function to request location permission and check availability
   const requestLocationPermission = async () => {
-    if (!currentUser) {
-      console.log("User not authenticated, showing auth modal for location request");
-      if (onLoginRequired) {
-        onLoginRequired();
-      }
-      return;
-    }
     setIsRequestingLocation(true);
     try {
       const position = await new Promise<GeolocationPosition>(
@@ -366,44 +356,26 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
     localStorage.setItem("laundry_cart", JSON.stringify(cart));
   }, [cart]);
 
-  // Helper function to check authentication before any action
-  const requireAuthOrExecute = (action: () => void) => {
-    if (!currentUser) {
-      console.log("User not authenticated, showing auth modal");
-      if (onLoginRequired) {
-        onLoginRequired();
-      }
-      return;
-    }
-    action();
-  };
-
   const handleSearch = (query: string) => {
-    requireAuthOrExecute(() => {
-      setSearchQuery(query);
-    });
+    setSearchQuery(query);
   };
 
   const addToCart = (serviceId: string) => {
-    requireAuthOrExecute(() => {
-      setCart((prev) => ({
-        ...prev,
-        [serviceId]: (prev[serviceId] || 0) + 1,
-      }));
-    });
+    setCart((prev) => ({
+      ...prev,
+      [serviceId]: (prev[serviceId] || 0) + 1,
+    }));
   };
 
   const removeFromCart = (serviceId: string) => {
-    requireAuthOrExecute(() => {
-      setCart((prev) => {
-        const newCart = { ...prev };
-        if (newCart[serviceId] > 1) {
-          newCart[serviceId] -= 1;
-        } else {
-          delete newCart[serviceId];
-        }
-        return newCart;
-      });
+    setCart((prev) => {
+      const newCart = { ...prev };
+      if (newCart[serviceId] > 1) {
+        newCart[serviceId] -= 1;
+      } else {
+        delete newCart[serviceId];
+      }
+      return newCart;
     });
   };
 
@@ -500,17 +472,14 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   };
 
   const handleLogin = () => {
-    console.log("handleLogin clicked, calling parent onLoginRequired");
-    if (onLoginRequired) {
-      onLoginRequired();
-    }
+    console.log("handleLogin clicked, setting showAuthModal to true");
+    setShowAuthModal(true);
   };
 
-  // Remove handleAuthSuccess - auth success now handled by parent
-  // const handleAuthSuccess = (user: any) => {
-  //   setShowAuthModal(false);
-  //   onLoginSuccess(user);
-  // };
+  const handleAuthSuccess = (user: any) => {
+    setShowAuthModal(false);
+    onLoginSuccess(user);
+  };
 
   const handleLogout = () => {
     // Use iOS fixes for logout
@@ -529,9 +498,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
       // Use parent navigation to go to bookings view
       onViewBookings();
     } else {
-      if (onLoginRequired) {
-        onLoginRequired();
-      }
+      setShowAuthModal(true);
     }
   };
 
@@ -541,13 +508,11 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   };
 
   const handleBookService = () => {
-    requireAuthOrExecute(() => {
-      // Scroll to services section
-      const servicesSection = document.getElementById("services-section");
-      if (servicesSection) {
-        servicesSection.scrollIntoView({ behavior: "smooth" });
-      }
-    });
+    // Scroll to services section
+    const servicesSection = document.getElementById("services-section");
+    if (servicesSection) {
+      servicesSection.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   const EmptyStateCard = () => (
@@ -761,7 +726,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mobile-sticky-categories">
               <Button
                 variant={selectedCategory === "all" ? "default" : "ghost"}
-                onClick={() => requireAuthOrExecute(() => setSelectedCategory("all"))}
+                onClick={() => setSelectedCategory("all")}
                 className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 font-medium border ${
                   selectedCategory === "all"
                     ? "bg-white text-laundrify-blue border-white shadow-lg"
@@ -782,7 +747,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                     variant={
                       selectedCategory === category.id ? "default" : "ghost"
                     }
-                    onClick={() => requireAuthOrExecute(() => setSelectedCategory(category.id))}
+                    onClick={() => setSelectedCategory(category.id)}
                     className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 font-medium border ${
                       selectedCategory === category.id
                         ? "bg-white text-laundrify-blue border-white shadow-lg"
@@ -967,7 +932,12 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           </div>
         )}
 
-        {/* Auth Modal now handled by parent component */}
+        {/* Auth Modal */}
+        <PhoneOtpAuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={handleAuthSuccess}
+        />
       </div>
     );
   }
@@ -1137,7 +1107,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                   .map((category) => (
                     <div
                       key={category.id}
-                      onClick={() => requireAuthOrExecute(() => setSelectedCategory(category.id))}
+                      onClick={() => setSelectedCategory(category.id)}
                       className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center cursor-pointer hover:bg-white/20 transition-all duration-200 hover:scale-105 active:scale-95"
                     >
                       <span className="text-3xl block mb-2">
@@ -1171,7 +1141,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             <Button
               variant={selectedCategory === "all" ? "default" : "outline"}
-              onClick={() => requireAuthOrExecute(() => setSelectedCategory("all"))}
+              onClick={() => setSelectedCategory("all")}
               className={`flex-shrink-0 rounded-xl font-medium shadow-md border ${
                 selectedCategory === "all"
                   ? "bg-laundrify-purple text-white border-laundrify-purple shadow-lg"
@@ -1193,7 +1163,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                   variant={
                     selectedCategory === category.id ? "default" : "outline"
                   }
-                  onClick={() => requireAuthOrExecute(() => setSelectedCategory(category.id))}
+                  onClick={() => setSelectedCategory(category.id)}
                   className={`flex-shrink-0 rounded-xl font-medium shadow-md border ${
                     selectedCategory === category.id
                       ? "bg-laundrify-purple text-white border-laundrify-purple shadow-lg"
@@ -1323,7 +1293,19 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           </div>
         )}
 
-        {/* Authentication Modal now handled by parent component */}
+        {/* Authentication Modal */}
+        {console.log(
+          "Rendering PhoneOtpAuthModal, showAuthModal:",
+          showAuthModal,
+        )}
+        <PhoneOtpAuthModal
+          isOpen={showAuthModal}
+          onClose={() => {
+            console.log("PhoneOtpAuthModal onClose called");
+            setShowAuthModal(false);
+          }}
+          onSuccess={handleAuthSuccess}
+        />
 
         {/* Removed local booking history modal - using main navigation */}
 
