@@ -1296,19 +1296,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           </div>
         )}
 
-        {/* Authentication Modal */}
-        {console.log(
-          "Rendering PhoneOtpAuthModal, showAuthModal:",
-          showAuthModal,
-        )}
-        <PhoneOtpAuthModal
-          isOpen={showAuthModal}
-          onClose={() => {
-            console.log("PhoneOtpAuthModal onClose called");
-            setShowAuthModal(false);
-          }}
-          onSuccess={handleAuthSuccess}
-        />
+        {/* Authentication Modal now handled by parent component */}
 
         {/* Removed local booking history modal - using main navigation */}
 
