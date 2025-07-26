@@ -244,9 +244,6 @@ const LaundryIndex = () => {
   useEffect(() => {
     console.log("🔄 LaundryIndex component mounted");
 
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
     if (isIOS) {
       console.log("🍎 iOS device detected in LaundryIndex");
       console.log("🍎 User agent:", navigator.userAgent);
