@@ -479,10 +479,19 @@ const LaundryIndex = () => {
   const checkAuthState = async () => {
     try {
       console.log("🔍 Checking authentication state...");
+      console.log("🔍 Current loading state:", isInitialLoading);
 
       // iOS-specific: Try to restore auth from iOS backups if main storage is empty
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+      if (isIOS) {
+        console.log("🍎 iOS checkAuthState - current state:", {
+          isInitialLoading,
+          isLoggedIn,
+          hasCurrentUser: !!currentUser
+        });
+      }
 
       // Check if this is a post-login check
       const postLoginNavigation = localStorage.getItem("ios_post_login_navigation");
