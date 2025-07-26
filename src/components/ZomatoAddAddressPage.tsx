@@ -1528,7 +1528,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-white z-[70] flex flex-col modal-overlay-nested">
+    <div className="fixed inset-0 bg-white z-[80] flex flex-col modal-overlay-nested">
       {/* Header */}
       <div className="flex items-center gap-4 p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
         <Button
