@@ -459,7 +459,7 @@ const LaundryIndex = () => {
         document.head.appendChild(themeColorMeta);
       }
 
-      console.log("✅ PWA initialization complete");
+      console.log("��� PWA initialization complete");
 
       // For iOS, trigger immediate loading end if PWA init is fast enough
       if (isIOS) {
@@ -496,11 +496,8 @@ const LaundryIndex = () => {
       console.log("🔍 Current loading state:", isInitialLoading);
 
       // iOS-specific: Try to restore auth from iOS backups if main storage is empty
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
       if (isIOS) {
-        console.log("🍎 iOS checkAuthState - current state:", {
+        console.log("�� iOS checkAuthState - current state:", {
           isInitialLoading,
           isLoggedIn,
           hasCurrentUser: !!currentUser
