@@ -315,6 +315,16 @@ const LaundryIndex = () => {
         }
       }, 1000);
 
+      // Check for post-login navigation flag
+      const postLoginNavigation = localStorage.getItem("ios_post_login_navigation");
+      if (postLoginNavigation && isIOS) {
+        console.log("🍎 iOS post-login navigation detected - forcing auth check");
+        setTimeout(() => {
+          checkAuthState();
+          localStorage.removeItem("ios_post_login_navigation");
+        }, 100);
+      }
+
       iosCleanupFunctions = [
         () => document.removeEventListener('visibilitychange', handleIOSVisibilityChange),
         () => window.removeEventListener('focus', handleIOSFocus),
@@ -389,6 +399,11 @@ const LaundryIndex = () => {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
+      // Check if this is a post-login check
+      const postLoginNavigation = localStorage.getItem("ios_post_login_navigation");
+      const authTimestamp = localStorage.getItem("ios_auth_timestamp");
+      const isRecentLogin = authTimestamp && (Date.now() - parseInt(authTimestamp)) < 10000; // Within 10 seconds
+
       if (isIOS) {
         // Import iOS auth restoration utility
         const { restoreIosAuth, clearIosLogoutFlag } = await import("../utils/iosAuthFix");
@@ -396,9 +411,14 @@ const LaundryIndex = () => {
         // Clear any logout flags to ensure restoration works
         clearIosLogoutFlag();
 
-        const restored = await restoreIosAuth();
-        if (restored) {
-          console.log("🍎 iOS auth restored successfully during check");
+        // If this is a recent login, skip restoration to avoid conflicts
+        if (!isRecentLogin) {
+          const restored = await restoreIosAuth();
+          if (restored) {
+            console.log("🍎 iOS auth restored successfully during check");
+          }
+        } else {
+          console.log("🍎 Skipping iOS auth restoration - recent login detected");
         }
       }
 
@@ -424,6 +444,7 @@ const LaundryIndex = () => {
               phone: storedUser.phone,
               name: storedUser.name,
               id: storedUser.id || storedUser._id,
+              isRecentLogin: isRecentLogin || postLoginNavigation
             });
 
             // Ensure auth service has the latest data
@@ -432,8 +453,20 @@ const LaundryIndex = () => {
             // For iOS, also trigger an auth event to update other components
             if (isIOS) {
               window.dispatchEvent(new CustomEvent("auth-login", {
-                detail: { user: storedUser }
+                detail: {
+                  user: storedUser,
+                  isPostLogin: !!postLoginNavigation,
+                  timestamp: Date.now()
+                }
               }));
+            }
+
+            // Clean up temporary flags after successful auth state restoration
+            if (postLoginNavigation) {
+              setTimeout(() => {
+                localStorage.removeItem("ios_post_login_navigation");
+                localStorage.removeItem("ios_auth_timestamp");
+              }, 2000);
             }
 
             return; // Exit early - user is authenticated
