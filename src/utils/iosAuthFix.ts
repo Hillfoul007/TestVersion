@@ -330,10 +330,9 @@ export const preventIosAutoLogout = (): void => {
       return; // Don't try to restore if user logged out intentionally
     }
 
-    // Skip monitoring if force login is active or on force login page
+    // Skip monitoring if force login is active (legacy check)
     const forceLoginActive = localStorage.getItem("force_login_active");
-    const onForceLoginPage = window.location.pathname.includes('/force-login');
-    if (forceLoginActive === "true" || onForceLoginPage) {
+    if (forceLoginActive === "true") {
       return; // Don't interfere during login process
     }
 
@@ -385,11 +384,7 @@ export const restoreIosAuth = async (): Promise<boolean> => {
     return false;
   }
 
-  // Also check if we're currently on force login page to prevent interference
-  if (window.location.pathname.includes('/force-login')) {
-    console.log("🍎🚫 Skipping auth restore - on force login page");
-    return false;
-  }
+  // Legacy force login page check removed - no longer needed
 
   // Check if user intentionally logged out
   const intentionalLogout = localStorage.getItem("ios_intentional_logout");
