@@ -399,6 +399,11 @@ const LaundryIndex = () => {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
+      // Check if this is a post-login check
+      const postLoginNavigation = localStorage.getItem("ios_post_login_navigation");
+      const authTimestamp = localStorage.getItem("ios_auth_timestamp");
+      const isRecentLogin = authTimestamp && (Date.now() - parseInt(authTimestamp)) < 10000; // Within 10 seconds
+
       if (isIOS) {
         // Import iOS auth restoration utility
         const { restoreIosAuth, clearIosLogoutFlag } = await import("../utils/iosAuthFix");
@@ -406,9 +411,14 @@ const LaundryIndex = () => {
         // Clear any logout flags to ensure restoration works
         clearIosLogoutFlag();
 
-        const restored = await restoreIosAuth();
-        if (restored) {
-          console.log("🍎 iOS auth restored successfully during check");
+        // If this is a recent login, skip restoration to avoid conflicts
+        if (!isRecentLogin) {
+          const restored = await restoreIosAuth();
+          if (restored) {
+            console.log("🍎 iOS auth restored successfully during check");
+          }
+        } else {
+          console.log("🍎 Skipping iOS auth restoration - recent login detected");
         }
       }
 
