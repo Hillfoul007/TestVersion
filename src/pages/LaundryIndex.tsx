@@ -245,6 +245,19 @@ const LaundryIndex = () => {
 
     return !!(postLoginNavigation || isRecentLogin);
   });
+
+  // Safety timeout for post-login loading to prevent it from getting stuck
+  useEffect(() => {
+    if (isPostLoginLoading) {
+      console.log("🍎 Post-login loading active - setting safety timeout");
+      const safetyTimeout = setTimeout(() => {
+        console.log("🍎 Post-login loading safety timeout reached - clearing loading state");
+        setIsPostLoginLoading(false);
+      }, 3000); // 3 second maximum for post-login loading
+
+      return () => clearTimeout(safetyTimeout);
+    }
+  }, [isPostLoginLoading]);
   const authService = DVHostingSmsService.getInstance();
   const pushService = PushNotificationService.getInstance();
   const referralService = ReferralService.getInstance();
@@ -924,7 +937,7 @@ const LaundryIndex = () => {
           localBookingData,
           itemPrices,
         );
-        console.log("📝 Local booking result:", localResult);
+        console.log("��� Local booking result:", localResult);
 
         // Store booking data for confirmation screen
         const confirmationData = {
