@@ -111,7 +111,7 @@ const ForceLoginPage: React.FC = () => {
         console.log("🍎 iOS device detected - using enhanced navigation strategy");
 
         // For iOS, use a more reliable navigation method with better timing
-        await new Promise(resolve => setTimeout(resolve, 800)); // Reduced from 1200ms
+        await new Promise(resolve => setTimeout(resolve, 1200));
 
         // Verify auth persisted properly
         const savedUser = localStorage.getItem("current_user");
@@ -125,7 +125,7 @@ const ForceLoginPage: React.FC = () => {
           localStorage.setItem("cleancare_auth_token", authToken);
 
           // Wait a bit more after re-save
-          await new Promise(resolve => setTimeout(resolve, 300)); // Reduced from 500ms
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
 
         // Clear force login flags before navigation
@@ -136,28 +136,15 @@ const ForceLoginPage: React.FC = () => {
         // Mark that we're navigating
         isNavigatingRef.current = true;
 
-        // Set a flag to help LaundryIndex detect post-login navigation
-        localStorage.setItem("ios_post_login_navigation", "true");
-        localStorage.setItem("ios_auth_timestamp", Date.now().toString());
-
         console.log("🍎 Navigating to home page via React Router...");
         logAuthEvent('force_login_navigation_start', { method: 'react_router' });
-
-        // Broadcast auth event immediately before navigation to ensure components are ready
-        window.dispatchEvent(new CustomEvent("auth-login", {
-          detail: {
-            user: user,
-            source: 'force_login_page',
-            timestamp: Date.now()
-          }
-        }));
 
         // Try React Router first for better SPA experience
         try {
           navigate("/", { replace: true });
           logAuthEvent('force_login_react_router_called');
 
-          // Shorter fallback timeout for better UX
+          // Fallback to window.location if React Router fails
           setTimeout(() => {
             if (window.location.pathname === "/force-login") {
               console.log("🍎 React Router navigation failed, using window.location");
@@ -165,12 +152,8 @@ const ForceLoginPage: React.FC = () => {
               window.location.href = "/";
             } else {
               logAuthEvent('force_login_react_router_success');
-              // Clean up navigation flag after successful navigation
-              setTimeout(() => {
-                localStorage.removeItem("ios_post_login_navigation");
-              }, 1000);
             }
-          }, 500); // Reduced from 1000ms
+          }, 1000);
         } catch (navError) {
           console.warn("🍎 React Router failed, using window.location:", navError);
           logAuthEvent('force_login_react_router_error', { error: navError?.toString() });
