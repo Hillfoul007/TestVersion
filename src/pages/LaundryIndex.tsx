@@ -823,7 +823,7 @@ const LaundryIndex = () => {
       };
 
       // Save to MongoDB backend first
-      console.log("💾 Saving to MongoDB backend...");
+      console.log("��� Saving to MongoDB backend...");
       console.log(
         "📤 MongoDB booking data:",
         JSON.stringify(mongoBookingData, null, 2),
@@ -1025,7 +1025,16 @@ const LaundryIndex = () => {
 
   // Show splash loader on initial load
   if (isInitialLoading) {
-    return <LaundrifySplashLoader isVisible={true} message="Initializing Laundrify..." />;
+    return (
+      <LaundrifySplashLoader
+        isVisible={true}
+        message="Initializing Laundrify..."
+        onDismiss={() => {
+          console.log("🍎 User manually dismissed loading screen");
+          setIsInitialLoading(false);
+        }}
+      />
+    );
   }
 
   return (
