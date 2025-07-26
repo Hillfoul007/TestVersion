@@ -384,6 +384,12 @@ export const restoreIosAuth = async (): Promise<boolean> => {
     return false;
   }
 
+  // Also check if we're currently on force login page to prevent interference
+  if (window.location.pathname.includes('/force-login')) {
+    console.log("🍎🚫 Skipping auth restore - on force login page");
+    return false;
+  }
+
   // Check if user intentionally logged out
   const intentionalLogout = localStorage.getItem("ios_intentional_logout");
   if (intentionalLogout === "true") {
