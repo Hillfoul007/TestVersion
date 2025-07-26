@@ -353,28 +353,101 @@ const LaundryIndex = () => {
   }, []);
 
   const initializeApp = async () => {
-    // Show loader for minimum 2 seconds for better UX
-    setTimeout(() => {
+    console.log("🚀 Initializing app...");
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    // For iOS, use multiple fallback mechanisms to ensure loading completes
+    const endLoading = () => {
+      console.log("✅ App initialization complete - hiding loader");
       setIsInitialLoading(false);
-    }, 2000);
+    };
 
-    // Initialize PWA features
-    await pushService.initializePWA();
+    // Primary timer - standard 2 second delay
+    const primaryTimer = setTimeout(endLoading, 2000);
 
-    // Add manifest link to head if not present
-    if (!document.querySelector('link[rel="manifest"]')) {
-      const manifestLink = document.createElement("link");
-      manifestLink.rel = "manifest";
-      manifestLink.href = "/manifest.json";
-      document.head.appendChild(manifestLink);
+    // iOS fallback mechanisms
+    if (isIOS) {
+      console.log("🍎 iOS detected - adding fallback loading mechanisms");
+
+      // Fallback timer 1: 3 seconds (in case primary timer fails)
+      const fallbackTimer1 = setTimeout(() => {
+        if (isInitialLoading) {
+          console.log("🍎 Primary timer failed - using fallback 1");
+          endLoading();
+        }
+      }, 3000);
+
+      // Fallback timer 2: 5 seconds (last resort)
+      const fallbackTimer2 = setTimeout(() => {
+        if (isInitialLoading) {
+          console.log("🍎 All timers failed - using emergency fallback");
+          endLoading();
+        }
+      }, 5000);
+
+      // iOS specific: Also trigger on page visibility change
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible' && isInitialLoading) {
+          setTimeout(() => {
+            if (isInitialLoading) {
+              console.log("🍎 Visibility-based fallback triggered");
+              endLoading();
+            }
+          }, 500);
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+
+      // Cleanup function to remove event listeners
+      const cleanup = () => {
+        clearTimeout(primaryTimer);
+        clearTimeout(fallbackTimer1);
+        clearTimeout(fallbackTimer2);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+
+      // Auto cleanup after 10 seconds
+      setTimeout(cleanup, 10000);
     }
 
-    // Add theme color meta tag
-    if (!document.querySelector('meta[name="theme-color"]')) {
-      const themeColorMeta = document.createElement("meta");
-      themeColorMeta.name = "theme-color";
-      themeColorMeta.content = "#C46DD8";
-      document.head.appendChild(themeColorMeta);
+    try {
+      // Initialize PWA features
+      await pushService.initializePWA();
+
+      // Add manifest link to head if not present
+      if (!document.querySelector('link[rel="manifest"]')) {
+        const manifestLink = document.createElement("link");
+        manifestLink.rel = "manifest";
+        manifestLink.href = "/manifest.json";
+        document.head.appendChild(manifestLink);
+      }
+
+      // Add theme color meta tag
+      if (!document.querySelector('meta[name="theme-color"]')) {
+        const themeColorMeta = document.createElement("meta");
+        themeColorMeta.name = "theme-color";
+        themeColorMeta.content = "#C46DD8";
+        document.head.appendChild(themeColorMeta);
+      }
+
+      console.log("✅ PWA initialization complete");
+
+      // For iOS, trigger immediate loading end if PWA init is fast enough
+      if (isIOS) {
+        setTimeout(() => {
+          if (isInitialLoading) {
+            console.log("🍎 PWA-based loading completion");
+            endLoading();
+          }
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("❌ Error during app initialization:", error);
+      // Don't let initialization errors block the UI
+      setTimeout(endLoading, 1000);
     }
   };
 
