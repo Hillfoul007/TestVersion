@@ -394,14 +394,16 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   };
 
   const removeFromCart = (serviceId: string) => {
-    setCart((prev) => {
-      const newCart = { ...prev };
-      if (newCart[serviceId] > 1) {
-        newCart[serviceId] -= 1;
-      } else {
-        delete newCart[serviceId];
-      }
-      return newCart;
+    requireAuthOrExecute(() => {
+      setCart((prev) => {
+        const newCart = { ...prev };
+        if (newCart[serviceId] > 1) {
+          newCart[serviceId] -= 1;
+        } else {
+          delete newCart[serviceId];
+        }
+        return newCart;
+      });
     });
   };
 
