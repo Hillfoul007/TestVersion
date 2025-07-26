@@ -255,6 +255,8 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
 
         // For iOS devices, ensure auth state is fully persisted before calling success callback
         if (isIosDevice()) {
+          logAuthEvent('otp_verify_ios_persistence_start', { user: result.user });
+
           // Give iOS extra time to persist auth data to localStorage and IndexedDB
           // Increased from 300ms to 1000ms for better persistence
           await new Promise(resolve => setTimeout(resolve, 1000));
@@ -265,11 +267,15 @@ const PhoneOtpAuthModal: React.FC<PhoneOtpAuthModalProps> = ({
 
           if (!authToken || !userStr) {
             console.warn("🍎⚠️ Auth state not persisted, manual save required");
+            logAuthEvent('otp_verify_ios_manual_save_required');
             // Ensure user is saved with token
             dvhostingSmsService.setCurrentUser(result.user);
+          } else {
+            logAuthEvent('otp_verify_ios_persistence_verified');
           }
 
           console.log("🍎✅ iOS auth persistence verified and completed");
+          logAuthEvent('otp_verify_ios_persistence_completed');
         }
 
         onSuccess(result.user);
