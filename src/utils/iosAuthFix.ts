@@ -330,9 +330,10 @@ export const preventIosAutoLogout = (): void => {
       return; // Don't try to restore if user logged out intentionally
     }
 
-    // Skip monitoring if force login is active
+    // Skip monitoring if force login is active or on force login page
     const forceLoginActive = localStorage.getItem("force_login_active");
-    if (forceLoginActive === "true") {
+    const onForceLoginPage = window.location.pathname.includes('/force-login');
+    if (forceLoginActive === "true" || onForceLoginPage) {
       return; // Don't interfere during login process
     }
 
