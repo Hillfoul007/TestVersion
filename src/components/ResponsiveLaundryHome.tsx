@@ -532,11 +532,13 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   };
 
   const handleBookService = () => {
-    // Scroll to services section
-    const servicesSection = document.getElementById("services-section");
-    if (servicesSection) {
-      servicesSection.scrollIntoView({ behavior: "smooth" });
-    }
+    requireAuthOrExecute(() => {
+      // Scroll to services section
+      const servicesSection = document.getElementById("services-section");
+      if (servicesSection) {
+        servicesSection.scrollIntoView({ behavior: "smooth" });
+      }
+    });
   };
 
   const EmptyStateCard = () => (
