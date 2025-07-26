@@ -40,15 +40,15 @@ const AuthGuardedCheckout: React.FC<AuthGuardedCheckoutProps> = ({
   // Check if user needs authentication when component mounts or user changes
   useEffect(() => {
     if (!currentUser && !authAttempted) {
-      setShowAuthModal(true);
       setAuthAttempted(true);
 
-      // Also trigger the parent's login required callback
-      if (onLoginRequired) {
-        onLoginRequired();
-      }
+      // Only show modal, don't also trigger parent callback to avoid double auth
+      setShowAuthModal(true);
+
+      // Don't call onLoginRequired() here to prevent double authentication
+      // The modal handles authentication flow directly
     }
-  }, [currentUser, authAttempted, onLoginRequired]);
+  }, [currentUser, authAttempted]);
 
   const handleAuthSuccess = (user: any) => {
     setShowAuthModal(false);
@@ -59,10 +59,16 @@ const AuthGuardedCheckout: React.FC<AuthGuardedCheckoutProps> = ({
       ),
     );
 
+    // For iOS devices, add extra delay to ensure auth state is fully persisted
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    const delay = isIOS ? 1500 : 1000; // Extra time for iOS
+
     // Auto-proceed to checkout after successful auth
     setTimeout(() => {
       onProceedToCheckout(cartData);
-    }, 1000);
+    }, delay);
   };
 
   const handleProceedClick = () => {
