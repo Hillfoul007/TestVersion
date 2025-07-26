@@ -218,7 +218,19 @@ const LaundryIndex = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<string>("");
   const [showFirst30Notification, setShowFirst30Notification] = useState(false);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(() => {
+    // Check if this is a post-login navigation - skip initial loading
+    const postLoginNavigation = localStorage.getItem("ios_post_login_navigation");
+    const authTimestamp = localStorage.getItem("ios_auth_timestamp");
+    const isRecentLogin = authTimestamp && (Date.now() - parseInt(authTimestamp)) < 10000;
+
+    if (postLoginNavigation || isRecentLogin) {
+      console.log("🍎 Post-login navigation detected - skipping initial loading");
+      return false;
+    }
+
+    return true;
+  });
   const authService = DVHostingSmsService.getInstance();
   const pushService = PushNotificationService.getInstance();
   const referralService = ReferralService.getInstance();
@@ -310,7 +322,7 @@ const LaundryIndex = () => {
       // Also check auth state immediately on page load for iOS
       const handleIOSPageShow = () => {
         setTimeout(() => {
-          console.log("🍎 iOS page show detected - rechecking auth state");
+          console.log("���� iOS page show detected - rechecking auth state");
           checkAuthState();
         }, 200);
       };
