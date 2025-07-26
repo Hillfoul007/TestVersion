@@ -750,7 +750,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mobile-sticky-categories">
               <Button
                 variant={selectedCategory === "all" ? "default" : "ghost"}
-                onClick={() => setSelectedCategory("all")}
+                onClick={() => requireAuthOrExecute(() => setSelectedCategory("all"))}
                 className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 font-medium border ${
                   selectedCategory === "all"
                     ? "bg-white text-laundrify-blue border-white shadow-lg"
@@ -771,7 +771,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                     variant={
                       selectedCategory === category.id ? "default" : "ghost"
                     }
-                    onClick={() => setSelectedCategory(category.id)}
+                    onClick={() => requireAuthOrExecute(() => setSelectedCategory(category.id))}
                     className={`flex-shrink-0 rounded-xl text-xs px-3 py-2 font-medium border ${
                       selectedCategory === category.id
                         ? "bg-white text-laundrify-blue border-white shadow-lg"
@@ -1126,7 +1126,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                   .map((category) => (
                     <div
                       key={category.id}
-                      onClick={() => setSelectedCategory(category.id)}
+                      onClick={() => requireAuthOrExecute(() => setSelectedCategory(category.id))}
                       className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center cursor-pointer hover:bg-white/20 transition-all duration-200 hover:scale-105 active:scale-95"
                     >
                       <span className="text-3xl block mb-2">
@@ -1160,7 +1160,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             <Button
               variant={selectedCategory === "all" ? "default" : "outline"}
-              onClick={() => setSelectedCategory("all")}
+              onClick={() => requireAuthOrExecute(() => setSelectedCategory("all"))}
               className={`flex-shrink-0 rounded-xl font-medium shadow-md border ${
                 selectedCategory === "all"
                   ? "bg-laundrify-purple text-white border-laundrify-purple shadow-lg"
@@ -1182,7 +1182,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
                   variant={
                     selectedCategory === category.id ? "default" : "outline"
                   }
-                  onClick={() => setSelectedCategory(category.id)}
+                  onClick={() => requireAuthOrExecute(() => setSelectedCategory(category.id))}
                   className={`flex-shrink-0 rounded-xl font-medium shadow-md border ${
                     selectedCategory === category.id
                       ? "bg-laundrify-purple text-white border-laundrify-purple shadow-lg"
