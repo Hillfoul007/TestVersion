@@ -1545,7 +1545,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto">
         {/* Search Bar */}
-        <div className="p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
+        <div className="p-4 border-b border-gray-200 bg-white sticky top-0 z-[5]">
           <div className="relative">
             <div className="flex items-center gap-2 p-3 border border-gray-300 rounded-lg bg-gray-50">
               <Search className="h-5 w-5 text-green-600 flex-shrink-0" />
