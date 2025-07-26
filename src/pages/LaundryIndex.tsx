@@ -444,6 +444,7 @@ const LaundryIndex = () => {
               phone: storedUser.phone,
               name: storedUser.name,
               id: storedUser.id || storedUser._id,
+              isRecentLogin: isRecentLogin || postLoginNavigation
             });
 
             // Ensure auth service has the latest data
@@ -452,8 +453,20 @@ const LaundryIndex = () => {
             // For iOS, also trigger an auth event to update other components
             if (isIOS) {
               window.dispatchEvent(new CustomEvent("auth-login", {
-                detail: { user: storedUser }
+                detail: {
+                  user: storedUser,
+                  isPostLogin: !!postLoginNavigation,
+                  timestamp: Date.now()
+                }
               }));
+            }
+
+            // Clean up temporary flags after successful auth state restoration
+            if (postLoginNavigation) {
+              setTimeout(() => {
+                localStorage.removeItem("ios_post_login_navigation");
+                localStorage.removeItem("ios_auth_timestamp");
+              }, 2000);
             }
 
             return; // Exit early - user is authenticated
