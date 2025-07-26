@@ -92,6 +92,25 @@ const LaundrifySplashLoader: React.FC<LaundrifySplashLoaderProps> = ({
             {message}
           </p>
         )}
+
+        {/* iOS Tap Hint */}
+        {showTapHint && (
+          <div className="mt-4 animate-pulse">
+            <p className="text-white/90 text-sm font-medium">
+              Taking longer than expected?
+            </p>
+            <p className="text-white/70 text-xs mt-1">
+              Tap anywhere to continue →
+            </p>
+          </div>
+        )}
+
+        {/* Debug loading time (only show after 6 seconds) */}
+        {loadingTime > 6 && (
+          <p className="text-white/50 text-xs mt-2">
+            Loading for {loadingTime}s...
+          </p>
+        )}
       </div>
 
       {/* Subtle Background Pattern */}
