@@ -1,18 +1,59 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface LaundrifySplashLoaderProps {
   isVisible?: boolean;
   message?: string;
+  onDismiss?: () => void;
 }
 
 const LaundrifySplashLoader: React.FC<LaundrifySplashLoaderProps> = ({
   isVisible = true,
   message = "Loading...",
+  onDismiss,
 }) => {
+  const [showTapHint, setShowTapHint] = useState(false);
+  const [loadingTime, setLoadingTime] = useState(0);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const timer = setInterval(() => {
+      setLoadingTime(prev => prev + 1);
+    }, 1000);
+
+    // Show tap hint after 4 seconds on iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    if (isIOS) {
+      const hintTimer = setTimeout(() => {
+        setShowTapHint(true);
+      }, 4000);
+
+      return () => {
+        clearInterval(timer);
+        clearTimeout(hintTimer);
+      };
+    }
+
+    return () => clearInterval(timer);
+  }, [isVisible]);
+
+  const handleTap = () => {
+    if (showTapHint && onDismiss) {
+      console.log("🍎 User tapped to dismiss loading screen");
+      onDismiss();
+    }
+  };
+
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-laundrify-purple via-purple-400 to-laundrify-pink">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-laundrify-purple via-purple-400 to-laundrify-pink"
+      onClick={handleTap}
+      style={{ cursor: showTapHint ? 'pointer' : 'default' }}
+    >
       <div className="text-center space-y-6 px-8">
         {/* Logo with Pulse Animation */}
         <div className="relative">
