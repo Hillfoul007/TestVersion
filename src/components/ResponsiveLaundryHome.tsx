@@ -378,10 +378,12 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   };
 
   const addToCart = (serviceId: string) => {
-    setCart((prev) => ({
-      ...prev,
-      [serviceId]: (prev[serviceId] || 0) + 1,
-    }));
+    requireAuthOrExecute(() => {
+      setCart((prev) => ({
+        ...prev,
+        [serviceId]: (prev[serviceId] || 0) + 1,
+      }));
+    });
   };
 
   const removeFromCart = (serviceId: string) => {
