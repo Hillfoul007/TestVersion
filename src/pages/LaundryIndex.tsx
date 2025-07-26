@@ -378,9 +378,6 @@ const LaundryIndex = () => {
   const initializeApp = async () => {
     console.log("🚀 Initializing app...");
 
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
     // For iOS, use multiple fallback mechanisms to ensure loading completes
     const endLoading = () => {
       console.log("✅ App initialization complete - hiding loader");
