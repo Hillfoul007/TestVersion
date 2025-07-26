@@ -591,6 +591,14 @@ const LaundryIndex = () => {
           isVerified: user.isVerified,
         });
 
+        // For iOS: If we successfully restore auth via service, also clear loading state as safety net
+        if (isIOS && isInitialLoading) {
+          console.log("🍎 Auth service restored on iOS - clearing loading state as safety net");
+          setTimeout(() => {
+            setIsInitialLoading(false);
+          }, 500);
+        }
+
         // For iOS, also trigger an auth event
         if (isIOS) {
           window.dispatchEvent(new CustomEvent("auth-login", {
