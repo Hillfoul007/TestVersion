@@ -14,6 +14,7 @@ import {
   Check,
   Sparkles
 } from "lucide-react";
+import { logAuthEvent } from "@/utils/iosAuthDebug";
 
 const ForceLoginPage: React.FC = () => {
   const navigate = useNavigate();
