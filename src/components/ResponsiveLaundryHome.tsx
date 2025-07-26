@@ -86,6 +86,13 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
   // Function to request location permission and check availability
   const requestLocationPermission = async () => {
+    if (!currentUser) {
+      console.log("User not authenticated, showing auth modal for location request");
+      if (onLoginRequired) {
+        onLoginRequired();
+      }
+      return;
+    }
     setIsRequestingLocation(true);
     try {
       const position = await new Promise<GeolocationPosition>(
