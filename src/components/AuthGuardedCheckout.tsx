@@ -59,10 +59,16 @@ const AuthGuardedCheckout: React.FC<AuthGuardedCheckoutProps> = ({
       ),
     );
 
+    // For iOS devices, add extra delay to ensure auth state is fully persisted
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    const delay = isIOS ? 1500 : 1000; // Extra time for iOS
+
     // Auto-proceed to checkout after successful auth
     setTimeout(() => {
       onProceedToCheckout(cartData);
-    }, 1000);
+    }, delay);
   };
 
   const handleProceedClick = () => {
