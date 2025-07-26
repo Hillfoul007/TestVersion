@@ -359,8 +359,22 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
     localStorage.setItem("laundry_cart", JSON.stringify(cart));
   }, [cart]);
 
+  // Helper function to check authentication before any action
+  const requireAuthOrExecute = (action: () => void) => {
+    if (!currentUser) {
+      console.log("User not authenticated, showing auth modal");
+      if (onLoginRequired) {
+        onLoginRequired();
+      }
+      return;
+    }
+    action();
+  };
+
   const handleSearch = (query: string) => {
-    setSearchQuery(query);
+    requireAuthOrExecute(() => {
+      setSearchQuery(query);
+    });
   };
 
   const addToCart = (serviceId: string) => {
