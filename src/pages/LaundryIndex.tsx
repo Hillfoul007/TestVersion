@@ -208,7 +208,7 @@ const getReverseGeocodedLocation = async (
 const LaundryIndex = () => {
   const { addNotification } = useNotifications();
   const [currentView, setCurrentView] = useState<
-    "home" | "cart" | "bookings" | "auth" | "booking-confirmed"
+    "home" | "cart" | "bookings" | "booking-confirmed"
   >("home");
   const [previousView, setPreviousView] = useState<
     "home" | "cart" | "bookings"
@@ -216,6 +216,7 @@ const LaundryIndex = () => {
   const [lastBookingData, setLastBookingData] = useState<any>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<string>("");
   const [showFirst30Notification, setShowFirst30Notification] = useState(false);
 
@@ -781,10 +782,10 @@ const LaundryIndex = () => {
 
   const handleViewBookings = () => {
     if (!currentUser) {
-      // Auto-redirect to auth view
-      console.log("User not authenticated, showing auth view");
+      // Show auth modal instead of redirecting to auth view
+      console.log("User not authenticated, showing auth modal");
       setPreviousView("bookings");
-      setCurrentView("auth");
+      setIsAuthModalOpen(true);
       return;
     }
     setCurrentView("bookings");
@@ -792,7 +793,7 @@ const LaundryIndex = () => {
 
   const handleLoginRequired = (fromView: "cart" | "bookings" = "cart") => {
     setPreviousView(fromView);
-    setCurrentView("auth");
+    setIsAuthModalOpen(true);
   };
 
   const [isProcessingGlobalCheckout, setIsProcessingGlobalCheckout] =
@@ -807,8 +808,8 @@ const LaundryIndex = () => {
 
     // Check if user is authenticated first
     if (!currentUser) {
-      console.log("User not authenticated, switching to auth view");
-      setCurrentView("auth");
+      console.log("User not authenticated, showing auth modal");
+      setIsAuthModalOpen(true);
       return;
     }
 
@@ -1149,24 +1150,24 @@ const LaundryIndex = () => {
         </>
       )}
 
-      {/* Authentication View */}
-      {currentView === "auth" && (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-md">
-            <PhoneOtpAuthModal
-              isOpen={true}
-              onClose={() =>
-                setCurrentView(previousView === "cart" ? "cart" : "home")
-              }
-              onSuccess={(user) => {
-                handleLoginSuccess(user);
-                // Return to the view they were trying to access
-                setCurrentView(previousView);
-              }}
-            />
-          </div>
-        </div>
-      )}
+      {/* Authentication Modal Overlay */}
+      <PhoneOtpAuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => {
+          setIsAuthModalOpen(false);
+          // Reset previousView to prevent unintended navigation
+          setPreviousView("home");
+        }}
+        onSuccess={(user) => {
+          handleLoginSuccess(user);
+          setIsAuthModalOpen(false);
+          // Navigate to the view they were trying to access
+          if (previousView === "cart" || previousView === "bookings") {
+            setCurrentView(previousView);
+          }
+          setPreviousView("home");
+        }}
+      />
 
       {currentView === "bookings" && (
         <EnhancedBookingHistory
