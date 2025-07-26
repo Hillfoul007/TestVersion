@@ -70,6 +70,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   onViewCart,
   onViewBookings,
   onLogout,
+  onLoginRequired,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -336,7 +337,7 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
         preloadCriticalImages(services).catch(console.warn);
       } catch (error) {
         console.warn(
-          "⚠️ Failed to load dynamic services, using static fallback:",
+          "���️ Failed to load dynamic services, using static fallback:",
           error,
         );
         setDynamicServices(laundryServices);
