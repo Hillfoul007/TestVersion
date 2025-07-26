@@ -60,6 +60,7 @@ interface ResponsiveLaundryHomeProps {
   onViewCart: () => void;
   onViewBookings: () => void;
   onLogout?: () => void;
+  onLoginRequired?: () => void;
 }
 
 const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
