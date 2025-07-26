@@ -1,59 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 interface LaundrifySplashLoaderProps {
   isVisible?: boolean;
   message?: string;
-  onDismiss?: () => void;
 }
 
 const LaundrifySplashLoader: React.FC<LaundrifySplashLoaderProps> = ({
   isVisible = true,
   message = "Loading...",
-  onDismiss,
 }) => {
-  const [showTapHint, setShowTapHint] = useState(false);
-  const [loadingTime, setLoadingTime] = useState(0);
-
-  useEffect(() => {
-    if (!isVisible) return;
-
-    const timer = setInterval(() => {
-      setLoadingTime(prev => prev + 1);
-    }, 1000);
-
-    // Show tap hint after 4 seconds on iOS
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-    if (isIOS) {
-      const hintTimer = setTimeout(() => {
-        setShowTapHint(true);
-      }, 4000);
-
-      return () => {
-        clearInterval(timer);
-        clearTimeout(hintTimer);
-      };
-    }
-
-    return () => clearInterval(timer);
-  }, [isVisible]);
-
-  const handleTap = () => {
-    if (showTapHint && onDismiss) {
-      console.log("🍎 User tapped to dismiss loading screen");
-      onDismiss();
-    }
-  };
-
   if (!isVisible) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-laundrify-purple via-purple-400 to-laundrify-pink"
-      onClick={handleTap}
-      style={{ cursor: showTapHint ? 'pointer' : 'default' }}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-laundrify-purple via-purple-400 to-laundrify-pink">
       <div className="text-center space-y-6 px-8">
         {/* Logo with Pulse Animation */}
         <div className="relative">
@@ -90,25 +49,6 @@ const LaundrifySplashLoader: React.FC<LaundrifySplashLoaderProps> = ({
         {message && (
           <p className="text-white/80 text-sm font-medium">
             {message}
-          </p>
-        )}
-
-        {/* iOS Tap Hint */}
-        {showTapHint && (
-          <div className="mt-4 animate-pulse">
-            <p className="text-white/90 text-sm font-medium">
-              Taking longer than expected?
-            </p>
-            <p className="text-white/70 text-xs mt-1">
-              Tap anywhere to continue →
-            </p>
-          </div>
-        )}
-
-        {/* Debug loading time (only show after 6 seconds) */}
-        {loadingTime > 6 && (
-          <p className="text-white/50 text-xs mt-2">
-            Loading for {loadingTime}s...
           </p>
         )}
       </div>

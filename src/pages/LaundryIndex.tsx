@@ -218,39 +218,13 @@ const LaundryIndex = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<string>("");
   const [showFirst30Notification, setShowFirst30Notification] = useState(false);
-
-  // Single iOS detection for the entire component
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-  const [isInitialLoading, setIsInitialLoading] = useState(() => {
-    // Check if this is a post-login navigation - skip initial loading
-    const postLoginNavigation = localStorage.getItem("ios_post_login_navigation");
-    const authTimestamp = localStorage.getItem("ios_auth_timestamp");
-    const isRecentLogin = authTimestamp && (Date.now() - parseInt(authTimestamp)) < 10000;
-
-    if (postLoginNavigation || isRecentLogin) {
-      console.log("🍎 Post-login navigation detected - skipping initial loading");
-      return false;
-    }
-
-    return true;
-  });
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const authService = DVHostingSmsService.getInstance();
   const pushService = PushNotificationService.getInstance();
   const referralService = ReferralService.getInstance();
 
   // Initialize PWA and check auth state
   useEffect(() => {
-    console.log("🔄 LaundryIndex component mounted");
-
-    if (isIOS) {
-      console.log("🍎 iOS device detected in LaundryIndex");
-      console.log("🍎 User agent:", navigator.userAgent);
-      console.log("🍎 Platform:", navigator.platform);
-      console.log("🍎 Current loading state:", isInitialLoading);
-    }
-
     initializeApp();
     checkAuthState();
     getUserLocation();
@@ -296,6 +270,9 @@ const LaundryIndex = () => {
     window.addEventListener("ios-session-restored", handleIOSSessionRestore);
 
     // iOS-specific: Handle potential auth persistence issues after navigation
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
     let iosCleanupFunctions: (() => void)[] = [];
 
     if (isIOS) {
@@ -376,98 +353,28 @@ const LaundryIndex = () => {
   }, []);
 
   const initializeApp = async () => {
-    console.log("🚀 Initializing app...");
-
-    // For iOS, use multiple fallback mechanisms to ensure loading completes
-    const endLoading = () => {
-      console.log("✅ App initialization complete - hiding loader");
+    // Show loader for minimum 2 seconds for better UX
+    setTimeout(() => {
       setIsInitialLoading(false);
-    };
+    }, 2000);
 
-    // Primary timer - standard 2 second delay
-    const primaryTimer = setTimeout(endLoading, 2000);
+    // Initialize PWA features
+    await pushService.initializePWA();
 
-    // iOS fallback mechanisms
-    if (isIOS) {
-      console.log("🍎 iOS detected - adding fallback loading mechanisms");
-
-      // Fallback timer 1: 3 seconds (in case primary timer fails)
-      const fallbackTimer1 = setTimeout(() => {
-        if (isInitialLoading) {
-          console.log("🍎 Primary timer failed - using fallback 1");
-          endLoading();
-        }
-      }, 3000);
-
-      // Fallback timer 2: 5 seconds (last resort)
-      const fallbackTimer2 = setTimeout(() => {
-        if (isInitialLoading) {
-          console.log("🍎 All timers failed - using emergency fallback");
-          endLoading();
-        }
-      }, 5000);
-
-      // iOS specific: Also trigger on page visibility change
-      const handleVisibilityChange = () => {
-        if (document.visibilityState === 'visible' && isInitialLoading) {
-          setTimeout(() => {
-            if (isInitialLoading) {
-              console.log("🍎 Visibility-based fallback triggered");
-              endLoading();
-            }
-          }, 500);
-        }
-      };
-
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-
-      // Cleanup function to remove event listeners
-      const cleanup = () => {
-        clearTimeout(primaryTimer);
-        clearTimeout(fallbackTimer1);
-        clearTimeout(fallbackTimer2);
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-      };
-
-      // Auto cleanup after 10 seconds
-      setTimeout(cleanup, 10000);
+    // Add manifest link to head if not present
+    if (!document.querySelector('link[rel="manifest"]')) {
+      const manifestLink = document.createElement("link");
+      manifestLink.rel = "manifest";
+      manifestLink.href = "/manifest.json";
+      document.head.appendChild(manifestLink);
     }
 
-    try {
-      // Initialize PWA features
-      await pushService.initializePWA();
-
-      // Add manifest link to head if not present
-      if (!document.querySelector('link[rel="manifest"]')) {
-        const manifestLink = document.createElement("link");
-        manifestLink.rel = "manifest";
-        manifestLink.href = "/manifest.json";
-        document.head.appendChild(manifestLink);
-      }
-
-      // Add theme color meta tag
-      if (!document.querySelector('meta[name="theme-color"]')) {
-        const themeColorMeta = document.createElement("meta");
-        themeColorMeta.name = "theme-color";
-        themeColorMeta.content = "#C46DD8";
-        document.head.appendChild(themeColorMeta);
-      }
-
-      console.log("✅ PWA initialization complete");
-
-      // For iOS, trigger immediate loading end if PWA init is fast enough
-      if (isIOS) {
-        setTimeout(() => {
-          if (isInitialLoading) {
-            console.log("🍎 PWA-based loading completion");
-            endLoading();
-          }
-        }, 1500);
-      }
-    } catch (error) {
-      console.error("❌ Error during app initialization:", error);
-      // Don't let initialization errors block the UI
-      setTimeout(endLoading, 1000);
+    // Add theme color meta tag
+    if (!document.querySelector('meta[name="theme-color"]')) {
+      const themeColorMeta = document.createElement("meta");
+      themeColorMeta.name = "theme-color";
+      themeColorMeta.content = "#C46DD8";
+      document.head.appendChild(themeColorMeta);
     }
   };
 
@@ -487,16 +394,10 @@ const LaundryIndex = () => {
   const checkAuthState = async () => {
     try {
       console.log("🔍 Checking authentication state...");
-      console.log("🔍 Current loading state:", isInitialLoading);
 
       // iOS-specific: Try to restore auth from iOS backups if main storage is empty
-      if (isIOS) {
-        console.log("🍎 iOS checkAuthState - current state:", {
-          isInitialLoading,
-          isLoggedIn,
-          hasCurrentUser: !!currentUser
-        });
-      }
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
       // Check if this is a post-login check
       const postLoginNavigation = localStorage.getItem("ios_post_login_navigation");
@@ -546,14 +447,6 @@ const LaundryIndex = () => {
               isRecentLogin: isRecentLogin || postLoginNavigation
             });
 
-            // For iOS: If we successfully restore auth, also clear loading state as safety net
-            if (isIOS && isInitialLoading) {
-              console.log("🍎 Auth restored on iOS - clearing loading state as safety net");
-              setTimeout(() => {
-                setIsInitialLoading(false);
-              }, 500);
-            }
-
             // Ensure auth service has the latest data
             authService.setCurrentUser(storedUser, token);
 
@@ -595,14 +488,6 @@ const LaundryIndex = () => {
           name: user.name,
           isVerified: user.isVerified,
         });
-
-        // For iOS: If we successfully restore auth via service, also clear loading state as safety net
-        if (isIOS && isInitialLoading) {
-          console.log("🍎 Auth service restored on iOS - clearing loading state as safety net");
-          setTimeout(() => {
-            setIsInitialLoading(false);
-          }, 500);
-        }
 
         // For iOS, also trigger an auth event
         if (isIOS) {
@@ -1067,16 +952,7 @@ const LaundryIndex = () => {
 
   // Show splash loader on initial load
   if (isInitialLoading) {
-    return (
-      <LaundrifySplashLoader
-        isVisible={true}
-        message="Initializing Laundrify..."
-        onDismiss={() => {
-          console.log("🍎 User manually dismissed loading screen");
-          setIsInitialLoading(false);
-        }}
-      />
-    );
+    return <LaundrifySplashLoader isVisible={true} message="Initializing Laundrify..." />;
   }
 
   return (
