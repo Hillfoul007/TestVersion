@@ -475,8 +475,10 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
   };
 
   const handleLogin = () => {
-    console.log("handleLogin clicked, setting showAuthModal to true");
-    setShowAuthModal(true);
+    console.log("handleLogin clicked, calling parent onLoginRequired");
+    if (onLoginRequired) {
+      onLoginRequired();
+    }
   };
 
   const handleAuthSuccess = (user: any) => {
