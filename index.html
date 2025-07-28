@@ -10,15 +10,50 @@
     <!-- Additional viewport meta for PWA -->
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
+    <!-- iOS Safari specific meta tags -->
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="HandheldFriendly" content="true" />
+    <meta name="MobileOptimized" content="width" />
     <style>
-      /* Additional CSS to prevent zoom on double tap */
+      /* iOS Safari compatibility CSS */
       * {
         touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
       }
+
       input,
       textarea,
-      select {
+      select,
+      button {
         font-size: 16px !important;
+        -webkit-appearance: none;
+        border-radius: 0;
+        user-select: text;
+        -webkit-user-select: text;
+      }
+
+      /* Prevent iOS zoom issues */
+      @supports (-webkit-overflow-scrolling: touch) {
+        body {
+          cursor: pointer;
+          -webkit-overflow-scrolling: touch;
+        }
+      }
+
+      /* Fix for iOS viewport height issues */
+      #root {
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+      }
+
+      /* Prevent horizontal scrolling on iOS */
+      body {
+        overflow-x: hidden;
+        position: relative;
       }
     </style>
 
