@@ -25,6 +25,7 @@ const config = {
     : [
         "https://testversion.onrender.com",
         "https://cleancarepro-1-p2oc.onrender.com",
+        "https://laundrify-app-5su7.onrender.com",
       ],
 
   // SMS Service
