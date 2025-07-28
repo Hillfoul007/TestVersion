@@ -112,6 +112,34 @@
     <!-- Fix FullStory namespace conflict -->
     <script>
       window["_fs_namespace"] = "FS";
+
+      // iOS debugging and error handling
+      window.addEventListener('error', function(e) {
+        console.log('Global error:', e.error, e.filename, e.lineno, e.colno);
+        // Send to console for debugging
+        if (window.location.hostname.includes('laundrify-app')) {
+          console.log('Error on iOS Safari:', {
+            message: e.message,
+            filename: e.filename,
+            lineno: e.lineno,
+            colno: e.colno,
+            userAgent: navigator.userAgent
+          });
+        }
+      });
+
+      window.addEventListener('unhandledrejection', function(e) {
+        console.log('Unhandled promise rejection:', e.reason);
+        if (window.location.hostname.includes('laundrify-app')) {
+          console.log('Promise rejection on iOS Safari:', {
+            reason: e.reason,
+            userAgent: navigator.userAgent
+          });
+        }
+      });
+
+      // Log when page loads
+      console.log('Laundrify loading on:', navigator.userAgent);
     </script>
 
     <script type="module" src="/src/main.tsx"></script>
