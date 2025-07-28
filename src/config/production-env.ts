@@ -4,7 +4,8 @@
  */
 
 // Define the correct production API URL - always point to the backend
-export const PRODUCTION_API_URL = "https://backend-vaxf.onrender.com/api";
+// For now using the same domain approach - you may need to update this to your actual backend URL
+export const PRODUCTION_API_URL = "https://laundrify-app-5su7.onrender.com/api";
 
 export const getProductionApiUrl = (): string => {
   // Check if we're in production based on hostname
