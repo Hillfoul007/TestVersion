@@ -6,10 +6,6 @@ declare global {
   const riderHelpers: any;
   const WhatsAppAuth: any;
 
-  interface Window {
-    pwaUpdatesInitialized?: boolean;
-  }
-
   interface ExotelResponse {
     success: boolean;
     data?: any;

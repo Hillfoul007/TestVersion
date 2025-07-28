@@ -224,40 +224,18 @@ const LaundryIndex = () => {
                 (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
   const [isInitialLoading, setIsInitialLoading] = useState(() => {
-    // Check if this is a post-login navigation
+    // Check if this is a post-login navigation - skip initial loading
     const postLoginNavigation = localStorage.getItem("ios_post_login_navigation");
     const authTimestamp = localStorage.getItem("ios_auth_timestamp");
     const isRecentLogin = authTimestamp && (Date.now() - parseInt(authTimestamp)) < 10000;
 
     if (postLoginNavigation || isRecentLogin) {
-      console.log("🍎 Post-login navigation detected - using minimal loading");
-      return false; // We'll use a different loading state
+      console.log("🍎 Post-login navigation detected - skipping initial loading");
+      return false;
     }
 
     return true;
   });
-
-  // Add a specific loading state for post-login navigation to prevent black screen
-  const [isPostLoginLoading, setIsPostLoginLoading] = useState(() => {
-    const postLoginNavigation = localStorage.getItem("ios_post_login_navigation");
-    const authTimestamp = localStorage.getItem("ios_auth_timestamp");
-    const isRecentLogin = authTimestamp && (Date.now() - parseInt(authTimestamp)) < 10000;
-
-    return !!(postLoginNavigation || isRecentLogin);
-  });
-
-  // Safety timeout for post-login loading to prevent it from getting stuck
-  useEffect(() => {
-    if (isPostLoginLoading) {
-      console.log("🍎 Post-login loading active - setting safety timeout");
-      const safetyTimeout = setTimeout(() => {
-        console.log("🍎 Post-login loading safety timeout reached - clearing loading state");
-        setIsPostLoginLoading(false);
-      }, 3000); // 3 second maximum for post-login loading
-
-      return () => clearTimeout(safetyTimeout);
-    }
-  }, [isPostLoginLoading]);
   const authService = DVHostingSmsService.getInstance();
   const pushService = PushNotificationService.getInstance();
   const referralService = ReferralService.getInstance();
@@ -367,10 +345,6 @@ const LaundryIndex = () => {
         setTimeout(() => {
           checkAuthState();
           localStorage.removeItem("ios_post_login_navigation");
-          // Clear post-login loading state after auth check
-          setTimeout(() => {
-            setIsPostLoginLoading(false);
-          }, 200);
         }, 100);
       }
 
@@ -572,13 +546,12 @@ const LaundryIndex = () => {
               isRecentLogin: isRecentLogin || postLoginNavigation
             });
 
-            // For iOS: If we successfully restore auth, also clear loading states as safety net
-            if (isIOS) {
-              console.log("🍎 Auth restored on iOS - clearing loading states as safety net");
+            // For iOS: If we successfully restore auth, also clear loading state as safety net
+            if (isIOS && isInitialLoading) {
+              console.log("🍎 Auth restored on iOS - clearing loading state as safety net");
               setTimeout(() => {
-                if (isInitialLoading) setIsInitialLoading(false);
-                if (isPostLoginLoading) setIsPostLoginLoading(false);
-              }, 300);
+                setIsInitialLoading(false);
+              }, 500);
             }
 
             // Ensure auth service has the latest data
@@ -623,13 +596,12 @@ const LaundryIndex = () => {
           isVerified: user.isVerified,
         });
 
-        // For iOS: If we successfully restore auth via service, also clear loading states as safety net
-        if (isIOS) {
-          console.log("🍎 Auth service restored on iOS - clearing loading states as safety net");
+        // For iOS: If we successfully restore auth via service, also clear loading state as safety net
+        if (isIOS && isInitialLoading) {
+          console.log("🍎 Auth service restored on iOS - clearing loading state as safety net");
           setTimeout(() => {
-            if (isInitialLoading) setIsInitialLoading(false);
-            if (isPostLoginLoading) setIsPostLoginLoading(false);
-          }, 300);
+            setIsInitialLoading(false);
+          }, 500);
         }
 
         // For iOS, also trigger an auth event
@@ -937,7 +909,7 @@ const LaundryIndex = () => {
           localBookingData,
           itemPrices,
         );
-        console.log("��� Local booking result:", localResult);
+        console.log("📝 Local booking result:", localResult);
 
         // Store booking data for confirmation screen
         const confirmationData = {
@@ -1093,18 +1065,15 @@ const LaundryIndex = () => {
     }
   };
 
-  // Show splash loader on initial load or post-login navigation
-  if (isInitialLoading || isPostLoginLoading) {
-    const message = isPostLoginLoading ? "Completing sign in..." : "Initializing Laundrify...";
-
+  // Show splash loader on initial load
+  if (isInitialLoading) {
     return (
       <LaundrifySplashLoader
         isVisible={true}
-        message={message}
+        message="Initializing Laundrify..."
         onDismiss={() => {
           console.log("🍎 User manually dismissed loading screen");
-          if (isInitialLoading) setIsInitialLoading(false);
-          if (isPostLoginLoading) setIsPostLoginLoading(false);
+          setIsInitialLoading(false);
         }}
       />
     );
