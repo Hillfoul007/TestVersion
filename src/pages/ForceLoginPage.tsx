@@ -1,27 +1,83 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PhoneOtpAuthModal from "@/components/PhoneOtpAuthModal";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { createSuccessNotification } from "@/utils/notificationUtils";
-import { 
-  Gift, 
-  Phone, 
-  Users, 
-  ArrowRight, 
+import {
+  Gift,
+  Phone,
+  Users,
+  ArrowRight,
   Star,
   Check,
-  Sparkles 
+  Sparkles
 } from "lucide-react";
+import { logAuthEvent } from "@/utils/iosAuthDebug";
 
 const ForceLoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(true); // Auto-open auth modal
   const { addNotification } = useNotifications();
+  const isNavigatingRef = useRef(false);
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+              (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  // Prevent iOS auto-refresh and session restoration interference
+  useEffect(() => {
+    if (isIOS) {
+      console.log("🍎 ForceLoginPage: Initializing iOS stability measures");
+
+      // Prevent automatic auth restoration on this page
+      localStorage.setItem("force_login_active", "true");
+
+      // Disable page restoration from cache - but avoid infinite reload
+      if ('pageshow' in window) {
+        const handlePageShow = (event: PageTransitionEvent) => {
+          if (event.persisted && !isNavigatingRef.current) {
+            console.log("🍎 ForceLoginPage: iOS page cache restoration detected");
+
+            // Check if we just reloaded recently to prevent infinite loops
+            const lastReload = localStorage.getItem('ios_force_login_reload');
+            const now = Date.now();
+            if (lastReload && (now - parseInt(lastReload)) < 3000) {
+              console.log("🍎 ForceLoginPage: Skipping reload - too recent");
+              return;
+            }
+
+            // Mark reload timestamp to prevent loops
+            localStorage.setItem('ios_force_login_reload', now.toString());
+            console.log("🍎 ForceLoginPage: Performing controlled reload to clear cache");
+
+            // Use replace instead of reload to avoid history stack issues
+            window.location.replace(window.location.href);
+          }
+        };
+
+        window.addEventListener('pageshow', handlePageShow);
+
+        return () => {
+          window.removeEventListener('pageshow', handlePageShow);
+        };
+      }
+    }
+  }, [isIOS]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("force_login_active");
+      localStorage.removeItem("ios_force_login_reload");
+    };
+  }, []);
 
   const handleAuthSuccess = async (user: any) => {
     console.log("🎉 Auth successful:", user);
+    logAuthEvent('force_login_auth_success', { user });
+
+    // Close the auth modal first to prevent any UI conflicts
+    setIsAuthModalOpen(false);
 
     addNotification(
       createSuccessNotification(
@@ -30,38 +86,110 @@ const ForceLoginPage: React.FC = () => {
       )
     );
 
-    // For iOS devices, add a longer delay and verify auth state is persisted
-    // before navigation to prevent race conditions
+    // For iOS devices, add enhanced auth persistence and navigation handling
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                   (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-    if (isIOS) {
-      console.log("🍎 iOS device detected - ensuring robust auth persistence before navigation");
+    try {
+      // Always ensure auth data is properly saved regardless of platform
+      const authToken = `user_token_${user.phone || user.id}_persistent`;
+      const userStr = JSON.stringify(user);
 
-      // Longer delay for iOS - 1500ms instead of 500ms
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Set all auth data with multiple redundancy
+      localStorage.setItem("current_user", userStr);
+      localStorage.setItem("cleancare_user", userStr);
+      localStorage.setItem("auth_token", authToken);
+      localStorage.setItem("cleancare_auth_token", authToken);
 
-      // Verify auth state is properly saved before navigating
-      const authToken = localStorage.getItem("auth_token") || localStorage.getItem("cleancare_auth_token");
-      const userStr = localStorage.getItem("current_user") || localStorage.getItem("cleancare_user");
+      // Clear any iOS logout flags that might interfere
+      localStorage.removeItem("ios_intentional_logout");
+      localStorage.removeItem("ios_logout_timestamp");
 
-      if (!authToken || !userStr) {
-        console.warn("🍎⚠️ Auth state not found after delay, attempting manual save");
-        // Manual save as backup
-        localStorage.setItem("current_user", JSON.stringify(user));
-        localStorage.setItem("cleancare_user", JSON.stringify(user));
-        localStorage.setItem("auth_token", `user_token_${user.phone || user.id}_persistent`);
-        localStorage.setItem("cleancare_auth_token", `user_token_${user.phone || user.id}_persistent`);
+      console.log("✅ Auth state saved with redundancy");
 
-        // Additional delay after manual save
-        await new Promise(resolve => setTimeout(resolve, 500));
+      if (isIOS) {
+        console.log("🍎 iOS device detected - using enhanced navigation strategy");
+
+        // For iOS, use a more reliable navigation method with optimized timing
+        await new Promise(resolve => setTimeout(resolve, 600)); // Further optimized timing
+
+        // Verify auth persisted properly
+        const savedUser = localStorage.getItem("current_user");
+        const savedToken = localStorage.getItem("auth_token");
+
+        if (!savedUser || !savedToken) {
+          console.warn("🍎⚠️ Re-attempting auth save...");
+          localStorage.setItem("current_user", userStr);
+          localStorage.setItem("cleancare_user", userStr);
+          localStorage.setItem("auth_token", authToken);
+          localStorage.setItem("cleancare_auth_token", authToken);
+
+          // Wait a bit more after re-save
+          await new Promise(resolve => setTimeout(resolve, 200)); // Further optimized timing
+        }
+
+        // Clear force login flags before navigation
+        localStorage.removeItem("force_login_active");
+        localStorage.removeItem("ios_force_login_reload");
+        logAuthEvent('force_login_flags_cleared');
+
+        // Mark that we're navigating
+        isNavigatingRef.current = true;
+
+        // Set flags to help LaundryIndex detect post-login navigation and prevent black screen
+        localStorage.setItem("ios_post_login_navigation", "true");
+        localStorage.setItem("ios_auth_timestamp", Date.now().toString());
+        console.log("🍎 Post-login flags set for smooth navigation");
+
+        console.log("🍎 Navigating to home page via React Router...");
+        logAuthEvent('force_login_navigation_start', { method: 'react_router' });
+
+        // Broadcast auth event immediately before navigation to ensure components are ready
+        window.dispatchEvent(new CustomEvent("auth-login", {
+          detail: {
+            user: user,
+            source: 'force_login_page',
+            timestamp: Date.now()
+          }
+        }));
+
+        // Try React Router first for better SPA experience
+        try {
+          navigate("/", { replace: true });
+          logAuthEvent('force_login_react_router_called');
+
+          // Optimized fallback timeout for better UX
+          setTimeout(() => {
+            if (window.location.pathname === "/force-login") {
+              console.log("🍎 React Router navigation failed, using window.location");
+              logAuthEvent('force_login_fallback_to_window_location');
+              window.location.href = "/";
+            } else {
+              logAuthEvent('force_login_react_router_success');
+              // Navigation flags will be cleaned up by LaundryIndex after auth check
+              console.log("🍎 React Router navigation successful");
+            }
+          }, 400); // Further optimized timing
+        } catch (navError) {
+          console.warn("🍎 React Router failed, using window.location:", navError);
+          logAuthEvent('force_login_react_router_error', { error: navError?.toString() });
+          window.location.href = "/";
+        }
+
+        return;
       }
 
-      console.log("🍎✅ iOS auth persistence verified - proceeding with navigation");
-    }
+      // For non-iOS devices, use standard navigation after optimized delay
+      await new Promise(resolve => setTimeout(resolve, 200));
+      isNavigatingRef.current = true;
+      navigate("/");
 
-    // Navigate to home
-    navigate("/");
+    } catch (error) {
+      console.error("❌ Error in auth success handler:", error);
+      // Fallback navigation
+      isNavigatingRef.current = true;
+      window.location.href = "/";
+    }
   };
 
   const benefits = [

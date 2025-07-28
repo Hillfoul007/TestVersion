@@ -28,15 +28,27 @@ export const cleanupOldServiceWorkers = async (): Promise<void> => {
 };
 
 /**
- * Force reload the page to get the latest version
+ * Setup controlled page reload on service worker updates
  */
-export const forcePageReload = (): void => {
+export const setupControlledReload = (): void => {
   if ("serviceWorker" in navigator) {
+    let reloadScheduled = false;
+
     // Add event listener for when the service worker updates
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      console.log("Service worker controller changed, reloading page");
-      window.location.reload();
-    });
+    const handleControllerChange = () => {
+      // Prevent multiple reloads
+      if (reloadScheduled) return;
+
+      reloadScheduled = true;
+      console.log("Service worker controller changed, scheduling reload");
+
+      // Small delay to ensure proper cleanup
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    };
+
+    navigator.serviceWorker.addEventListener("controllerchange", handleControllerChange);
   }
 };
 
@@ -44,11 +56,19 @@ export const forcePageReload = (): void => {
  * Initialize PWA update handling
  */
 export const initializePWAUpdates = (): void => {
+  // Only initialize once
+  if (window.pwaUpdatesInitialized) {
+    console.log("PWA updates already initialized, skipping");
+    return;
+  }
+
   // Clean up any old service workers on app start
   cleanupOldServiceWorkers();
 
-  // Set up force reload handling
-  forcePageReload();
+  // Set up controlled reload handling
+  setupControlledReload();
 
+  // Mark as initialized
+  window.pwaUpdatesInitialized = true;
   console.log("PWA updates initialized");
 };
