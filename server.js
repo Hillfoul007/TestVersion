@@ -83,8 +83,21 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-app.listen(port, () => {
-  console.log(`🚀 Laundrify server running on port ${port}`);
-  console.log(`Frontend: http://localhost:${port}`);
-  console.log(`API: http://localhost:${port}/api`);
-});
+// Connect to database and start server
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    app.listen(port, () => {
+      console.log(`🚀 Laundrify server running on port ${port}`);
+      console.log(`Frontend: http://localhost:${port}`);
+      console.log(`API: http://localhost:${port}/api`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
