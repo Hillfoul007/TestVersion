@@ -45,7 +45,7 @@ envVarGroups:
         value: # sms key
       - key: JWT_SECRET
         value: # secret
-      - key: VITE_DVHOSTING_API_KEY
+      - key: REACT_APP_DVHOSTING_API_KEY
         value: # frontend key
-      - key: VITE_GOOGLE_MAPS_API_KEY
+      - key: REACT_APP_GOOGLE_MAPS_API_KEY
         value: # map key
