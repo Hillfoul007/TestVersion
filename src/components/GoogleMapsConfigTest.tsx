@@ -190,7 +190,7 @@ export function GoogleMapsConfigTest() {
             Set <code>REACT_APP_GOOGLE_MAPS_API_KEY</code> in your .env file
           </li>
           <li>
-            Optionally set <code>VITE_GOOGLE_MAPS_MAP_ID</code> for Advanced
+            Optionally set <code>REACT_APP_GOOGLE_MAPS_MAP_ID</code> for Advanced
             Markers
           </li>
           <li>Ensure APIs are enabled in Google Cloud Console</li>
