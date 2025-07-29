@@ -3,9 +3,9 @@
   "private": true,
   "version": "0.0.0-2025-07-25T06-15-21",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject",
     "dev:backend": "cd backend && node server-laundry.js",
     "dev:full": "concurrently \"npm start\" \"npm run dev:backend\"",
