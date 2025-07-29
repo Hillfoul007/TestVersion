@@ -17,7 +17,8 @@
     "render:build": "NODE_OPTIONS=--max-old-space-size=300 npm install && NODE_OPTIONS=--max-old-space-size=300 npm run build && cd backend && npm install --production && echo 'Build completed successfully'",
     "render:start": "NODE_ENV=production node server.js",
     "install:all": "npm install && cd backend && npm install",
-    "build:production": "NODE_OPTIONS=--max-old-space-size=384 npm run install:all && NODE_OPTIONS=--max-old-space-size=384 npm run build"
+    "build:production": "NODE_OPTIONS=--max-old-space-size=384 npm run install:all && NODE_OPTIONS=--max-old-space-size=384 npm run build",
+    "verify-env": "node scripts/verify-env.js"
   },
   "dependencies": {
     "react": "^18.3.1",
