@@ -23,7 +23,7 @@ export function GoogleMapsConfigTest() {
 
       try {
         const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
-        const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+        const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
         const newStatus: ConfigStatus = {
           apiKey: !!(apiKey && apiKey.trim() !== ""),
