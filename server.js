@@ -81,19 +81,31 @@ app.get('*', (req, res) => {
 
 // Connect to database and start server
 const startServer = async () => {
-  try {
-    await connectDB();
+  // Only connect to MongoDB in production or if credentials are provided
+  const hasValidCredentials = process.env.MONGODB_USERNAME &&
+    process.env.MONGODB_PASSWORD &&
+    process.env.MONGODB_CLUSTER &&
+    process.env.MONGODB_USERNAME !== 'your_mongodb_username';
 
-    app.listen(port, () => {
-      console.log(`🚀 Laundrify server running on port ${port}`);
-      console.log(`Frontend: http://localhost:${port}`);
-      console.log(`API: http://localhost:${port}/api`);
-      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    });
-  } catch (error) {
-    console.error('❌ Failed to start server:', error);
-    process.exit(1);
+  if (process.env.NODE_ENV === 'production' && hasValidCredentials) {
+    try {
+      await connectDB();
+      console.log('✅ Connected to MongoDB');
+    } catch (error) {
+      console.error('❌ MongoDB connection failed:', error.message);
+      process.exit(1);
+    }
+  } else {
+    console.log('🔄 Running in development mode without MongoDB');
+    console.log('💡 Set MONGODB_USERNAME, MONGODB_PASSWORD, and MONGODB_CLUSTER to connect to database');
   }
+
+  app.listen(port, () => {
+    console.log(`🚀 Laundrify server running on port ${port}`);
+    console.log(`Frontend: http://localhost:${port}`);
+    console.log(`API: http://localhost:${port}/api`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
 };
 
 startServer();
