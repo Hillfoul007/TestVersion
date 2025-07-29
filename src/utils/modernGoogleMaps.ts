@@ -36,7 +36,7 @@ class ModernGoogleMapsService {
 
     if (!mapId || mapId.trim() === "") {
       console.warn(
-        "⚠️ Google Maps Map ID not configured. Advanced Markers will not be available. Set VITE_GOOGLE_MAPS_MAP_ID to enable Advanced Markers.",
+        "⚠️ Google Maps Map ID not configured. Advanced Markers will not be available. Set REACT_APP_GOOGLE_MAPS_MAP_ID to enable Advanced Markers.",
       );
     }
 
