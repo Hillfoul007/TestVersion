@@ -1,5 +1,5 @@
 // VAPID keys - Retrieved from environment variables
-const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY || "";
+const VAPID_PUBLIC_KEY = process.env.REACT_APP_VAPID_PUBLIC_KEY || "";
 
 export class PushNotificationService {
   private static instance: PushNotificationService;

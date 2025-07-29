@@ -47,7 +47,7 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
     const timeoutId = setTimeout(() => controller.abort(), 3000);
 
     const response = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/health`,
+      `${process.env.REACT_APP_API_BASE_URL}/health`,
       {
         signal: controller.signal,
         method: "GET",

@@ -146,7 +146,7 @@ const AdminServicesManager: React.FC<AdminServicesManagerProps> = ({
   const setupInitialSheet = async () => {
     try {
       const backendUrl =
-        import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+        process.env.REACT_APP_BACKEND_URL || "http://localhost:3001";
       const response = await fetch(`${backendUrl}/api/services/setup-sheet`);
       const result = await response.json();
 
