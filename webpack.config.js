@@ -64,6 +64,17 @@ module.exports = (env, argv) => {
         template: './public/index.html',
         inject: true,
       }),
+      new webpack.DefinePlugin({
+        'process.env': JSON.stringify({
+          ...Object.keys(process.env)
+            .filter(key => key.startsWith('REACT_APP_'))
+            .reduce((env, key) => {
+              env[key] = process.env[key];
+              return env;
+            }, {}),
+          NODE_ENV: process.env.NODE_ENV || 'development'
+        })
+      }),
     ],
     devServer: {
       static: {
