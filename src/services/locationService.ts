@@ -35,8 +35,8 @@ export interface GeocodeResult {
 }
 
 class LocationService {
-  private readonly GOOGLE_MAPS_API_KEY = import.meta.env
-    .VITE_GOOGLE_MAPS_API_KEY;
+  private readonly GOOGLE_MAPS_API_KEY = process.env
+    .REACT_APP_GOOGLE_MAPS_API_KEY;
 
   /**
    * Get user's current position using browser geolocation with enhanced accuracy
