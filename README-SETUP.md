@@ -47,6 +47,7 @@ No setup needed! The dev server runs without MongoDB.
    - `MONGODB_CLUSTER` - Your MongoDB cluster URL
    - `JWT_SECRET` - Secret key for authentication
    - `REACT_APP_GOOGLE_MAPS_API_KEY` - Google Maps API key
+   - `REACT_APP_GOOGLE_MAPS_MAP_ID` - Google Maps Map ID (optional)
 
 ## 📁 Project Structure
 
