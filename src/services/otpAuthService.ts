@@ -20,7 +20,7 @@ interface OTPResponse {
 export class OTPAuthService {
   private static instance: OTPAuthService;
   private apiBaseUrl =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:3001/api";
 
   public static getInstance(): OTPAuthService {
     if (!OTPAuthService.instance) {

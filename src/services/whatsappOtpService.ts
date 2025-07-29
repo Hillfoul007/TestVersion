@@ -17,12 +17,12 @@ export interface User {
 export class WhatsAppOTPService {
   private static instance: WhatsAppOTPService;
   private apiBaseUrl =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:3001/api";
   private gupshupApiUrl = "https://api.gupshup.io/wa/api/v1/msg";
   private gupshupApiKey =
-    import.meta.env.VITE_GUPSHUP_API_KEY || "hfyvni2bshn1r3oo76wgupvlirijscwr";
+    process.env.REACT_APP_GUPSHUP_API_KEY || "hfyvni2bshn1r3oo76wgupvlirijscwr";
   private sourceNumber =
-    import.meta.env.VITE_GUPSHUP_SOURCE_NUMBER || "917834811114";
+    process.env.REACT_APP_GUPSHUP_SOURCE_NUMBER || "917834811114";
 
   public static getInstance(): WhatsAppOTPService {
     if (!WhatsAppOTPService.instance) {

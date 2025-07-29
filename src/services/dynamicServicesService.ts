@@ -31,7 +31,7 @@ class DynamicServicesService {
   private lastFetch: number = 0;
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
   private readonly BACKEND_URL =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+    process.env.REACT_APP_BACKEND_URL || "http://localhost:3001";
 
   static getInstance(): DynamicServicesService {
     if (!DynamicServicesService.instance) {
