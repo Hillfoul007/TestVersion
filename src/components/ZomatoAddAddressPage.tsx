@@ -182,7 +182,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     try {
       const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
       if (!apiKey) {
-        console.warn("❌ Google Maps API key not configured. Please set VITE_GOOGLE_MAPS_API_KEY in your .env file");
+        console.warn("❌ Google Maps API key not configured. Please set REACT_APP_GOOGLE_MAPS_API_KEY in your .env file");
         console.warn("🔧 Address search will work with limited functionality");
         setIsMapLoading(false);
         return;
