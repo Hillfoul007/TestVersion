@@ -26,7 +26,7 @@ class ModernGoogleMapsService {
 
   constructor() {
     const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
-    const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+    const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
     if (!apiKey) {
       console.error(
@@ -81,7 +81,7 @@ class ModernGoogleMapsService {
       ...config,
     };
 
-    const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+    const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
     const mapConfig: any = {
       ...defaultConfig,
@@ -130,7 +130,7 @@ class ModernGoogleMapsService {
 
     await this.initialize();
 
-    const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+    const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
     // Use AdvancedMarkerElement if Map ID is available and configured
     if (
