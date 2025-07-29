@@ -25,7 +25,7 @@ const AddressFunctionalityStatus: React.FC<AddressFunctionalityStatusProps> = ({
   onLoginRequired,
   className = ''
 }) => {
-  const isGoogleMapsConfigured = Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
+  const isGoogleMapsConfigured = Boolean(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
   const isUserAuth = isUserAuthenticated();
   const currentUser = getCurrentUser();
   const isBackendAvailable = config.isBackendAvailable;
