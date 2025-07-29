@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import LaundryIndex from "@/pages/LaundryIndex";
 import LocationConfigPage from "@/pages/LocationConfigPage";
@@ -73,6 +74,7 @@ function App() {
               <Route path="*" element={<LaundryIndex />} />
             </Routes>
             <Toaster />
+            <SonnerToaster />
             <InstallPrompt />
             <PWAUpdateNotification />
           </div>
