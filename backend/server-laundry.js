@@ -77,34 +77,26 @@ app.use("/api/auth", (req, res, next) => {
 });
 
 // CORS configuration - Enhanced for iOS Safari compatibility
-const allowedOrigins = JSON.parse(process.env.ALLOWED_ORIGINS || "[]");
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like curl or mobile apps)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
+    origin: productionConfig.ALLOWED_ORIGINS,
+    credentials: true, // Enable credentials for iOS
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",
       "Accept",
       "user-id",
-      "Cache-Control",
+      "Cache-Control", // Add Cache-Control header support
       "Pragma",
       "Expires",
     ],
-    exposedHeaders: ["Clear-Site-Data"],
-    optionsSuccessStatus: 200,
+    exposedHeaders: ["Clear-Site-Data"], // Expose clear site data header
+    optionsSuccessStatus: 200, // Support legacy browsers
     preflightContinue: false,
-  })
+  }),
 );
+
 
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
