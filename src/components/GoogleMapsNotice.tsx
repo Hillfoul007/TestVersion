@@ -6,7 +6,7 @@ interface GoogleMapsNoticeProps {
 }
 
 const GoogleMapsNotice: React.FC<GoogleMapsNoticeProps> = ({ className = "" }) => {
-  const isGoogleMapsConfigured = Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY?.trim());
+  const isGoogleMapsConfigured = Boolean(process.env.REACT_APP_GOOGLE_MAPS_API_KEY?.trim());
 
   if (isGoogleMapsConfigured) {
     return null; // Don't show notice if Google Maps is properly configured
