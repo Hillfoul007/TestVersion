@@ -12,8 +12,8 @@ const getApiBaseUrl = () => {
     window.location.hostname.includes("vercel.app") ||
     window.location.hostname.includes("builder.codes")
   ) {
-    // Use the correct render.com backend URL
-    return "https://backend-vaxf.onrender.com/api";
+    // Use the correct Railway backend URL
+    return "https://cleancare-pro-api-production-129e.up.railway.app/api";
   }
 
   // For hosted environment, detect if we're on fly.dev and disable backend calls
