@@ -2,6 +2,7 @@
 // This is a stub implementation for demo purposes
 
 import { apiClient } from "@/lib/api";
+import { getGoogleMapsApiKey } from "@/utils/env";
 
 export interface Coordinates {
   lat: number;
