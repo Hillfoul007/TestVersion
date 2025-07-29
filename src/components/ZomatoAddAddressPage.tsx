@@ -603,7 +603,8 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       }
 
       if (!coordinates) {
-        throw new Error("All location attempts failed");
+        console.warn("⚠️ All GPS location attempts failed, trying fallback methods...");
+        throw new Error("GPS location unavailable");
       }
 
       console.log(`🎯 Final location accuracy: ${coordinates.accuracy}m`);
@@ -650,21 +651,31 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         autoFillAddressFields(enhancedAddress);
       }
     } catch (error) {
-      console.error("❌ All location detection attempts failed:", error);
+      console.warn("⚠️ Primary location detection failed:", error.message);
 
-      // Enhanced fallback - try to get approximate location from IP
-      try {
-        console.log("🌐 Trying browser location fallback...");
-        const browserLocation = await getBrowserLocation();
-        if (browserLocation) {
-          setSelectedLocation(browserLocation);
-          setSearchQuery(browserLocation.address);
-          updateMapLocation(browserLocation.coordinates);
-          autoFillAddressFields(browserLocation.address);
-          return;
+      // Don't try browser location fallback if it's a permission denied error
+      const isPermissionDenied = error.message?.includes('denied') ||
+                                  error.message?.includes('permission') ||
+                                  (error.code === 1); // PERMISSION_DENIED
+
+      if (!isPermissionDenied) {
+        // Enhanced fallback - try to get approximate location from IP
+        try {
+          console.log("🌐 Trying browser location fallback...");
+          const browserLocation = await getBrowserLocation();
+          if (browserLocation) {
+            console.log("✅ Browser location fallback successful");
+            setSelectedLocation(browserLocation);
+            setSearchQuery(browserLocation.address);
+            updateMapLocation(browserLocation.coordinates);
+            autoFillAddressFields(browserLocation.address);
+            return;
+          }
+        } catch (locationError) {
+          console.warn("🌐 Browser location fallback failed:", locationError.message);
         }
-      } catch (locationError) {
-        console.warn("Browser location fallback failed:", locationError);
+      } else {
+        console.log("📍 Location permission denied by user, skipping additional GPS attempts");
       }
 
       // Ultimate fallback - major Indian cities based on common usage
@@ -682,13 +693,19 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       const fallbackAddress = `${randomFallback.city}, India`;
 
       console.log(`🏙️ Using fallback location: ${fallbackAddress}`);
+      console.log(`ℹ️ Please enter your address manually or search for your location`);
 
       setSelectedLocation({
         address: fallbackAddress,
         coordinates: { lat: randomFallback.lat, lng: randomFallback.lng },
       });
-      setSearchQuery(fallbackAddress);
+      setSearchQuery(''); // Don't pre-fill with random city
       updateMapLocation({ lat: randomFallback.lat, lng: randomFallback.lng });
+
+      // Show a user-friendly message
+      if (isPermissionDenied) {
+        console.info('💡 Tip: You can enable location access in your browser settings for automatic address detection');
+      }
     } finally {
       setIsDetectingLocation(false);
       setLocationAttempt(0);
@@ -955,27 +972,17 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
                   lng: position.coords.longitude,
                 };
 
-                // Use Google Maps Geocoding to get address
-                if (mapInstance) {
-                  const geocoder = new google.maps.Geocoder();
-                  geocoder.geocode(
-                    { location: coordinates },
-                    (results, status) => {
-                      if (status === "OK" && results && results[0]) {
-                        const address = results[0].formatted_address;
-                        console.log("🌐 Browser location found:", {
-                          coordinates,
-                          address,
-                        });
-                        resolve({ coordinates, address });
-                      } else {
-                        console.warn("Geocoding failed:", status);
-                        resolve({ coordinates, address: "Current Location" });
-                      }
-                    },
-                  );
-                } else {
-                  resolve({ coordinates, address: "Current Location" });
+                // Use OpenCage/LocationService for geocoding instead of Google Maps
+                try {
+                  const address = await locationService.reverseGeocode(coordinates);
+                  console.log("🌐 Browser location found:", {
+                    coordinates,
+                    address,
+                  });
+                  resolve({ coordinates, address });
+                } catch (geocodeError) {
+                  console.warn("Geocoding failed, using coordinates:", geocodeError);
+                  resolve({ coordinates, address: `${coordinates.lat.toFixed(4)}, ${coordinates.lng.toFixed(4)}` });
                 }
               } catch (error) {
                 console.error("Error processing geolocation:", error);
@@ -983,11 +990,16 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
               }
             },
             (error) => {
-              console.warn("Geolocation failed:", error);
+              // Don't log permission denied as an error - it's user choice
+              if (error.code === error.PERMISSION_DENIED) {
+                console.info("📍 Location access was denied by user");
+              } else {
+                console.warn("🌐 Geolocation failed:", error.message);
+              }
               reject(error);
             },
             {
-              enableHighAccuracy: true,
+              enableHighAccuracy: false, // Use lower accuracy for fallback
               timeout: 10000,
               maximumAge: 300000, // 5 minutes
             },
