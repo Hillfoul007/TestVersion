@@ -19,6 +19,7 @@ import { LocationDetectionService } from "@/services/locationDetectionService";
 import LocationUnavailableModal from "./LocationUnavailableModal";
 import GoogleMapsNotice from "./GoogleMapsNotice";
 import { Loader } from "@googlemaps/js-api-loader";
+import { toast } from "sonner";
 
 // Add CSS for bounce animation
 const bounceAnimation = `
@@ -705,6 +706,15 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       // Show a user-friendly message
       if (isPermissionDenied) {
         console.info('💡 Tip: You can enable location access in your browser settings for automatic address detection');
+        toast.info('Location access denied', {
+          description: 'Please enter your address manually or enable location access in browser settings.',
+          duration: 5000
+        });
+      } else {
+        toast.error('Location detection failed', {
+          description: 'Please enter your address manually or try again.',
+          duration: 4000
+        });
       }
     } finally {
       setIsDetectingLocation(false);
