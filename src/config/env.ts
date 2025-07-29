@@ -7,7 +7,7 @@ import { getProductionApiUrl, shouldUseBackend } from "./production-env";
 
 export const getApiBaseUrl = (): string => {
   // First, check for explicit environment variable
-  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  const envUrl = process.env.REACT_APP_API_BASE_URL;
 
   if (envUrl && envUrl !== "") {
     console.log("🔧 Using environment variable API URL:", envUrl);
