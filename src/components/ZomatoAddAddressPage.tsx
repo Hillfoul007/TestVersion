@@ -19,7 +19,6 @@ import { LocationDetectionService } from "@/services/locationDetectionService";
 import LocationUnavailableModal from "./LocationUnavailableModal";
 import GoogleMapsNotice from "./GoogleMapsNotice";
 import { Loader } from "@googlemaps/js-api-loader";
-import { toast } from "@/components/ui/sonner";
 
 // Add CSS for bounce animation
 const bounceAnimation = `
@@ -563,7 +562,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
           const currentCoords = await locationService.getCurrentPosition({
             enableHighAccuracy: true,
-            timeout: attempts === 0 ? 20000 : 10000, // Reasonable timeout for precision
+            timeout: attempts === 0 ? 30000 : 15000, // Much longer timeout for precision
             maximumAge: 0, // Always get fresh location
           });
 
@@ -604,8 +603,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       }
 
       if (!coordinates) {
-        console.warn("⚠️ All GPS location attempts failed, trying fallback methods...");
-        throw new Error("GPS location unavailable");
+        throw new Error("All location attempts failed");
       }
 
       console.log(`🎯 Final location accuracy: ${coordinates.accuracy}m`);
@@ -651,43 +649,22 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       } else {
         autoFillAddressFields(enhancedAddress);
       }
-
-      // Show success message
-      toast.success('Location detected successfully', {
-        description: `Address: ${enhancedAddress.substring(0, 50)}${enhancedAddress.length > 50 ? '...' : ''}`,
-        duration: 3000
-      });
     } catch (error) {
-      console.warn("⚠️ Primary location detection failed:", error.message);
+      console.error("❌ All location detection attempts failed:", error);
 
-      // Don't try browser location fallback if it's a permission denied error
-      const isPermissionDenied = error.message?.includes('denied') ||
-                                  error.message?.includes('permission') ||
-                                  (error.code === 1); // PERMISSION_DENIED
-
-      if (!isPermissionDenied) {
-        // Enhanced fallback - try to get approximate location from IP
-        try {
-          console.log("🌐 Trying browser location fallback...");
-          const browserLocation = await getBrowserLocation();
-          if (browserLocation) {
-            console.log("✅ Browser location fallback successful");
-            setSelectedLocation(browserLocation);
-            setSearchQuery(browserLocation.address);
-            updateMapLocation(browserLocation.coordinates);
-            autoFillAddressFields(browserLocation.address);
-
-            toast.success('Location detected', {
-              description: `Using browser location: ${browserLocation.address.substring(0, 50)}${browserLocation.address.length > 50 ? '...' : ''}`,
-              duration: 3000
-            });
-            return;
-          }
-        } catch (locationError) {
-          console.warn("🌐 Browser location fallback failed:", locationError.message);
+      // Enhanced fallback - try to get approximate location from IP
+      try {
+        console.log("🌐 Trying browser location fallback...");
+        const browserLocation = await getBrowserLocation();
+        if (browserLocation) {
+          setSelectedLocation(browserLocation);
+          setSearchQuery(browserLocation.address);
+          updateMapLocation(browserLocation.coordinates);
+          autoFillAddressFields(browserLocation.address);
+          return;
         }
-      } else {
-        console.log("📍 Location permission denied by user, skipping additional GPS attempts");
+      } catch (locationError) {
+        console.warn("Browser location fallback failed:", locationError);
       }
 
       // Ultimate fallback - major Indian cities based on common usage
@@ -705,28 +682,13 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       const fallbackAddress = `${randomFallback.city}, India`;
 
       console.log(`🏙️ Using fallback location: ${fallbackAddress}`);
-      console.log(`ℹ️ Please enter your address manually or search for your location`);
 
       setSelectedLocation({
         address: fallbackAddress,
         coordinates: { lat: randomFallback.lat, lng: randomFallback.lng },
       });
-      setSearchQuery(''); // Don't pre-fill with random city
+      setSearchQuery(fallbackAddress);
       updateMapLocation({ lat: randomFallback.lat, lng: randomFallback.lng });
-
-      // Show a user-friendly message
-      if (isPermissionDenied) {
-        console.info('💡 Tip: You can enable location access in your browser settings for automatic address detection');
-        toast.info('Location access denied', {
-          description: 'Please enter your address manually or enable location access in browser settings.',
-          duration: 5000
-        });
-      } else {
-        toast.error('Location detection failed', {
-          description: 'Please enter your address manually or try again.',
-          duration: 4000
-        });
-      }
     } finally {
       setIsDetectingLocation(false);
       setLocationAttempt(0);
@@ -950,7 +912,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
                 ) {
                   const nearbyStreet = results[0];
                   console.log(
-                    "��� Found nearby street via legacy Places API:",
+                    "✅ Found nearby street via legacy Places API:",
                     nearbyStreet.vicinity,
                   );
                   resolve({
@@ -993,17 +955,27 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
                   lng: position.coords.longitude,
                 };
 
-                // Use OpenCage/LocationService for geocoding instead of Google Maps
-                try {
-                  const address = await locationService.reverseGeocode(coordinates);
-                  console.log("🌐 Browser location found:", {
-                    coordinates,
-                    address,
-                  });
-                  resolve({ coordinates, address });
-                } catch (geocodeError) {
-                  console.warn("Geocoding failed, using coordinates:", geocodeError);
-                  resolve({ coordinates, address: `${coordinates.lat.toFixed(4)}, ${coordinates.lng.toFixed(4)}` });
+                // Use Google Maps Geocoding to get address
+                if (mapInstance) {
+                  const geocoder = new google.maps.Geocoder();
+                  geocoder.geocode(
+                    { location: coordinates },
+                    (results, status) => {
+                      if (status === "OK" && results && results[0]) {
+                        const address = results[0].formatted_address;
+                        console.log("🌐 Browser location found:", {
+                          coordinates,
+                          address,
+                        });
+                        resolve({ coordinates, address });
+                      } else {
+                        console.warn("Geocoding failed:", status);
+                        resolve({ coordinates, address: "Current Location" });
+                      }
+                    },
+                  );
+                } else {
+                  resolve({ coordinates, address: "Current Location" });
                 }
               } catch (error) {
                 console.error("Error processing geolocation:", error);
@@ -1011,16 +983,11 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
               }
             },
             (error) => {
-              // Don't log permission denied as an error - it's user choice
-              if (error.code === error.PERMISSION_DENIED) {
-                console.info("📍 Location access was denied by user");
-              } else {
-                console.warn("🌐 Geolocation failed:", error.message);
-              }
+              console.warn("Geolocation failed:", error);
               reject(error);
             },
             {
-              enableHighAccuracy: false, // Use lower accuracy for fallback
+              enableHighAccuracy: true,
               timeout: 10000,
               maximumAge: 300000, // 5 minutes
             },
