@@ -1,6 +1,14 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const compression = require('compression');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+require('dotenv').config();
+
+// Import database connection
+const { connectDB } = require('./backend/config/database');
 
 // Import backend routes
 const bookingsRoutes = require('./backend/routes/bookings');
@@ -20,10 +28,37 @@ const detectedLocationsRoutes = require('./backend/routes/detected-locations');
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // limit each IP to 1000 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false
+}));
+app.use(compression());
+app.use(limiter);
+
+// Logging
+if (process.env.NODE_ENV !== 'production') {
+  app.use(morgan('dev'));
+}
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production'
+    ? ['https://laundrify-app.onrender.com', 'https://laundrify.onrender.com']
+    : ['http://localhost:3000', 'http://localhost:10000'],
+  credentials: true
+}));
+
+// Body parsing middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Serve static files from React build
 app.use(express.static(path.join(__dirname, 'build')));
