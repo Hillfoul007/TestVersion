@@ -69,11 +69,9 @@ app.use('/api/dynamic-services', dynamicServicesRoutes);
 app.use('/api/google-maps', googleMapsRoutes);
 app.use('/api/location', locationRoutes);
 app.use('/api/otp-auth', otpAuthRoutes);
-app.use('/api/ping', pingRoutes);
 app.use('/api/riders', ridersRoutes);
-app.use('/api/services', servicesRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/webhooks', webhooksRoutes);
+app.use('/api/referrals', referralsRoutes);
+app.use('/api/whatsapp-auth', whatsappAuthRoutes);
 app.use('/api/detected-locations', detectedLocationsRoutes);
 
 // Handle React routing, return all requests to React app
