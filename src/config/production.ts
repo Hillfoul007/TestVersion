@@ -3,12 +3,12 @@
 
 export const PRODUCTION_CONFIG = {
   // Environment
-  NODE_ENV: import.meta.env.VITE_NODE_ENV || "production",
-  IS_PRODUCTION: import.meta.env.VITE_NODE_ENV === "production",
+  NODE_ENV: process.env.REACT_APP_NODE_ENV || "production",
+  IS_PRODUCTION: process.env.REACT_APP_NODE_ENV === "production",
 
   // API Configuration
   API_BASE_URL:
-    import.meta.env.VITE_API_BASE_URL ||
+    process.env.REACT_APP_API_BASE_URL ||
     "https://cleancare-pro-api-production-129e.up.railway.app/api",
 
   // Authentication
@@ -16,10 +16,10 @@ export const PRODUCTION_CONFIG = {
   USER_DATA_KEY: "laundrify_user",
 
   // Google Services
-  GOOGLE_MAPS_API_KEY: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+  GOOGLE_MAPS_API_KEY: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
 
   // SMS Service
-  DVHOSTING_API_KEY: import.meta.env.VITE_DVHOSTING_API_KEY,
+  DVHOSTING_API_KEY: process.env.REACT_APP_DVHOSTING_API_KEY,
 
   // App Settings
   APP_NAME: "Laundrify",
