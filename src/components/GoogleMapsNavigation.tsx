@@ -99,7 +99,7 @@ const GoogleMapsNavigation: React.FC<GoogleMapsNavigationProps> = ({
       calculateRoute();
     } else if (map && !origin) {
       // Show just the destination marker if no origin
-      const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+      const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
       // Only use Advanced Markers if Map ID is configured and available
       if (

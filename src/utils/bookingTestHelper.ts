@@ -111,7 +111,7 @@ export const bookingTestHelper = {
 
     // Check backend connectivity
     const apiUrl =
-      import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+      process.env.REACT_APP_API_BASE_URL || "http://localhost:3001/api";
     console.log("API Base URL:", apiUrl);
     console.log("Environment:", window.location.hostname);
 

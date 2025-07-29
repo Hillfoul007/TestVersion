@@ -20,7 +20,7 @@ export interface User {
 export class ResendEmailService {
   private static instance: ResendEmailService;
   private apiBaseUrl =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:3001/api";
   private resendApiKey = "re_5jhaDsos_4PHJ1Cm9G47f9PNS37zbR7tH";
   private resendApiUrl = "https://api.resend.com/emails";
 

@@ -34,7 +34,7 @@ const RiderSetupChecker: React.FC<RiderSetupCheckerProps> = ({
       // Check if backend is running
       try {
         const apiBaseUrl =
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+          process.env.REACT_APP_API_BASE_URL || "http://localhost:3001/api";
         const healthResponse = await fetch(
           `${apiBaseUrl.replace("/api", "")}/health`,
         );
@@ -205,12 +205,12 @@ const RiderSetupChecker: React.FC<RiderSetupCheckerProps> = ({
         <div className="text-xs text-gray-500 space-y-1">
           <p>
             🔧 Backend Health:{" "}
-            {import.meta.env.VITE_API_BASE_URL || "http://localhost:3001"}
+            {process.env.REACT_APP_API_BASE_URL || "http://localhost:3001"}
             /health
           </p>
           <p>
             🧪 API Test:{" "}
-            {import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api"}
+            {process.env.REACT_APP_API_BASE_URL || "http://localhost:3001/api"}
             /test
           </p>
           <p>📚 Documentation: See MONGODB_SETUP_GUIDE.md</p>

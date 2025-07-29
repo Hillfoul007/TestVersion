@@ -1,0 +1,111 @@
+const express = require('express');
+const path = require('path');
+const cors = require('cors');
+const compression = require('compression');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+require('dotenv').config();
+
+// Import database connection
+const { connectDB } = require('./backend/config/database');
+
+// Import backend routes
+const bookingsRoutes = require('./backend/routes/bookings');
+const addressesRoutes = require('./backend/routes/addresses');
+const adminRoutes = require('./backend/routes/admin');
+const dynamicServicesRoutes = require('./backend/routes/dynamic-services');
+const googleMapsRoutes = require('./backend/routes/google-maps');
+const locationRoutes = require('./backend/routes/location');
+const otpAuthRoutes = require('./backend/routes/otp-auth');
+const ridersRoutes = require('./backend/routes/riders');
+const referralsRoutes = require('./backend/routes/referrals');
+const whatsappAuthRoutes = require('./backend/routes/whatsapp-auth');
+const detectedLocationsRoutes = require('./backend/routes/detected-locations');
+
+const app = express();
+const port = process.env.PORT || 3001;
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // limit each IP to 1000 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false
+}));
+app.use(compression());
+app.use(limiter);
+
+// Logging
+if (process.env.NODE_ENV !== 'production') {
+  app.use(morgan('dev'));
+}
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production'
+    ? ['https://laundrify-app.onrender.com', 'https://laundrify.onrender.com']
+    : ['http://localhost:3000', 'http://localhost:10000'],
+  credentials: true
+}));
+
+// Body parsing middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// API Routes
+app.use('/api/bookings', bookingsRoutes);
+app.use('/api/addresses', addressesRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/dynamic-services', dynamicServicesRoutes);
+app.use('/api/google-maps', googleMapsRoutes);
+app.use('/api/location', locationRoutes);
+app.use('/api/otp-auth', otpAuthRoutes);
+app.use('/api/riders', ridersRoutes);
+app.use('/api/referrals', referralsRoutes);
+app.use('/api/whatsapp-auth', whatsappAuthRoutes);
+app.use('/api/detected-locations', detectedLocationsRoutes);
+
+// Handle React routing, return all requests to React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+// Connect to database and start server
+const startServer = async () => {
+  // Only connect to MongoDB in production or if credentials are provided
+  const hasValidCredentials = process.env.MONGODB_USERNAME &&
+    process.env.MONGODB_PASSWORD &&
+    process.env.MONGODB_CLUSTER &&
+    process.env.MONGODB_USERNAME !== 'your_mongodb_username';
+
+  if (process.env.NODE_ENV === 'production' && hasValidCredentials) {
+    try {
+      await connectDB();
+      console.log('✅ Connected to MongoDB');
+    } catch (error) {
+      console.error('❌ MongoDB connection failed:', error.message);
+      process.exit(1);
+    }
+  } else {
+    console.log('🔄 Running in development mode without MongoDB');
+    console.log('💡 Set MONGODB_USERNAME, MONGODB_PASSWORD, and MONGODB_CLUSTER to connect to database');
+  }
+
+  app.listen(port, () => {
+    console.log(`🚀 Laundrify server running on port ${port}`);
+    console.log(`Frontend: http://localhost:${port}`);
+    console.log(`API: http://localhost:${port}/api`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+};
+
+startServer();

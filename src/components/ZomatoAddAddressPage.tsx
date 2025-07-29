@@ -180,9 +180,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
   const initializeMap = async () => {
     try {
-      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
       if (!apiKey) {
-        console.warn("❌ Google Maps API key not configured. Please set VITE_GOOGLE_MAPS_API_KEY in your .env file");
+        console.warn("❌ Google Maps API key not configured. Please set REACT_APP_GOOGLE_MAPS_API_KEY in your .env file");
         console.warn("🔧 Address search will work with limited functionality");
         setIsMapLoading(false);
         return;
@@ -202,7 +202,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       const defaultCenter = { lat: 20.5937, lng: 78.9629 };
 
       // Check if Map ID is configured for Advanced Markers
-      const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+      const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
       const mapConfig: any = {
         center: defaultCenter,
@@ -392,7 +392,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
       // Add new marker with enhanced visual feedback
       let newMarker;
-      const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+      const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
       // Only use Advanced Markers if Map ID is configured and available
       if (
@@ -1109,7 +1109,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       let suggestions = [];
 
       // Method 1: Google Places API (primary) - Only if properly configured
-      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
       if (autocompleteService && apiKey && apiKey.trim() !== "") {
         try {
           const { AutocompleteSuggestion, AutocompleteSessionToken } =
@@ -1362,7 +1362,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
     try {
       // Check if Google Maps API is available before trying to use it
-      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
       if (!apiKey || !apiKey.trim() || !window.google?.maps) {
         console.log("🗺�� Google Maps API not available, using fallback method");
         throw new Error("Google Maps API not available");

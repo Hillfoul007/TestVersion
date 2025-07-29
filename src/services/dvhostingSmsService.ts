@@ -1,5 +1,5 @@
 const getApiBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  const envUrl = process.env.REACT_APP_API_BASE_URL;
   if (envUrl && envUrl !== "") {
     return envUrl;
   }
@@ -595,7 +595,7 @@ export class DVHostingSmsService {
   private async sendDirectDVHostingOTP(phoneNumber: string): Promise<boolean> {
     try {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const apiKey = import.meta.env.VITE_DVHOSTING_API_KEY || "GLX2yKgdb9";
+      const apiKey = process.env.REACT_APP_DVHOSTING_API_KEY || "GLX2yKgdb9";
 
       console.log("DVHosting SMS: Calling DVHosting API directly");
       console.log("DVHosting SMS: Phone:", phoneNumber, "OTP:", otp);
@@ -790,7 +790,7 @@ export class DVHostingSmsService {
       return ""; // Return empty string to indicate no backend available
     }
 
-    return import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+    return process.env.REACT_APP_API_BASE_URL || "http://localhost:3001/api";
   }
 
   /**
@@ -811,7 +811,7 @@ export class DVHostingSmsService {
       }
 
       // Use the same URL detection as booking helpers
-      let apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+      let apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
       if (!apiBaseUrl || apiBaseUrl === "") {
         if (
@@ -899,7 +899,7 @@ export class DVHostingSmsService {
       }
 
       // Use the same URL detection as other services
-      let apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+      let apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
       if (!apiBaseUrl || apiBaseUrl === "") {
         if (window.location.hostname.includes("vercel.app")) {

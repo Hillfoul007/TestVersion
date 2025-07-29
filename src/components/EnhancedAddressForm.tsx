@@ -156,7 +156,7 @@ const EnhancedAddressForm: React.FC<EnhancedAddressFormProps> = ({
   }, []);
 
   const loadGoogleMapsAPI = () => {
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
     if (!apiKey) {
       console.warn("Google Maps API key not configured");
       return;

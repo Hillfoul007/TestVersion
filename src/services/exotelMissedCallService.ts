@@ -6,11 +6,11 @@ import { isBackendAvailable } from "../config/env";
 export class ExotelMissedCallService {
   private static instance: ExotelMissedCallService;
   private apiBaseUrl =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
-  private exotelApiKey = import.meta.env.VITE_EXOTEL_API_KEY || "";
-  private exotelToken = import.meta.env.VITE_EXOTEL_TOKEN || "";
-  private exotelNumber = import.meta.env.VITE_EXOTEL_NUMBER || "";
-  private exotelPin = import.meta.env.VITE_EXOTEL_PIN || "";
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:3001/api";
+  private exotelApiKey = process.env.REACT_APP_EXOTEL_API_KEY || "";
+  private exotelToken = process.env.REACT_APP_EXOTEL_TOKEN || "";
+  private exotelNumber = process.env.REACT_APP_EXOTEL_NUMBER || "";
+  private exotelPin = process.env.REACT_APP_EXOTEL_PIN || "";
 
   public static getInstance(): ExotelMissedCallService {
     if (!ExotelMissedCallService.instance) {

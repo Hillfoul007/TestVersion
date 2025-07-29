@@ -164,13 +164,13 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ isOpen, onClose }) => {
                 <div>
                   API Key:{" "}
                   <code>
-                    {import.meta.env.VITE_GUPSHUP_API_KEY ? "Set" : "Not Set"}
+                    {process.env.REACT_APP_GUPSHUP_API_KEY ? "Set" : "Not Set"}
                   </code>
                 </div>
                 <div>
                   Source Number:{" "}
                   <code>
-                    {import.meta.env.VITE_GUPSHUP_SOURCE_NUMBER ||
+                    {process.env.REACT_APP_GUPSHUP_SOURCE_NUMBER ||
                       "Using fallback"}
                   </code>
                 </div>

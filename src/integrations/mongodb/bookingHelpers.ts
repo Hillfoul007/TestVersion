@@ -1,6 +1,6 @@
 // API URL configuration with fallback for hosted environment
 const getApiBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  const envUrl = process.env.REACT_APP_API_BASE_URL;
 
   // If we have an environment URL, use it
   if (envUrl && envUrl !== "") {

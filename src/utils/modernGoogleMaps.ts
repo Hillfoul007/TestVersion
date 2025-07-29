@@ -25,18 +25,18 @@ class ModernGoogleMapsService {
   )[] = [];
 
   constructor() {
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-    const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+    const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+    const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
     if (!apiKey) {
       console.error(
-        "❌ Google Maps API key not configured. Please set VITE_GOOGLE_MAPS_API_KEY",
+        "❌ Google Maps API key not configured. Please set REACT_APP_GOOGLE_MAPS_API_KEY",
       );
     }
 
     if (!mapId || mapId.trim() === "") {
       console.warn(
-        "⚠️ Google Maps Map ID not configured. Advanced Markers will not be available. Set VITE_GOOGLE_MAPS_MAP_ID to enable Advanced Markers.",
+        "⚠️ Google Maps Map ID not configured. Advanced Markers will not be available. Set REACT_APP_GOOGLE_MAPS_MAP_ID to enable Advanced Markers.",
       );
     }
 
@@ -81,7 +81,7 @@ class ModernGoogleMapsService {
       ...config,
     };
 
-    const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+    const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
     const mapConfig: any = {
       ...defaultConfig,
@@ -130,7 +130,7 @@ class ModernGoogleMapsService {
 
     await this.initialize();
 
-    const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+    const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
     // Use AdvancedMarkerElement if Map ID is available and configured
     if (

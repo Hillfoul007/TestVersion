@@ -22,8 +22,8 @@ export function GoogleMapsConfigTest() {
       setIsLoading(true);
 
       try {
-        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-        const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+        const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+        const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
         const newStatus: ConfigStatus = {
           apiKey: !!(apiKey && apiKey.trim() !== ""),
@@ -187,10 +187,10 @@ export function GoogleMapsConfigTest() {
         </p>
         <ol className="list-decimal list-inside space-y-1">
           <li>
-            Set <code>VITE_GOOGLE_MAPS_API_KEY</code> in your .env file
+            Set <code>REACT_APP_GOOGLE_MAPS_API_KEY</code> in your .env file
           </li>
           <li>
-            Optionally set <code>VITE_GOOGLE_MAPS_MAP_ID</code> for Advanced
+            Optionally set <code>REACT_APP_GOOGLE_MAPS_MAP_ID</code> for Advanced
             Markers
           </li>
           <li>Ensure APIs are enabled in Google Cloud Console</li>

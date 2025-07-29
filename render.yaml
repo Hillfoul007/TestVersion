@@ -23,11 +23,11 @@ services:
     staticPublishPath: dist
     envVars:
       - fromGroup: cleancare-secrets
-      - key: VITE_API_BASE_URL
+      - key: REACT_APP_API_BASE_URL
         value: https://cleancare-pro-api-production-129e.up.railway.app/api
-      - key: VITE_APP_NAME
+      - key: REACT_APP_APP_NAME
         value: Laundrify
-      - key: VITE_APP_URL
+      - key: REACT_APP_APP_URL
         value: https://laundrify-up.up.railway.app
 
 envVarGroups:
@@ -45,7 +45,7 @@ envVarGroups:
         value: # sms key
       - key: JWT_SECRET
         value: # secret
-      - key: VITE_DVHOSTING_API_KEY
+      - key: REACT_APP_DVHOSTING_API_KEY
         value: # frontend key
-      - key: VITE_GOOGLE_MAPS_API_KEY
+      - key: REACT_APP_GOOGLE_MAPS_API_KEY
         value: # map key

@@ -2,6 +2,7 @@
 // This is a stub implementation for demo purposes
 
 import { apiClient } from "@/lib/api";
+import { getGoogleMapsApiKey } from "@/utils/env";
 
 export interface Coordinates {
   lat: number;
@@ -35,8 +36,7 @@ export interface GeocodeResult {
 }
 
 class LocationService {
-  private readonly GOOGLE_MAPS_API_KEY = import.meta.env
-    .VITE_GOOGLE_MAPS_API_KEY;
+  private readonly GOOGLE_MAPS_API_KEY = getGoogleMapsApiKey();
 
   /**
    * Get user's current position using browser geolocation with enhanced accuracy
