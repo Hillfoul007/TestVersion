@@ -563,7 +563,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
           const currentCoords = await locationService.getCurrentPosition({
             enableHighAccuracy: true,
-            timeout: attempts === 0 ? 30000 : 15000, // Much longer timeout for precision
+            timeout: attempts === 0 ? 20000 : 10000, // Reasonable timeout for precision
             maximumAge: 0, // Always get fresh location
           });
 
@@ -950,7 +950,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
                 ) {
                   const nearbyStreet = results[0];
                   console.log(
-                    "✅ Found nearby street via legacy Places API:",
+                    "��� Found nearby street via legacy Places API:",
                     nearbyStreet.vicinity,
                   );
                   resolve({
