@@ -15,7 +15,9 @@ export const PRODUCTION_CONFIG = {
   AUTH_TOKEN_KEY: "laundrify_token",
   USER_DATA_KEY: "laundrify_user",
 
-  // Google Services
+  // Geocoding Services
+  OPENCAGE_API_KEY: import.meta.env.VITE_OPENCAGE_API_KEY || 'bb9e8b5e99a24e1c811e89a6c1099fd1',
+  // Deprecated Google Maps (kept for fallback compatibility)
   GOOGLE_MAPS_API_KEY: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
 
   // SMS Service
@@ -86,8 +88,12 @@ export const validateEnvironment = () => {
   const errors: string[] = [];
 
   // Required environment variables
+  if (!PRODUCTION_CONFIG.OPENCAGE_API_KEY) {
+    errors.push("OpenCage API key is required for geocoding");
+  }
+
   if (!PRODUCTION_CONFIG.GOOGLE_MAPS_API_KEY) {
-    warnings.push("Google Maps API key not configured");
+    warnings.push("Google Maps API key not configured (fallback only)");
   }
 
   if (!PRODUCTION_CONFIG.DVHOSTING_API_KEY) {
