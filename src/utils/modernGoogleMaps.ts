@@ -30,7 +30,7 @@ class ModernGoogleMapsService {
 
     if (!apiKey) {
       console.error(
-        "❌ Google Maps API key not configured. Please set VITE_GOOGLE_MAPS_API_KEY",
+        "❌ Google Maps API key not configured. Please set REACT_APP_GOOGLE_MAPS_API_KEY",
       );
     }
 
