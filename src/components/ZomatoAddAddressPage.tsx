@@ -19,7 +19,7 @@ import { LocationDetectionService } from "@/services/locationDetectionService";
 import LocationUnavailableModal from "./LocationUnavailableModal";
 import GoogleMapsNotice from "./GoogleMapsNotice";
 import { Loader } from "@googlemaps/js-api-loader";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 
 // Add CSS for bounce animation
 const bounceAnimation = `
