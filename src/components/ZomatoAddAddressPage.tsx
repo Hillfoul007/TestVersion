@@ -202,7 +202,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       const defaultCenter = { lat: 20.5937, lng: 78.9629 };
 
       // Check if Map ID is configured for Advanced Markers
-      const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+      const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
       const mapConfig: any = {
         center: defaultCenter,
@@ -392,7 +392,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
       // Add new marker with enhanced visual feedback
       let newMarker;
-      const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+      const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
       // Only use Advanced Markers if Map ID is configured and available
       if (
