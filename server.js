@@ -80,7 +80,7 @@ app.use('/api/detected-locations', detectedLocationsRoutes);
 
 // Handle React routing, return all requests to React app
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 // Connect to database and start server
