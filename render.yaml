@@ -14,7 +14,7 @@ services:
       - key: MONGODB_DATABASE
         value: cleancare_pro
       - key: ALLOWED_ORIGINS
-        value: https://cleancare-pro-frontend.onrender.com
+        value: https://laundrify-up.up.railway.app
 
   - type: web
     name: cleancare-pro-frontend
