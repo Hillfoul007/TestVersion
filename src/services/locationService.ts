@@ -1,7 +1,8 @@
-// Simplified location service without Supabase dependencies
-// This is a stub implementation for demo purposes
+// Enhanced location service with OpenCage as primary geocoding provider
+// Replaces Google Maps dependency with OpenCage Data API
 
 import { apiClient } from "@/lib/api";
+import { openCageService, type OpenCageCoordinates } from "./openCageService";
 
 export interface Coordinates {
   lat: number;
@@ -35,8 +36,7 @@ export interface GeocodeResult {
 }
 
 class LocationService {
-  private readonly GOOGLE_MAPS_API_KEY = import.meta.env
-    .VITE_GOOGLE_MAPS_API_KEY;
+  private readonly OPENCAGE_API_KEY = import.meta.env.VITE_OPENCAGE_API_KEY || 'bb9e8b5e99a24e1c811e89a6c1099fd1';
 
   /**
    * Get user's current position using browser geolocation with enhanced accuracy
@@ -83,9 +83,12 @@ class LocationService {
         },
         (error) => {
           let errorMessage = "Unknown geolocation error";
+          let logLevel = "error";
+
           switch (error.code) {
             case error.PERMISSION_DENIED:
               errorMessage = "Location access denied by user";
+              logLevel = "info"; // Not really an error, user choice
               break;
             case error.POSITION_UNAVAILABLE:
               errorMessage = "Location information unavailable";
@@ -95,8 +98,15 @@ class LocationService {
               break;
           }
 
-          console.error("❌ Geolocation error:", errorMessage, error);
-          reject(new Error(errorMessage));
+          if (logLevel === "info") {
+            console.info("📍 Geolocation permission:", errorMessage);
+          } else {
+            console.error("❌ Geolocation error:", errorMessage, error);
+          }
+
+          const errorWithCode = new Error(errorMessage);
+          (errorWithCode as any).code = error.code;
+          reject(errorWithCode);
         },
         defaultOptions,
       );
@@ -104,117 +114,54 @@ class LocationService {
   }
 
   /**
-   * Reverse geocode coordinates to human-readable address with maximum detail including area/village
+   * Reverse geocode coordinates to human-readable address using OpenCage as primary provider
    */
   async reverseGeocode(coordinates: Coordinates): Promise<string> {
     console.log("🔍 Starting enhanced reverse geocoding for:", coordinates);
 
-    // Method 1: Google Maps API with multiple result types for maximum detail
-    if (this.GOOGLE_MAPS_API_KEY) {
-      try {
-        // Import the API base URL
-        const { getApiBaseUrl } = await import('../config/env');
-        const apiBaseUrl = getApiBaseUrl();
+    // Method 1: OpenCage API (Primary)
+    try {
+      const openCageCoords: OpenCageCoordinates = {
+        lat: coordinates.lat,
+        lng: coordinates.lng,
+        accuracy: coordinates.accuracy
+      };
 
-        if (!apiBaseUrl) {
-          console.warn("🌐 Backend not available, skipping Google Maps API");
-          return null;
-        }
+      const address = await openCageService.reverseGeocode(openCageCoords);
+      if (address && address.length > 10) {
+        console.log("✅ OpenCage reverse geocoding successful:", address);
+        return address;
+      }
+    } catch (error) {
+      console.warn("OpenCage reverse geocoding failed, trying fallback:", error);
+    }
 
-        // Make multiple requests prioritizing street-level detail using backend proxy
-        const requests = [
-          // Ultra-high detail request for street addresses
-          `${apiBaseUrl}/google-maps/geocode?latlng=${coordinates.lat},${coordinates.lng}&result_type=street_address&language=en&region=IN`,
-          // Building/premise detail request
-          `${apiBaseUrl}/google-maps/geocode?latlng=${coordinates.lat},${coordinates.lng}&result_type=premise|subpremise|establishment&language=en&region=IN`,
-          // Street-level detail request
-          `${apiBaseUrl}/google-maps/geocode?latlng=${coordinates.lat},${coordinates.lng}&result_type=route|intersection&language=en&region=IN`,
-          // Neighborhood detail request
-          `${apiBaseUrl}/google-maps/geocode?latlng=${coordinates.lat},${coordinates.lng}&result_type=neighborhood|sublocality_level_1|sublocality_level_2&language=en&region=IN`,
-          // Comprehensive fallback request
+    // Method 2: Backend proxy (fallback to converted OpenCage)
+    try {
+      // Import the API base URL
+      const { getApiBaseUrl } = await import('../config/env');
+      const apiBaseUrl = getApiBaseUrl();
+
+      if (apiBaseUrl) {
+        const response = await fetch(
           `${apiBaseUrl}/google-maps/geocode?latlng=${coordinates.lat},${coordinates.lng}&language=en&region=IN`,
-        ];
+          {
+            headers: {
+              Accept: "application/json",
+            },
+          }
+        );
 
-        for (const requestUrl of requests) {
-          try {
-            const response = await fetch(requestUrl, {
-              headers: {
-                Accept: "application/json",
-              },
-            });
-
-            if (!response.ok) {
-              console.warn(
-                `Google Maps API returned ${response.status}: ${response.statusText}`,
-              );
-              continue;
-            }
-
-            const data = await response.json();
-
-            if (data.status === "OK" && data.results.length > 0) {
-              // Enhanced prioritization for street-level details
-              const streetAddressResult = data.results.find((result) =>
-                result.types.includes("street_address"),
-              );
-
-              const premiseResult = data.results.find(
-                (result) =>
-                  result.types.includes("premise") ||
-                  result.types.includes("subpremise"),
-              );
-
-              const routeResult = data.results.find(
-                (result) =>
-                  result.types.includes("route") ||
-                  result.types.includes("intersection"),
-              );
-
-              // Use the most detailed result available
-              const prioritizedResult =
-                streetAddressResult ||
-                premiseResult ||
-                routeResult ||
-                data.results[0];
-
-              console.log(
-                "✅ Google Maps street-level result:",
-                prioritizedResult,
-              );
-              console.log("🏠 Result types:", prioritizedResult.types);
-
-              // Extract and format detailed components
-              const addressComponents = this.extractDetailedComponents(
-                prioritizedResult.address_components,
-              );
-              const enhancedAddress =
-                this.formatEnhancedIndianAddress(addressComponents);
-
-              // Only return if we have meaningful street-level detail
-              if (
-                enhancedAddress &&
-                (addressComponents.street_number ||
-                  addressComponents.route ||
-                  addressComponents.premise ||
-                  enhancedAddress.length > 15)
-              ) {
-                console.log("✅ Street-level address found:", enhancedAddress);
-                return enhancedAddress;
-              }
-
-              return prioritizedResult.formatted_address;
-            }
-          } catch (requestError) {
-            console.warn(
-              "Google Maps request failed, trying next:",
-              requestError,
-            );
-            continue;
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === "OK" && data.results.length > 0) {
+            console.log("✅ Backend proxy geocoding successful:", data.results[0].formatted_address);
+            return data.results[0].formatted_address;
           }
         }
-      } catch (error) {
-        console.warn("Google Maps enhanced reverse geocoding failed:", error);
       }
+    } catch (error) {
+      console.warn("Backend proxy geocoding failed:", error);
     }
 
     // Method 2: Enhanced Nominatim with maximum zoom for street-level detail
@@ -252,14 +199,14 @@ class LocationService {
       console.warn("Nominatim enhanced reverse geocoding failed:", error);
     }
 
-    // Method 3: Alternative reverse geocoding service
+    // Method 3: Direct OpenCage API fallback with demo key
     try {
-      // Use a CORS-friendly reverse geocoding service
       const response = await fetch(
-        `https://api.opencagedata.com/geocode/v1/json?q=${coordinates.lat}+${coordinates.lng}&key=demo&language=en&countrycode=in&limit=1`,
+        `https://api.opencagedata.com/geocode/v1/json?q=${coordinates.lat}+${coordinates.lng}&key=bb9e8b5e99a24e1c811e89a6c1099fd1&language=en&countrycode=in&limit=1`,
         {
           headers: {
             Accept: "application/json",
+            "User-Agent": "Laundrify-App/1.0"
           },
           mode: "cors",
         },
@@ -268,12 +215,12 @@ class LocationService {
       if (response.ok) {
         const data = await response.json();
         if (data && data.results && data.results.length > 0) {
-          console.log("✅ OpenCage enhanced result:", data.results[0]);
+          console.log("✅ Direct OpenCage result:", data.results[0]);
           return data.results[0].formatted;
         }
       }
     } catch (error) {
-      console.warn("OpenCage reverse geocoding failed:", error);
+      console.warn("Direct OpenCage reverse geocoding failed:", error);
     }
 
     // Method 4: Fallback with coordinate-based address
@@ -440,120 +387,47 @@ class LocationService {
   }
 
   /**
-   * Extract house number from Indian address string
+   * Extract house number from Indian address string using OpenCage service
    */
   extractHouseNumber(address: string): {
     houseNumber: string;
     building: string;
     cleanedAddress: string;
   } {
-    let houseNumber = "";
-    let building = "";
-    let cleanedAddress = address;
-
-    // Split address into parts
-    const parts = address.split(",").map((part) => part.trim());
-    const firstPart = parts[0] || "";
-
-    // Pattern 1: Simple house numbers (123, 45, etc.) - but not pincodes
-    const simpleNumberMatch = firstPart.match(/^\s*(\d+)\s*$/);
-    if (simpleNumberMatch && !simpleNumberMatch[1].match(/^\d{6}$/)) {
-      houseNumber = simpleNumberMatch[1];
-      cleanedAddress = parts.slice(1).join(", ").trim();
-      return { houseNumber, building, cleanedAddress };
-    }
-
-    // Pattern 2: House number with suffix (123A, 45B, etc.)
-    const numberSuffixMatch = firstPart.match(/^\s*(\d+[A-Z]+)\s*$/i);
-    if (numberSuffixMatch) {
-      houseNumber = numberSuffixMatch[1].toUpperCase();
-      cleanedAddress = parts.slice(1).join(", ").trim();
-      return { houseNumber, building, cleanedAddress };
-    }
-
-    // Pattern 3: Alphanumeric formats (A-123, B/45, Plot-67, etc.)
-    const alphaNumericMatch = firstPart.match(
-      /^\s*([A-Z]*[-\/]?\d+[A-Z]*)\s*$/i,
-    );
-    if (alphaNumericMatch) {
-      houseNumber = alphaNumericMatch[1].toUpperCase();
-      cleanedAddress = parts.slice(1).join(", ").trim();
-      return { houseNumber, building, cleanedAddress };
-    }
-
-    // Pattern 4: House number with description (House No 123, Plot 45, etc.)
-    const houseDescMatch = firstPart.match(
-      /(house\s+no\.?|plot\s+no\.?|flat\s+no\.?|door\s+no\.?|#)\s*(\d+[A-Z]*)/i,
-    );
-    if (houseDescMatch) {
-      houseNumber = houseDescMatch[2];
-      cleanedAddress =
-        firstPart.replace(houseDescMatch[0], "").trim() +
-        ", " +
-        parts.slice(1).join(", ");
-      cleanedAddress = cleanedAddress.replace(/^,\s*/, "").trim();
-      return { houseNumber, building, cleanedAddress };
-    }
-
-    // Pattern 5: Building with flat number (Flat 23, Tower A, etc.)
-    const buildingFlatMatch = firstPart.match(
-      /(flat|apartment|unit)\s*(\d+[A-Z]*),?\s*(.*)/i,
-    );
-    if (buildingFlatMatch) {
-      houseNumber = buildingFlatMatch[2];
-      building = buildingFlatMatch[3] || "";
-      cleanedAddress =
-        (building ? building + ", " : "") + parts.slice(1).join(", ");
-      return { houseNumber, building, cleanedAddress };
-    }
-
-    // Pattern 6: Complex building formats (Tower A-123, Block B-45, etc.)
-    const complexMatch = firstPart.match(
-      /(tower|block|wing|building)\s*([A-Z0-9]*[-\/]?\d+[A-Z]*)/i,
-    );
-    if (complexMatch) {
-      houseNumber = complexMatch[2];
-      building = complexMatch[1] + " " + complexMatch[2].split(/[-\/]/)[0];
-      cleanedAddress = parts.slice(1).join(", ").trim();
-      return { houseNumber, building, cleanedAddress };
-    }
-
-    // Pattern 7: Extract any number from first part
-    const anyNumberMatch = firstPart.match(/(\d+)/);
-    if (anyNumberMatch) {
-      houseNumber = anyNumberMatch[1];
-      // Try to extract building name from the remaining part
-      const buildingPart = firstPart.replace(anyNumberMatch[0], "").trim();
-      if (buildingPart.length > 2) {
-        building = buildingPart.replace(/[,-]/g, "").trim();
-      }
-      cleanedAddress = parts.slice(1).join(", ").trim();
-    }
-
-    return { houseNumber, building, cleanedAddress };
+    // Delegate to OpenCage service for consistent handling
+    return openCageService.extractHouseNumber(address);
   }
 
   /**
-   * Get detailed address components from coordinates
+   * Get detailed address components from coordinates using OpenCage
    */
   async getDetailedAddressComponents(coordinates: Coordinates): Promise<any> {
     console.log("🔍 Getting detailed address components...");
 
-    if (this.GOOGLE_MAPS_API_KEY) {
-      try {
-        const response = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinates.lat},${coordinates.lng}&key=${this.GOOGLE_MAPS_API_KEY}`,
-        );
+    // Use OpenCage as primary source
+    try {
+      const openCageCoords: OpenCageCoordinates = {
+        lat: coordinates.lat,
+        lng: coordinates.lng,
+        accuracy: coordinates.accuracy
+      };
 
-        const data = await response.json();
-
-        if (data.status === "OK" && data.results.length > 0) {
-          console.log("✅ Detailed components from Google:", data.results[0]);
-          return data.results[0];
-        }
-      } catch (error) {
-        console.warn("Google Maps component extraction failed:", error);
+      const result = await openCageService.forwardGeocode(`${coordinates.lat},${coordinates.lng}`);
+      if (result && result.components) {
+        console.log("✅ Detailed components from OpenCage:", result);
+        return {
+          formatted_address: result.formatted_address,
+          address_components: this.convertOpenCageComponentsToGoogleFormat(result.components),
+          geometry: {
+            location: {
+              lat: () => result.coordinates.lat,
+              lng: () => result.coordinates.lng,
+            },
+          },
+        };
       }
+    } catch (error) {
+      console.warn("OpenCage component extraction failed:", error);
     }
 
     // Fallback to Nominatim for detailed components
@@ -591,80 +465,87 @@ class LocationService {
   }
 
   /**
-   * Convert Nominatim address format to Google Maps format
+   * Convert OpenCage address components to Google Maps format for compatibility
    */
-  private convertNominatimToGoogleFormat(nominatimAddress: any): any[] {
+  private convertOpenCageComponentsToGoogleFormat(openCageComponents: any): any[] {
     const components = [];
 
-    if (nominatimAddress.house_number) {
+    if (openCageComponents.house_number) {
       components.push({
-        long_name: nominatimAddress.house_number,
-        short_name: nominatimAddress.house_number,
+        long_name: openCageComponents.house_number,
+        short_name: openCageComponents.house_number,
         types: ["street_number"],
       });
     }
 
-    if (nominatimAddress.road) {
+    if (openCageComponents.road) {
       components.push({
-        long_name: nominatimAddress.road,
-        short_name: nominatimAddress.road,
+        long_name: openCageComponents.road,
+        short_name: openCageComponents.road,
         types: ["route"],
       });
     }
 
-    if (nominatimAddress.neighbourhood || nominatimAddress.suburb) {
+    if (openCageComponents.neighbourhood || openCageComponents.suburb) {
       components.push({
-        long_name: nominatimAddress.neighbourhood || nominatimAddress.suburb,
-        short_name: nominatimAddress.neighbourhood || nominatimAddress.suburb,
+        long_name: openCageComponents.neighbourhood || openCageComponents.suburb,
+        short_name: openCageComponents.neighbourhood || openCageComponents.suburb,
         types: ["sublocality_level_1", "sublocality"],
       });
     }
 
     if (
-      nominatimAddress.city ||
-      nominatimAddress.town ||
-      nominatimAddress.village
+      openCageComponents.city ||
+      openCageComponents.town ||
+      openCageComponents.village
     ) {
       components.push({
         long_name:
-          nominatimAddress.city ||
-          nominatimAddress.town ||
-          nominatimAddress.village,
+          openCageComponents.city ||
+          openCageComponents.town ||
+          openCageComponents.village,
         short_name:
-          nominatimAddress.city ||
-          nominatimAddress.town ||
-          nominatimAddress.village,
+          openCageComponents.city ||
+          openCageComponents.town ||
+          openCageComponents.village,
         types: ["locality"],
       });
     }
 
-    if (nominatimAddress.state) {
+    if (openCageComponents.state) {
       components.push({
-        long_name: nominatimAddress.state,
-        short_name: nominatimAddress.state,
+        long_name: openCageComponents.state,
+        short_name: openCageComponents.state_code || openCageComponents.state,
         types: ["administrative_area_level_1"],
       });
     }
 
-    if (nominatimAddress.postcode) {
+    if (openCageComponents.postcode) {
       components.push({
-        long_name: nominatimAddress.postcode,
-        short_name: nominatimAddress.postcode,
+        long_name: openCageComponents.postcode,
+        short_name: openCageComponents.postcode,
         types: ["postal_code"],
       });
     }
 
-    if (nominatimAddress.country) {
+    if (openCageComponents.country) {
       components.push({
-        long_name: nominatimAddress.country,
+        long_name: openCageComponents.country,
         short_name:
-          nominatimAddress.country_code?.toUpperCase() ||
-          nominatimAddress.country,
+          openCageComponents.country_code?.toUpperCase() ||
+          openCageComponents.country,
         types: ["country"],
       });
     }
 
     return components;
+  }
+
+  /**
+   * Convert Nominatim address format to Google Maps format (kept for fallback compatibility)
+   */
+  private convertNominatimToGoogleFormat(nominatimAddress: any): any[] {
+    return this.convertOpenCageComponentsToGoogleFormat(nominatimAddress);
   }
 
   /**
@@ -701,11 +582,20 @@ class LocationService {
   }
 
   /**
-   * Geocode address to coordinates
+   * Geocode address to coordinates using OpenCage as primary provider
    */
   async geocodeAddress(address: string): Promise<GeocodeResult> {
     try {
-      // Import the API base URL
+      // Method 1: OpenCage API (Primary)
+      try {
+        const result = await openCageService.forwardGeocode(address);
+        console.log("✅ OpenCage forward geocoding successful:", result);
+        return result;
+      } catch (openCageError) {
+        console.warn("OpenCage forward geocoding failed, trying backend:", openCageError);
+      }
+
+      // Method 2: Backend proxy (fallback)
       const { getApiBaseUrl } = await import('../config/env');
       const apiBaseUrl = getApiBaseUrl();
 
@@ -745,39 +635,45 @@ class LocationService {
   }
 
   /**
-   * Get place autocomplete suggestions with enhanced types
+   * Get place autocomplete suggestions using OpenCage geocoding
    */
   async getPlaceAutocomplete(
     input: string,
     location?: Coordinates,
     radius?: number,
   ): Promise<PlaceAutocomplete[]> {
-    if (!this.GOOGLE_MAPS_API_KEY) {
-      return [];
-    }
-
     try {
-      let url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${this.GOOGLE_MAPS_API_KEY}&components=country:in&types=address|establishment|geocode`;
+      // Use OpenCage for autocomplete suggestions
+      const results = await openCageService.getGeocodingSuggestions(input, 5);
 
-      if (location) {
-        url += `&location=${location.lat},${location.lng}`;
-        if (radius) {
-          url += `&radius=${radius}`;
+      return results.map((result, index) => ({
+        place_id: result.place_id || `opencage_${index}`,
+        description: result.formatted_address,
+        structured_formatting: {
+          main_text: this.extractMainText(result.formatted_address),
+          secondary_text: this.extractSecondaryText(result.formatted_address)
         }
-      }
-
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (data.status === "OK") {
-        return data.predictions || [];
-      }
-
-      return [];
+      }));
     } catch (error) {
-      console.warn("Place autocomplete failed:", error);
+      console.warn("OpenCage autocomplete failed:", error);
       return [];
     }
+  }
+
+  /**
+   * Extract main text from formatted address for autocomplete display
+   */
+  private extractMainText(address: string): string {
+    const parts = address.split(',');
+    return parts[0]?.trim() || address;
+  }
+
+  /**
+   * Extract secondary text from formatted address for autocomplete display
+   */
+  private extractSecondaryText(address: string): string {
+    const parts = address.split(',');
+    return parts.slice(1).join(',').trim() || '';
   }
 
   /**
@@ -839,28 +735,12 @@ class LocationService {
   }
 
   /**
-   * Calculate distance between two coordinates in kilometers
+   * Calculate distance between two coordinates in kilometers using OpenCage service
    */
   calculateDistance(coord1: Coordinates, coord2: Coordinates): number {
-    const R = 6371; // Earth's radius in kilometers
-    const dLat = this.deg2rad(coord2.lat - coord1.lat);
-    const dLon = this.deg2rad(coord2.lng - coord1.lng);
-
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(this.deg2rad(coord1.lat)) *
-        Math.cos(this.deg2rad(coord2.lat)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c;
-
-    return distance;
-  }
-
-  private deg2rad(deg: number): number {
-    return deg * (Math.PI / 180);
+    const openCageCoord1: OpenCageCoordinates = { lat: coord1.lat, lng: coord1.lng };
+    const openCageCoord2: OpenCageCoordinates = { lat: coord2.lat, lng: coord2.lng };
+    return openCageService.calculateDistance(openCageCoord1, openCageCoord2);
   }
 
   /**
