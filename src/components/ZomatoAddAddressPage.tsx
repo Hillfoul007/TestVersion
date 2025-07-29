@@ -651,6 +651,12 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       } else {
         autoFillAddressFields(enhancedAddress);
       }
+
+      // Show success message
+      toast.success('Location detected successfully', {
+        description: `Address: ${enhancedAddress.substring(0, 50)}${enhancedAddress.length > 50 ? '...' : ''}`,
+        duration: 3000
+      });
     } catch (error) {
       console.warn("⚠️ Primary location detection failed:", error.message);
 
