@@ -47,9 +47,5 @@ envVarGroups:
         value: # secret
       - key: VITE_DVHOSTING_API_KEY
         value: # frontend key
-      - key: VITE_OPENCAGE_API_KEY
-        value: bb9e8b5e99a24e1c811e89a6c1099fd1
-      - key: OPENCAGE_API_KEY
-        value: bb9e8b5e99a24e1c811e89a6c1099fd1
       - key: VITE_GOOGLE_MAPS_API_KEY
-        value: # map key (deprecated)
+        value: # map key
