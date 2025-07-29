@@ -18,11 +18,9 @@ const dynamicServicesRoutes = require('./backend/routes/dynamic-services');
 const googleMapsRoutes = require('./backend/routes/google-maps');
 const locationRoutes = require('./backend/routes/location');
 const otpAuthRoutes = require('./backend/routes/otp-auth');
-const pingRoutes = require('./backend/routes/ping');
 const ridersRoutes = require('./backend/routes/riders');
-const servicesRoutes = require('./backend/routes/services');
-const userRoutes = require('./backend/routes/user');
-const webhooksRoutes = require('./backend/routes/webhooks');
+const referralsRoutes = require('./backend/routes/referrals');
+const whatsappAuthRoutes = require('./backend/routes/whatsapp-auth');
 const detectedLocationsRoutes = require('./backend/routes/detected-locations');
 
 const app = express();
