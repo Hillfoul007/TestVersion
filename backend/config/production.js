@@ -23,9 +23,9 @@ const config = {
   ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(",")
     : [
-        "https://testversion.onrender.com",
-        "https://cleancarepro-1-p2oc.onrender.com",
-        "https://laundrify-app-5su7.onrender.com",
+        "https://laundrify-up.up.railway.app",
+        "http://localhost:5173",
+        "http://localhost:3000",
       ],
 
   // SMS Service

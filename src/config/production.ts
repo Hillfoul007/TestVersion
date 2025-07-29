@@ -9,7 +9,7 @@ export const PRODUCTION_CONFIG = {
   // API Configuration
   API_BASE_URL:
     import.meta.env.VITE_API_BASE_URL ||
-    "https://backend-vaxf.onrender.com/api",
+    "https://cleancare-pro-api-production-129e.up.railway.app/api",
 
   // Authentication
   AUTH_TOKEN_KEY: "laundrify_token",

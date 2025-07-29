@@ -53,6 +53,7 @@ self.addEventListener("fetch", (event) => {
   // Don't interfere with API requests at all - let them pass through normally
   if (
     event.request.url.includes("/api/") ||
+    event.request.url.includes("railway.app") ||
     event.request.url.includes("onrender.com") ||
     event.request.url.includes("localhost:3001") ||
     event.request.url.includes("laundrify") ||
