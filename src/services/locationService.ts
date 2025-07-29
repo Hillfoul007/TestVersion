@@ -83,9 +83,12 @@ class LocationService {
         },
         (error) => {
           let errorMessage = "Unknown geolocation error";
+          let logLevel = "error";
+
           switch (error.code) {
             case error.PERMISSION_DENIED:
               errorMessage = "Location access denied by user";
+              logLevel = "info"; // Not really an error, user choice
               break;
             case error.POSITION_UNAVAILABLE:
               errorMessage = "Location information unavailable";
@@ -95,8 +98,15 @@ class LocationService {
               break;
           }
 
-          console.error("❌ Geolocation error:", errorMessage, error);
-          reject(new Error(errorMessage));
+          if (logLevel === "info") {
+            console.info("📍 Geolocation permission:", errorMessage);
+          } else {
+            console.error("❌ Geolocation error:", errorMessage, error);
+          }
+
+          const errorWithCode = new Error(errorMessage);
+          (errorWithCode as any).code = error.code;
+          reject(errorWithCode);
         },
         defaultOptions,
       );
