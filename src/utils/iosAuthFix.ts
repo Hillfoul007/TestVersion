@@ -403,8 +403,8 @@ export const restoreIosAuth = async (): Promise<boolean> => {
       NEVER: Infinity            // Never expire - permanent logout until manual login
     };
 
-    // Use DEFAULT (15 minutes) - better UX than 1 hour
-    const logoutDuration = LOGOUT_DURATION_OPTIONS.DEFAULT;
+    // Use DAY (24 hours) to prevent automatic logout - better UX for laundry app
+    const logoutDuration = LOGOUT_DURATION_OPTIONS.DAY;
 
     if (logoutAge < logoutDuration) {
       const remainingTime = Math.ceil((logoutDuration - logoutAge) / (60 * 1000));
