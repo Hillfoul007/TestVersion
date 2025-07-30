@@ -1544,6 +1544,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       updateMapLocation(coordinates);
       autoFillAddressFields(suggestion.description);
 
+      // Immediate validation for fallback suggestion
+      await validateLocationAvailability(suggestion.description);
+
       console.log(`✅ Used fallback coordinates for: ${suggestion.description}`);
     }
   };
