@@ -14,10 +14,12 @@ const SafeConnectionStatus: React.FC<ConnectionStatusProps> = (props) => {
 
 interface ConnectionStatusProps {
   className?: string;
+  enableBackendCheck?: boolean;
 }
 
 const ConnectionStatusInner: React.FC<ConnectionStatusProps> = ({
   className = "",
+  enableBackendCheck = false, // Default to false to prevent fetch errors
 }) => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [backendStatus, setBackendStatus] = useState<
@@ -28,10 +30,12 @@ const ConnectionStatusInner: React.FC<ConnectionStatusProps> = ({
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      // Disable backend check to prevent fetch errors in hosted environments
-      // setTimeout(() => {
-      //   checkBackendStatus();
-      // }, 1000);
+      // Only check backend if explicitly enabled
+      if (enableBackendCheck) {
+        setTimeout(() => {
+          checkBackendStatus();
+        }, 1000);
+      }
     };
 
     const handleOffline = () => {
@@ -42,13 +46,12 @@ const ConnectionStatusInner: React.FC<ConnectionStatusProps> = ({
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    // Disable automatic backend checks to prevent fetch errors in hosted environments
-    // Backend status will remain as "offline" which shows "Local Mode" - acceptable for this environment
-    // if (isOnline) {
-    //   setTimeout(() => {
-    //     checkBackendStatus();
-    //   }, 2000); // Wait 2 seconds before first check
-    // }
+    // Only run initial backend check if explicitly enabled
+    if (isOnline && enableBackendCheck) {
+      setTimeout(() => {
+        checkBackendStatus();
+      }, 2000); // Wait 2 seconds before first check
+    }
 
     return () => {
       setIsMounted(false);
