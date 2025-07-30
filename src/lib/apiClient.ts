@@ -27,6 +27,11 @@ class EnhancedApiClient {
     const url = baseURL || API_BASE_URL || '';
     this.baseURL = url ? url.replace(/\/$/, "") : ""; // Remove trailing slash if URL exists
     this.token = localStorage.getItem("auth_token");
+
+    // Log warning if no API URL is configured
+    if (!this.baseURL) {
+      console.warn("⚠️ No API_BASE_URL configured. Set VITE_API_BASE_URL environment variable.");
+    }
   }
 
   private async sleep(ms: number): Promise<void> {
