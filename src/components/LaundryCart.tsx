@@ -666,7 +666,7 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
 Booking Confirmation:
 
 Services: ${services.length} items
-${services.map((s) => `• ${s.name} x${s.quantity} - ���${s.price * s.quantity}`).join("\n")}
+${services.map((s) => `• ${s.name} x${s.quantity} - ₹${s.price * s.quantity}`).join("\n")}
 
 Pickup: ${selectedDate.toLocaleDateString()} at ${selectedTime}
 Delivery: ${finalDeliveryDate.toLocaleDateString()} at ${finalDeliveryTime}
