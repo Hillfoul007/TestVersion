@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Loader2, Navigation, Search, X, Sparkles } from "lucide-react";
 import SmartAddressInput from "./SmartAddressInput";
 import { ParsedAddress } from "@/utils/autocompleteSuggestionService";
+import LocationUnavailableModal from "./LocationUnavailableModal";
+import { LocationDetectionService } from "@/services/locationDetectionService";
 
 interface AddressData {
   flatNo: string;
@@ -63,6 +65,10 @@ const SimplifiedAddressForm: React.FC<SimplifiedAddressFormProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [locationError, setLocationError] = useState("");
   const [useSmartInput, setUseSmartInput] = useState(false);
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [detectedLocationText, setDetectedLocationText] = useState("");
+
+  const locationDetectionService = LocationDetectionService.getInstance();
 
   // Update parent when address changes
   useEffect(() => {
