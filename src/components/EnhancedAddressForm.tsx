@@ -430,6 +430,10 @@ const EnhancedAddressForm: React.FC<EnhancedAddressFormProps> = ({
         const coordsAddress = createCoordinatesAddress(coordinates);
         setAddress(coordsAddress);
         setSearchValue(coordsAddress.fullAddress);
+
+        // Validate service area
+        await validateAddressServiceArea(coordsAddress);
+
         if (onAddressChange) {
           onAddressChange(coordsAddress);
         }
