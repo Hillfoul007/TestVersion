@@ -51,6 +51,31 @@ function App() {
           }));
         }, 100);
       }
+
+      // For iOS: Set up continuous monitoring for session loss
+      if (isIOS) {
+        const continuousAuthCheck = setInterval(() => {
+          const hasAuth = localStorage.getItem('current_user') || localStorage.getItem('cleancare_user');
+          const hasToken = localStorage.getItem('auth_token') || localStorage.getItem('cleancare_auth_token');
+
+          if (!hasAuth || !hasToken) {
+            // Auth lost - attempt immediate restoration
+            import('./utils/iosAuthFix').then(({ restoreIosAuth }) => {
+              restoreIosAuth().then((authRestored) => {
+                if (authRestored) {
+                  console.log('🍎✨ Continuous monitoring: Auth restored successfully');
+                  window.dispatchEvent(new CustomEvent('ios-session-restored', {
+                    detail: { source: 'continuous-monitoring' }
+                  }));
+                }
+              });
+            });
+          }
+        }, 10000); // Check every 10 seconds
+
+        // Clean up interval on unmount (though App rarely unmounts)
+        return () => clearInterval(continuousAuthCheck);
+      }
     };
 
     initializeAuth();
