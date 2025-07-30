@@ -224,6 +224,9 @@ const LaundryIndex = () => {
   const [showFirst30Notification, setShowFirst30Notification] = useState(false);
   const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
   const [detectedLocationText, setDetectedLocationText] = useState("");
+  const [showAddressSyncNotification, setShowAddressSyncNotification] = useState(false);
+  const [addressSyncStatus, setAddressSyncStatus] = useState<'syncing' | 'success' | 'error'>('syncing');
+  const [syncedAddressCount, setSyncedAddressCount] = useState(0);
 
   // Single iOS detection for the entire component
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
