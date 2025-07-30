@@ -775,12 +775,38 @@ const LaundryIndex = () => {
   // Sync addresses across devices after login
   const syncAddressesAfterLogin = async () => {
     try {
+      // Show syncing notification
+      setShowAddressSyncNotification(true);
+      setAddressSyncStatus('syncing');
+
       const { AddressService } = await import("@/services/addressService");
       const addressService = AddressService.getInstance();
+
+      // Get addresses before and after sync to compare
+      const beforeSync = await addressService.getUserAddresses();
+      const beforeCount = Array.isArray(beforeSync.data) ? beforeSync.data.length : 0;
+
       await addressService.syncAddressesAfterLogin();
-      console.log("✅ Address synchronization completed after login");
+
+      const afterSync = await addressService.getUserAddresses();
+      const afterCount = Array.isArray(afterSync.data) ? afterSync.data.length : 0;
+
+      const newAddressCount = Math.max(0, afterCount - beforeCount);
+
+      setSyncedAddressCount(afterCount);
+      setAddressSyncStatus('success');
+
+      console.log(`✅ Address synchronization completed. ${afterCount} total addresses available.`);
+
+      // If no addresses were synced, hide notification after short delay
+      if (afterCount === 0) {
+        setTimeout(() => {
+          setShowAddressSyncNotification(false);
+        }, 2000);
+      }
     } catch (error) {
       console.warn("⚠️ Address synchronization failed after login:", error);
+      setAddressSyncStatus('error');
     }
   };
 
