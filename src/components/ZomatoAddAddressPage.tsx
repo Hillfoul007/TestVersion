@@ -442,20 +442,20 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
           }
         }
       } else {
-        // Use regular marker when Map ID is not configured
-        newMarker = new google.maps.Marker({
-          position: coordinates,
-          map: mapInstance,
-          draggable: true,
-          animation: google.maps.Animation.DROP,
-          title: "Drag to adjust location or click map to move pin",
-          icon: {
-            url: "data:image/svg+xml;charset=UTF-8,%3csvg width='32' height='32' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z' fill='%2316a34a' stroke='%23ffffff' stroke-width='1'/%3e%3ccircle cx='12' cy='10' r='3' fill='white'/%3e%3c/svg%3e",
-            scaledSize: new google.maps.Size(32, 32),
-            anchor: new google.maps.Point(16, 32),
-          },
-        });
-        console.log("📍 Created regular Marker at:", coordinates);
+        // Use AdvancedMarkerElement even without Map ID
+        try {
+          newMarker = new google.maps.marker.AdvancedMarkerElement({
+            position: coordinates,
+            map: mapInstance,
+            gmpDraggable: true,
+            title: "Drag to adjust location or click map to move pin",
+          });
+          console.log("📍 Created Advanced Marker without Map ID at:", coordinates);
+        } catch (error) {
+          console.warn("AdvancedMarkerElement not available", error);
+          // Don't create any marker if AdvancedMarkerElement is not available
+          newMarker = null;
+        }
       }
 
       // Add event listeners that work with both marker types
