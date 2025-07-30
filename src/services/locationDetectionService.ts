@@ -182,8 +182,9 @@ export class LocationDetectionService {
                       searchText.includes('gurgaon') ||
                       searchText.includes('gurgram'); // Common misspelling
 
-    // Check pincode for Sector 69 Gurugram (122505)
-    const isCorrectPincode = normalizedPincode === '122505';
+    // Check pincode for Sector 69 Gurugram (multiple valid pincodes)
+    const validPincodes = ['122001', '122101', '122505', '110088'];
+    const isCorrectPincode = normalizedPincode && validPincodes.includes(normalizedPincode);
 
     // Must have both Sector 69 and Gurugram/Gurgaon mentions, or correct pincode
     const isInServiceArea = (isSector69 && isGurugram) || isCorrectPincode;
