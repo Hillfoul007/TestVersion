@@ -6,7 +6,6 @@ const bookingSchema = new mongoose.Schema(
     custom_order_id: {
       type: String,
       required: false,
-      index: true,
     },
     name: {
       type: String,
@@ -18,7 +17,6 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: [true, "Customer phone number is required"],
       trim: true,
-      index: true,
     },
 
     // CUSTOMER REFERENCE
