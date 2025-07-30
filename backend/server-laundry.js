@@ -409,7 +409,7 @@ const setupKeepAlive = () => {
         const response = await fetch(`${url}/api/health`);
 
         if (response.ok) {
-          console.log("🔄 Keep-alive ping successful");
+          console.log("���� Keep-alive ping successful");
         } else {
           console.log(
             "⚠️ Keep-alive ping failed with status:",
@@ -461,10 +461,7 @@ const gracefulShutdown = async (signal) => {
 
     console.log("✅ HTTP server closed");
 
-    // Cleanup Google Sheets service
-    if (sheetsService) {
-      await sheetsService.cleanup();
-    }
+    // Google Sheets cleanup removed
 
     // Close database connection
     mongoose.connection.close(false, (err) => {
