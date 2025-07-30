@@ -418,6 +418,10 @@ const EnhancedAddressForm: React.FC<EnhancedAddressFormProps> = ({
         const parsedAddress = parseAddressString(addressString, coordinates);
         setAddress(parsedAddress);
         setSearchValue(addressString);
+
+        // Validate service area
+        await validateAddressServiceArea(parsedAddress);
+
         if (onAddressChange) {
           onAddressChange(parsedAddress);
         }
