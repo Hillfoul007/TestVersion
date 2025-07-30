@@ -18,8 +18,7 @@ export const PRODUCTION_CONFIG = {
   // Google Services
   GOOGLE_MAPS_API_KEY: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
 
-  // SMS Service
-  DVHOSTING_API_KEY: import.meta.env.VITE_DVHOSTING_API_KEY,
+  // SMS Service - API key handled by backend only
 
   // App Settings
   APP_NAME: "Laundrify",
@@ -90,9 +89,7 @@ export const validateEnvironment = () => {
     warnings.push("Google Maps API key not configured");
   }
 
-  if (!PRODUCTION_CONFIG.DVHOSTING_API_KEY) {
-    errors.push("DVHosting API key is required");
-  }
+  // DVHosting API key validation removed - handled by backend
 
   if (!PRODUCTION_CONFIG.API_BASE_URL) {
     errors.push("API base URL is required");

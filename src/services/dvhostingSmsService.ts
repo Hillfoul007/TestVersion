@@ -595,7 +595,8 @@ export class DVHostingSmsService {
   private async sendDirectDVHostingOTP(phoneNumber: string): Promise<boolean> {
     try {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const apiKey = import.meta.env.VITE_DVHOSTING_API_KEY || "GLX2yKgdb9";
+      // Generate OTP for simulation (API key handled by backend)
+      console.log("DVHosting SMS: Using backend API for OTP sending");
 
       console.log("DVHosting SMS: Calling DVHosting API directly");
       console.log("DVHosting SMS: Phone:", phoneNumber, "OTP:", otp);
