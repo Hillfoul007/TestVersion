@@ -112,8 +112,16 @@ class AutocompleteSuggestionService {
     input: string,
     sessionToken?: any,
   ): Promise<AutocompletePrediction[]> {
-    // Search suggestions disabled to prevent errors
-    return [];
+    if (!input || input.length < 2) {
+      return [];
+    }
+
+    return this.fetchSuggestions({
+      input,
+      sessionToken,
+      includedRegionCodes: ["IN"],
+      types: ["address", "establishment", "geocode"],
+    });
   }
 
   /**
