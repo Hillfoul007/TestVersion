@@ -122,6 +122,8 @@ export const SmartAddressInput: React.FC<SmartAddressInputProps> = ({
 
     const result = await autofillFromSuggestion(suggestion);
     if (result) {
+      // Validate service area
+      await validateAddressServiceArea(result);
       setShowAddressForm(true);
     }
   };
@@ -130,6 +132,8 @@ export const SmartAddressInput: React.FC<SmartAddressInputProps> = ({
   const handleCurrentLocation = async () => {
     const result = await autofillFromCurrentLocation();
     if (result) {
+      // Validate service area
+      await validateAddressServiceArea(result);
       setSearchQuery("Current Location");
       setShowAddressForm(true);
     }
