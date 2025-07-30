@@ -191,6 +191,15 @@ html {
   z-index: 9999 !important;
 }
 
+/* Fix for LocationUnavailableModal z-index conflict with ZomatoAddAddressPage */
+.location-unavailable-modal [data-radix-dialog-overlay] {
+  z-index: 85 !important;
+}
+
+.location-unavailable-modal [data-radix-dialog-content] {
+  z-index: 90 !important;
+}
+
 /* Prevent body scroll when modal is open */
 .modal-open {
   overflow: hidden;

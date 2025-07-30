@@ -51,8 +51,9 @@ const LocationUnavailableModal: React.FC<LocationUnavailableModalProps> = ({
     onClose();
   };
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md w-[90vw] mx-auto border-0 shadow-2xl rounded-3xl overflow-hidden bg-white">
+    <div className="location-unavailable-modal">
+      <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md w-[90vw] mx-auto border-0 shadow-2xl rounded-3xl overflow-hidden bg-white z-[90]">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -120,7 +121,8 @@ const LocationUnavailableModal: React.FC<LocationUnavailableModalProps> = ({
           </div>
         </div>
       </DialogContent>
-    </Dialog>
+      </Dialog>
+    </div>
   );
 };
 
