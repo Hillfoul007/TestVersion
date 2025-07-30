@@ -7,7 +7,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogOverlay,
+  DialogPortal,
 } from "@/components/ui/dialog";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { MapPin, Sparkles, X } from "lucide-react";
 
 interface LocationUnavailableModalProps {
