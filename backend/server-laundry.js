@@ -359,9 +359,6 @@ if (productionConfig.isDevelopment()) {
         "/api/addresses",
         "/api/location",
         "/api/whatsapp",
-        "/api/sheets/order",
-        "/api/sheets/test",
-        "/api/sheets/sync",
       ],
     });
   });
@@ -409,7 +406,7 @@ const setupKeepAlive = () => {
         const response = await fetch(`${url}/api/health`);
 
         if (response.ok) {
-          console.log("���� Keep-alive ping successful");
+          console.log("🔄 Keep-alive ping successful");
         } else {
           console.log(
             "⚠️ Keep-alive ping failed with status:",
