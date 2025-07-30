@@ -666,7 +666,7 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
 Booking Confirmation:
 
 Services: ${services.length} items
-${services.map((s) => `• ${s.name} x${s.quantity} - ₹${s.price * s.quantity}`).join("\n")}
+${services.map((s) => `• ${s.name} x${s.quantity} - ���${s.price * s.quantity}`).join("\n")}
 
 Pickup: ${selectedDate.toLocaleDateString()} at ${selectedTime}
 Delivery: ${finalDeliveryDate.toLocaleDateString()} at ${finalDeliveryTime}
@@ -791,12 +791,30 @@ Confirm this booking?`;
    */
   const validateAddressServiceArea = async (address: AddressData): Promise<boolean> => {
     try {
+      if (!address) {
+        console.error('❌ No address provided for validation');
+        throw new Error('No address provided');
+      }
+
       const locationService = LocationDetectionService.getInstance();
+      if (!locationService) {
+        console.error('❌ LocationDetectionService not available');
+        throw new Error('Location service not available');
+      }
+
       const city = address.city || address.village || '';
       const pincode = address.pincode || '';
       const fullAddress = address.fullAddress || '';
 
       console.log('🏠 Validating address service area:', { city, pincode, fullAddress });
+
+      if (!city && !pincode && !fullAddress) {
+        console.error('❌ Incomplete address data for validation');
+        const locationText = 'Incomplete address information';
+        setUnavailableLocationText(locationText);
+        setShowLocationUnavailable(true);
+        return false;
+      }
 
       const availability = await locationService.checkLocationAvailability(
         city,
@@ -804,9 +822,10 @@ Confirm this booking?`;
         fullAddress
       );
 
-      if (!availability.is_available) {
+      if (!availability || !availability.is_available) {
         console.log('🚫 Address not in service area, showing popup');
-        setUnavailableLocationText(fullAddress || `${city}, ${pincode}`);
+        const locationText = fullAddress || `${city || 'Unknown'}, ${pincode || 'Unknown'}`;
+        setUnavailableLocationText(locationText);
         setShowLocationUnavailable(true);
         return false;
       }
@@ -815,14 +834,18 @@ Confirm this booking?`;
       return true;
     } catch (error) {
       console.error('❌ Error validating address service area:', error);
-      // On error, allow the address but warn user
+      // On validation error, show the unavailable popup to be safe
+      const locationText = address?.fullAddress || `${address?.city || 'Unknown'}, ${address?.pincode || 'Unknown'}`;
+      setUnavailableLocationText(`${locationText} (validation failed)`);
+      setShowLocationUnavailable(true);
+
       addNotification(
-        createWarningNotification(
+        createErrorNotification(
           "Location Check Failed",
-          "Could not verify service availability for this location",
+          "Could not verify service availability. Please check your address.",
         ),
       );
-      return true;
+      return false;
     }
   };
 
