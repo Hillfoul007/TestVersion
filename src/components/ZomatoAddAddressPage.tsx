@@ -1612,8 +1612,15 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
       if (!availability.is_available) {
         console.log("🚫 Address not available for service, showing popup");
+        console.log("🔍 Modal state before showing:", {
+          showLocationUnavailable,
+          unavailableAddressText,
+          completeAddress,
+          selectedLocationAddress: selectedLocation.address
+        });
         setUnavailableAddressText(completeAddress || selectedLocation.address);
         setShowLocationUnavailable(true);
+        console.log("🔍 Modal should now be showing - state updated");
         return; // Don't save the address
       }
 
