@@ -16,6 +16,8 @@ import useAddressAutofill, {
   AddressAutofillOptions,
 } from "@/hooks/useAddressAutofill";
 import { ParsedAddress } from "@/utils/autocompleteSuggestionService";
+import LocationUnavailableModal from "./LocationUnavailableModal";
+import { LocationDetectionService } from "@/services/locationDetectionService";
 
 export interface SmartAddressInputProps {
   initialAddress?: Partial<ParsedAddress>;
@@ -41,6 +43,10 @@ export const SmartAddressInput: React.FC<SmartAddressInputProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showAddressForm, setShowAddressForm] = useState(false);
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [detectedLocationText, setDetectedLocationText] = useState("");
+
+  const locationDetectionService = LocationDetectionService.getInstance();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
