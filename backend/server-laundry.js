@@ -37,11 +37,36 @@ app.use(
 // Compression middleware
 app.use(compression());
 
-// Logging middleware
+// Enhanced logging middleware
+const detailedLogger = require('./middleware/detailedLogger');
+
+// Use detailed custom logger
+app.use(detailedLogger);
+
+// Debug middleware to track request processing
+app.use((req, res, next) => {
+  const requestId = Math.random().toString(36).substr(2, 9);
+  req.requestId = requestId;
+
+  console.log(`🎯 REQUEST_START [${requestId}] ${req.method} ${req.originalUrl}`);
+
+  // Track when response finishes
+  res.on('finish', () => {
+    console.log(`🏁 REQUEST_END [${requestId}] ${req.method} ${req.originalUrl} - ${res.statusCode}`);
+  });
+
+  next();
+});
+
+// Morgan middleware with custom format
 if (productionConfig.isProduction()) {
-  app.use(morgan("combined"));
+  // Custom production format with more details
+  const productionFormat = ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" :response-time ms';
+  app.use(morgan(productionFormat));
 } else {
-  app.use(morgan("dev"));
+  // Enhanced development format
+  const devFormat = ':method :url :status :response-time ms - :res[content-length]';
+  app.use(morgan(devFormat));
 }
 
 // Trust proxy for rate limiting
