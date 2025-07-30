@@ -199,6 +199,32 @@ class AutocompleteSuggestionService {
         types: place.types || [],
       };
 
+      // Auto-save detected location to database
+      try {
+        if (convertedPlace.geometry?.location && convertedPlace.formatted_address) {
+          const { LocationDetectionService } = await import("../services/locationDetectionService");
+          const locationService = LocationDetectionService.getInstance();
+
+          const detectedLocation = {
+            full_address: convertedPlace.formatted_address,
+            city: this.extractCityFromAddressComponents(convertedPlace.address_components),
+            state: this.extractStateFromAddressComponents(convertedPlace.address_components),
+            country: this.extractCountryFromAddressComponents(convertedPlace.address_components),
+            pincode: this.extractPincodeFromAddressComponents(convertedPlace.address_components),
+            coordinates: {
+              lat: convertedPlace.geometry.location.lat,
+              lng: convertedPlace.geometry.location.lng,
+            },
+            detection_method: "autocomplete" as const,
+          };
+
+          await locationService.saveDetectedLocation(detectedLocation);
+          console.log("✅ Autocomplete location saved to database");
+        }
+      } catch (error) {
+        console.warn("⚠️ Failed to save autocomplete location to database:", error);
+      }
+
       return convertedPlace;
     } catch (error) {
       console.error("Error fetching place details with new Places API:", error);
