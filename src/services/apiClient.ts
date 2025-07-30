@@ -1,4 +1,6 @@
 // API client for MongoDB operations through backend
+import { config } from "../config/env";
+
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
@@ -11,8 +13,7 @@ export class ApiClient {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl =
-      import.meta.env.VITE_API_BASE_URL || "https://cleancare-pro-api-production-129e.up.railway.app/api";
+    this.baseUrl = config.API_BASE_URL;
   }
 
   public static getInstance(): ApiClient {
