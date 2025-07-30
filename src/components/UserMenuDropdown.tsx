@@ -61,10 +61,10 @@ const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
     return phone || "";
   };
 
-  const handleWhatsAppShare = async () => {
+  const handleWhatsAppShare = () => {
     const loginUrl = `${window.location.origin}/`;
     const message = `Check out Laundrify - Quick clean & convenient! Sign up here: ${loginUrl}`;
-    const { config } = await import("../config/env");
+    const { config } = require("../config/env");
     const whatsappUrl = `${config.WHATSAPP_BASE_URL}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };

@@ -282,7 +282,7 @@ export class ReferralService {
   }
 
   // Generate social sharing URLs
-  async generateSocialShareUrls(shareUrl: string, referralCode: string) {
+  generateSocialShareUrls(shareUrl: string, referralCode: string) {
     const message = `🧼 Join me on CleanCare Pro and get 50% OFF your first laundry service! Click my link to sign up: ${shareUrl} or use my referral code: ${referralCode}`;
     const encodedMessage = encodeURIComponent(message);
     const encodedUrl = encodeURIComponent(shareUrl);
@@ -290,7 +290,8 @@ export class ReferralService {
       `Sign up with CleanCare Pro and get 50% OFF your first order with code ${referralCode}!`,
     );
 
-    const { config } = await import("../config/env");
+    // Import at the top instead of dynamic import to avoid async issues
+    const { config } = require("../config/env");
 
     return {
       whatsapp: `${config.WHATSAPP_BASE_URL}?text=${encodedMessage}`,
