@@ -198,7 +198,10 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
               if (!availability.is_available) {
                 // Show unavailable popup for auto-detected location
+                console.log("🚨 Service not available - showing popup");
                 setShowLocationUnavailable(true);
+              } else {
+                console.log("✅ Service is available - no popup needed");
               }
 
               // Mark that we've detected location for this device
