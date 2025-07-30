@@ -510,16 +510,12 @@ export class DVHostingSmsService {
           this.otpStorage.delete(cleanPhone);
           this.currentPhone = "";
 
-          const mockUser = {
-            id: `user_${cleanPhone}`,
-            phone: cleanPhone,
-            name:
-              name && name.trim()
-                ? name.trim()
-                : `User ${cleanPhone.slice(-4)}`,
-            isVerified: true,
-            createdAt: new Date().toISOString(),
-          };
+          // Import createUserByPhone for consistent user generation
+          const { createUserByPhone } = await import("../utils/authUtils");
+
+          const mockUser = createUserByPhone(cleanPhone, name);
+          mockUser.isVerified = true;
+          mockUser.createdAt = new Date().toISOString();
 
           return {
             success: true,
