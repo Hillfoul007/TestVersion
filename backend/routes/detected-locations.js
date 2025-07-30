@@ -85,7 +85,7 @@ router.post("/check-availability", async (req, res) => {
       is_available: isAvailable,
       message: isAvailable
         ? "Service available in your area"
-        : "Service currently only available in Sector 69, Gurugram (Pincode: 122505)",
+        : "Service currently only available in Sector 69, Gurugram",
     });
   } catch (error) {
     console.error("Error checking availability:", error);

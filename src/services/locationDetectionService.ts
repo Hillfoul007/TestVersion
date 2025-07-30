@@ -155,7 +155,7 @@ export class LocationDetectionService {
       is_available: isAvailable,
       message: isAvailable
         ? "Service available in your area"
-        : "Service currently only available in Sector 69, Gurugram (Pincode: 122505)",
+        : "Service currently only available in Sector 69, Gurugram",
     };
   }
 
@@ -182,11 +182,8 @@ export class LocationDetectionService {
                       searchText.includes('gurgaon') ||
                       searchText.includes('gurgram'); // Common misspelling
 
-    // Check pincode for Sector 69 Gurugram (122505)
-    const isCorrectPincode = normalizedPincode === '122505';
-
-    // Must have both Sector 69 and Gurugram/Gurgaon mentions, or correct pincode
-    const isInServiceArea = (isSector69 && isGurugram) || isCorrectPincode;
+    // Must have both Sector 69 and Gurugram/Gurgaon mentions in the address
+    const isInServiceArea = isSector69 && isGurugram;
 
     console.log('🏠 Service area check:', {
       searchText: searchText.substring(0, 100) + (searchText.length > 100 ? '...' : ''),

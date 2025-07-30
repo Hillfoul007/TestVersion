@@ -336,7 +336,7 @@ export class DVHostingSmsService {
         return false;
       }
     } catch (error) {
-      console.error("❌ OTP verification error:", error);
+      console.error("�� OTP verification error:", error);
       return false;
     }
   }
@@ -752,6 +752,13 @@ export class DVHostingSmsService {
 
   logout(): void {
     try {
+      // Enhanced iOS logout clearing
+      if (this.isIosDevice()) {
+        import("../utils/iosAuthFix").then(({ clearIosAuthState }) => {
+          clearIosAuthState();
+        });
+      }
+
       // Clear all auth-related localStorage
       localStorage.removeItem("current_user");
       localStorage.removeItem("cleancare_user");
