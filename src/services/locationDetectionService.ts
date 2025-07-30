@@ -155,7 +155,7 @@ export class LocationDetectionService {
       is_available: isAvailable,
       message: isAvailable
         ? "Service available in your area"
-        : "Service currently only available in Sector 69, Gurugram (Pincode: 122505)",
+        : "Service currently only available in Sector 69, Gurugram (Pincodes: 122001, 122101, 122505, 110088)",
     };
   }
 
