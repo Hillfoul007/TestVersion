@@ -1099,8 +1099,8 @@ Confirm this booking?`;
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <span className="font-semibold text-xs text-laundrify-red">
-                    ��{service!.price * quantity}
+                  <span className="font-semibold text-xs text-laundrify-red currency-symbol">
+                    ₹{service!.price * quantity}
                   </span>
                   <Button
                     variant="ghost"
