@@ -828,16 +828,51 @@ Confirm this booking?`;
 
   // Handle new address creation
   const handleNewAddressSave = async (newAddress: any) => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      console.warn("⚠️ No current user, cannot save address");
+      addNotification(
+        createWarningNotification(
+          "Authentication Required",
+          "Please login to save addresses"
+        )
+      );
+      return;
+    }
+
+    if (!newAddress || !newAddress.fullAddress) {
+      console.error("❌ Invalid address data", newAddress);
+      addNotification(
+        createErrorNotification(
+          "Invalid Address",
+          "Please provide a valid address"
+        )
+      );
+      return;
+    }
 
     // Validate service area before saving
-    const isValid = await validateAddressServiceArea(newAddress);
-    if (!isValid) {
-      return; // Validation failed, popup shown
+    try {
+      const isValid = await validateAddressServiceArea(newAddress);
+      if (!isValid) {
+        return; // Validation failed, popup shown
+      }
+    } catch (validationError) {
+      console.error("❌ Address validation failed:", validationError);
+      addNotification(
+        createErrorNotification(
+          "Validation Failed",
+          "Could not validate address. Please try again."
+        )
+      );
+      return;
     }
 
     try {
       const addressService = AddressService.getInstance();
+      if (!addressService) {
+        throw new Error("AddressService instance not available");
+      }
+
       const result = await addressService.saveAddress(newAddress);
 
       if (result.success) {
