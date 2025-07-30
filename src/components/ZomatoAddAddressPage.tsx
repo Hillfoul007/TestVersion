@@ -547,27 +547,57 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     setIsDetectingLocation(true);
 
     try {
-      console.log("📍 Starting high-accuracy location detection...");
+      console.log("📍 Starting optimized location detection...");
 
-      // Multiple attempts for better accuracy - target street-level precision
+      // Optimized strategy: Quick first attempt, then high-accuracy followup
       let coordinates;
       let bestAccuracy = Infinity;
       let attempts = 0;
-      const maxAttempts = 5; // Increased attempts for better precision
+      const maxAttempts = 3; // Reduced attempts for faster response
 
-      while (attempts < maxAttempts && bestAccuracy > 10) {
-        // Tighter accuracy requirement for street-level detection
+      // First attempt: Quick location with moderate accuracy
+      try {
+        setLocationAttempt(1);
+        console.log("🚀 Quick location attempt...");
+
+        const quickCoords = await locationService.getCurrentPosition({
+          enableHighAccuracy: false, // Faster, uses cell/wifi positioning
+          timeout: 5000, // Short timeout for quick response
+          maximumAge: 60000, // Allow 1-minute cached location for speed
+        });
+
+        coordinates = quickCoords;
+        bestAccuracy = quickCoords.accuracy || Infinity;
+        setLocationAccuracy(bestAccuracy);
+        console.log(`⚡ Quick location found - Accuracy: ${bestAccuracy}m`);
+
+        // Auto-fill immediately with quick location
+        const quickAddress = await locationService.reverseGeocode(coordinates);
+        if (quickAddress) {
+          setSelectedLocation({ address: quickAddress, coordinates });
+          setSearchQuery(quickAddress);
+          updateMapLocation(coordinates);
+          autoFillAddressFields(quickAddress);
+        }
+
+      } catch (quickError) {
+        console.warn("⚠️ Quick location failed, trying high-accuracy:", quickError);
+      }
+
+      // Follow-up attempts for better accuracy if needed
+      while (attempts < maxAttempts && bestAccuracy > 20) {
         try {
-          setLocationAttempt(attempts + 1);
+          setLocationAttempt(attempts + 2);
+          console.log(`🎯 High-accuracy attempt ${attempts + 1}...`);
 
           const currentCoords = await locationService.getCurrentPosition({
             enableHighAccuracy: true,
-            timeout: attempts === 0 ? 30000 : 15000, // Much longer timeout for precision
+            timeout: attempts === 0 ? 10000 : 8000, // Shorter timeouts for responsiveness
             maximumAge: 0, // Always get fresh location
           });
 
           console.log(
-            `📍 Attempt ${attempts + 1} - Accuracy: ${currentCoords.accuracy}m`,
+            `📍 Attempt ${attempts + 2} - Accuracy: ${currentCoords.accuracy}m`,
           );
 
           if (
@@ -578,18 +608,27 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
             bestAccuracy = currentCoords.accuracy || Infinity;
             setLocationAccuracy(bestAccuracy);
             console.log(`✅ Better accuracy found: ${bestAccuracy}m`);
+
+            // Update immediately when we get better accuracy
+            const improvedAddress = await locationService.reverseGeocode(coordinates);
+            if (improvedAddress) {
+              setSelectedLocation({ address: improvedAddress, coordinates });
+              setSearchQuery(improvedAddress);
+              updateMapLocation(coordinates);
+              autoFillAddressFields(improvedAddress);
+            }
           }
 
-          // If we get street-level accuracy, break early
-          if (currentCoords.accuracy && currentCoords.accuracy <= 10) {
+          // If we get good accuracy, break early
+          if (currentCoords.accuracy && currentCoords.accuracy <= 20) {
             console.log(
-              "🎯 Street-level accuracy achieved, using this location",
+              "🎯 Good accuracy achieved, using this location",
             );
             break;
           }
         } catch (attemptError) {
           console.warn(
-            `⚠️ Location attempt ${attempts + 1} failed:`,
+            `⚠️ Location attempt ${attempts + 2} failed:`,
             attemptError,
           );
         }
@@ -598,7 +637,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
         // Small delay between attempts
         if (attempts < maxAttempts) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 500)); // Reduced delay
         }
       }
 
@@ -608,19 +647,23 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
       console.log(`🎯 Final location accuracy: ${coordinates.accuracy}m`);
 
-      // Get detailed address with multiple geocoding sources
-      const address = await locationService.reverseGeocode(coordinates);
-      console.log("🏠 Geocoded address:", address);
+      // If we haven't already updated with the final coordinates, do it now
+      const finalAddress = await locationService.reverseGeocode(coordinates);
+      console.log("🏠 Final geocoded address:", finalAddress);
 
       // Get additional detailed components for better auto-fill
-      const detailedComponents =
-        await locationService.getDetailedAddressComponents(coordinates);
+      let detailedComponents;
+      try {
+        detailedComponents = await locationService.getDetailedAddressComponents(coordinates);
+      } catch (error) {
+        console.warn("Failed to get detailed components:", error);
+      }
 
       // Try to enhance with street-level details if not found initially
-      let enhancedAddress = address;
+      let enhancedAddress = finalAddress;
       let finalComponents = detailedComponents;
 
-      if (!hasStreetLevelDetails(address, detailedComponents)) {
+      if (!hasStreetLevelDetails(finalAddress, detailedComponents)) {
         console.log(
           "🔍 Initial address lacks street details, trying enhanced detection...",
         );
@@ -639,6 +682,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         }
       }
 
+      // Final update with best available data
       setSelectedLocation({ address: enhancedAddress, coordinates });
       setSearchQuery(enhancedAddress);
       updateMapLocation(coordinates);
@@ -667,33 +711,30 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         console.warn("Browser location fallback failed:", locationError);
       }
 
-      // Ultimate fallback - major Indian cities based on common usage
-      const fallbackLocations = [
-        { lat: 28.6139, lng: 77.209, city: "New Delhi" },
-        { lat: 19.076, lng: 72.8777, city: "Mumbai" },
-        { lat: 12.9716, lng: 77.5946, city: "Bangalore" },
-        { lat: 17.385, lng: 78.4867, city: "Hyderabad" },
-        { lat: 13.0827, lng: 80.2707, city: "Chennai" },
-        { lat: 22.5726, lng: 88.3639, city: "Kolkata" },
-      ];
+      // Service area specific fallback - Default to Sector 69, Gurugram since that's our service area
+      const serviceAreaFallback = {
+        lat: 28.4595, lng: 77.0266, // Gurugram coordinates
+        area: "Sector 69, Gurugram"
+      };
 
-      const randomFallback =
-        fallbackLocations[Math.floor(Math.random() * fallbackLocations.length)];
-      const fallbackAddress = `${randomFallback.city}, India`;
-
-      console.log(`🏙️ Using fallback location: ${fallbackAddress}`);
+      const fallbackAddress = `${serviceAreaFallback.area}, Haryana, India`;
+      console.log(`🎯 Using service area fallback: ${fallbackAddress}`);
 
       setSelectedLocation({
         address: fallbackAddress,
-        coordinates: { lat: randomFallback.lat, lng: randomFallback.lng },
+        coordinates: { lat: serviceAreaFallback.lat, lng: serviceAreaFallback.lng },
       });
       setSearchQuery(fallbackAddress);
-      updateMapLocation({ lat: randomFallback.lat, lng: randomFallback.lng });
+      updateMapLocation({ lat: serviceAreaFallback.lat, lng: serviceAreaFallback.lng });
+
+      // Auto-fill with service area details
+      setArea("Sector 69, Gurugram, Haryana");
+      setPincode("122505"); // Sector 69 Gurugram pincode
     } finally {
       setIsDetectingLocation(false);
       setLocationAttempt(0);
       // Keep accuracy info for a bit longer to show final result
-      setTimeout(() => setLocationAccuracy(null), 3000);
+      setTimeout(() => setLocationAccuracy(null), 2000); // Reduced display time
     }
   };
 
