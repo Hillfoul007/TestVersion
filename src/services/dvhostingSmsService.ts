@@ -4,7 +4,7 @@ const getApiBaseUrl = () => {
   return config.API_BASE_URL;
 };
 
-let apiBaseUrl: string;
+const apiBaseUrl = getApiBaseUrl();
 export class DVHostingSmsService {
   private static instance: DVHostingSmsService;
   private currentPhone: string = "";
