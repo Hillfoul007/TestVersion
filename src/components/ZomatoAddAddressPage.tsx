@@ -1462,6 +1462,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       updateMapLocation(coordinates);
       autoFillAddressFields(suggestion.description);
 
+      // Immediate validation for mock suggestion
+      await validateLocationAvailability(suggestion.description);
+
       return;
     }
 
