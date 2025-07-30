@@ -61,7 +61,7 @@ const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
     return phone || "";
   };
 
-  const handleWhatsAppShare = () => {
+  const handleWhatsAppShare = async () => {
     const loginUrl = `${window.location.origin}/`;
     const message = `Check out Laundrify - Quick clean & convenient! Sign up here: ${loginUrl}`;
     const { config } = await import("../config/env");
