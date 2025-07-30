@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Validation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+        .result { margin: 10px 0; padding: 5px; }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Location Validation Test</h1>
+    <p>Testing the LocationUnavailableModal popup for addresses outside Sector 69 Gurugram.</p>
+    
+    <div class="test">
+        <h3>Test 1: Valid Address (Should NOT show popup)</h3>
+        <button onclick="testValidAddress()">Test Sector 69 Gurugram</button>
+        <div id="result1" class="result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 2: Invalid Address (Should show popup)</h3>
+        <button onclick="testInvalidAddress()">Test Delhi Address</button>
+        <div id="result2" class="result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 3: Invalid Address with Different City (Should show popup)</h3>
+        <button onclick="testInvalidCity()">Test Mumbai Address</button>
+        <div id="result3" class="result"></div>
+    </div>
+
+    <div class="test">
+        <h3>Test 4: Edge Case - Gurugram but not Sector 69 (Should show popup)</h3>
+        <button onclick="testEdgeCase()">Test Sector 15 Gurugram</button>
+        <div id="result4" class="result"></div>
+    </div>
+
+    <script>
+        // Mock the console.log for testing
+        const originalLog = console.log;
+        const logs = [];
+        console.log = function(...args) {
+            logs.push(args.join(' '));
+            originalLog.apply(console, arguments);
+        };
+
+        async function testLocationValidation(city, pincode, fullAddress, testId) {
+            try {
+                const response = await fetch('/api/detected-locations/check-availability', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        city,
+                        pincode,
+                        full_address: fullAddress,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                const resultDiv = document.getElementById(testId);
+                if (result.is_available) {
+                    resultDiv.innerHTML = `<div class="pass">✅ PASS: Service available</div><pre>${JSON.stringify(result, null, 2)}</pre>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="fail">❌ EXPECTED: Service not available</div><pre>${JSON.stringify(result, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                const resultDiv = document.getElementById(testId);
+                resultDiv.innerHTML = `<div class="fail">❌ ERROR: ${error.message}</div>`;
+            }
+        }
+
+        function testValidAddress() {
+            testLocationValidation(
+                'Gurugram',
+                '122505',
+                'Sector 69, Gurugram, Haryana 122505',
+                'result1'
+            );
+        }
+
+        function testInvalidAddress() {
+            testLocationValidation(
+                'Delhi',
+                '110001',
+                'Connaught Place, New Delhi, Delhi 110001',
+                'result2'
+            );
+        }
+
+        function testInvalidCity() {
+            testLocationValidation(
+                'Mumbai',
+                '400001',
+                'Fort, Mumbai, Maharashtra 400001',
+                'result3'
+            );
+        }
+
+        function testEdgeCase() {
+            testLocationValidation(
+                'Gurugram',
+                '122001',
+                'Sector 15, Gurugram, Haryana 122001',
+                'result4'
+            );
+        }
+
+        // Test the global functions if available
+        if (typeof window.checkLocationAvailability === 'function') {
+            console.log('✅ Global checkLocationAvailability function is available');
+        } else {
+            console.log('��� Global checkLocationAvailability function is NOT available');
+        }
+
+        if (typeof window.testLocationPopup === 'function') {
+            console.log('✅ Global testLocationPopup function is available');
+        } else {
+            console.log('❌ Global testLocationPopup function is NOT available');
+        }
+    </script>
+</body>
+</html>

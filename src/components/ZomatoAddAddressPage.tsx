@@ -210,21 +210,22 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,
-        styles: [
-          {
-            featureType: "poi",
-            elementType: "labels",
-            stylers: [{ visibility: "off" }],
-          },
-        ],
       };
 
       // Only add Map ID if it's configured
       if (mapId && mapId.trim() !== "") {
         mapConfig.mapId = mapId;
-        console.log("🗺️ Using Map ID for Advanced Markers:", mapId);
+        console.log("🗺️ Using Map ID for Advanced Markers (styles controlled via cloud console):", mapId);
       } else {
-        console.log("🗺️ No Map ID configured, using regular markers");
+        // Only set styles when mapId is NOT present
+        mapConfig.styles = [
+          {
+            featureType: "poi",
+            elementType: "labels",
+            stylers: [{ visibility: "off" }],
+          },
+        ];
+        console.log("🗺️ No Map ID configured, using regular markers with custom styles");
       }
 
       const map = new google.maps.Map(mapRef.current!, mapConfig);
@@ -382,7 +383,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       if (!mapInstance) return;
 
       mapInstance.setCenter(coordinates);
-      mapInstance.setZoom(16);
+      mapInstance.setZoom(13); // Reduced zoom to prevent resource issues
 
       // Remove existing marker (works for both AdvancedMarkerElement and legacy Marker)
       if (marker) {
@@ -530,6 +531,67 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     [mapInstance, marker],
   );
 
+  // Debounced validation to prevent excessive calls
+  const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Immediate validation function for location availability
+  const validateLocationAvailability = async (address: string) => {
+    // Clear previous timeout
+    if (validationTimeoutRef.current) {
+      clearTimeout(validationTimeoutRef.current);
+    }
+
+    // Debounce validation to prevent excessive calls
+    validationTimeoutRef.current = setTimeout(async () => {
+      try {
+        console.log("🔍 Immediate validation for address:", address);
+
+        // Extract city and area from address
+        const parts = address.split(',').map(part => part.trim());
+        let area = '';
+        let city = '';
+        let pincode = '';
+
+        // Try to find city/area and pincode from address parts
+        for (const part of parts) {
+          if (/^\d{6}$/.test(part)) {
+            pincode = part;
+          } else if (part.toLowerCase().includes('sector') || part.toLowerCase().includes('gurugram') || part.toLowerCase().includes('gurgaon')) {
+            if (!area) area = part;
+            if (part.toLowerCase().includes('gurugram') || part.toLowerCase().includes('gurgaon')) {
+              city = part;
+            }
+          }
+        }
+
+        // Use the last non-pincode part as city if not found
+        if (!city) {
+          city = parts.find(part => !(/^\d{6}$/.test(part))) || '';
+        }
+
+        console.log("🔍 Parsed address for validation:", { area, city, pincode, fullAddress: address });
+
+        const locationService = LocationDetectionService.getInstance();
+        const availability = await locationService.checkLocationAvailability(
+          city || area, // city
+          pincode,
+          address, // full address
+        );
+
+        console.log("🏠 Immediate validation result:", availability);
+
+        if (!availability.is_available) {
+          console.log("🚨 Location not available - showing immediate popup");
+          setUnavailableAddressText(address);
+          setShowLocationUnavailable(true);
+        }
+      } catch (error) {
+        console.error("❌ Immediate validation failed:", error);
+        // Don't show popup on validation error during immediate check
+      }
+    }, 500); // 500ms debounce
+  };
+
   const handleMapClick = async (latLng: google.maps.LatLng) => {
     const coordinates = {
       lat: latLng.lat(),
@@ -542,6 +604,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       setSearchQuery(address);
       updateMapLocation(coordinates);
       autoFillAddressFields(address);
+
+      // Immediate validation when location is selected
+      await validateLocationAvailability(address);
     } catch (error) {
       console.error("Reverse geocoding failed:", error);
     }
@@ -582,6 +647,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
           setSearchQuery(quickAddress);
           updateMapLocation(coordinates);
           autoFillAddressFields(quickAddress);
+
+          // Immediate validation for detected location
+          await validateLocationAvailability(quickAddress);
         }
 
       } catch (quickError) {
@@ -620,6 +688,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
               setSearchQuery(improvedAddress);
               updateMapLocation(coordinates);
               autoFillAddressFields(improvedAddress);
+
+              // Immediate validation for improved location
+              await validateLocationAvailability(improvedAddress);
             }
           }
 
@@ -1137,7 +1208,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       setArea(areaParts.join(", "));
 
       console.log("🛣️ Street name:", cleanParts[0]);
-      console.log("🏘️ Extended area:", areaParts.join(", "));
+      console.log("��️ Extended area:", areaParts.join(", "));
     }
   };
 
@@ -1402,6 +1473,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       updateMapLocation(coordinates);
       autoFillAddressFields(suggestion.description);
 
+      // Immediate validation for mock suggestion
+      await validateLocationAvailability(suggestion.description);
+
       return;
     }
 
@@ -1441,6 +1515,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         autoFillAddressFields(
           place.formatted_address || suggestion.description,
         );
+
+        // Immediate validation for place details
+        await validateLocationAvailability(place.formatted_address || suggestion.description);
       } else {
         console.log("🗺️ No place geometry found, using fallback");
         throw new Error("No place geometry found");
@@ -1484,6 +1561,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       updateMapLocation(coordinates);
       autoFillAddressFields(suggestion.description);
 
+      // Immediate validation for fallback suggestion
+      await validateLocationAvailability(suggestion.description);
+
       console.log(`✅ Used fallback coordinates for: ${suggestion.description}`);
     }
   };
@@ -1510,7 +1590,16 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         area,
         pincode,
         completeAddress,
+        selectedLocation,
       });
+
+      // Validate that we have some address data
+      if (!area && !pincode && !completeAddress) {
+        console.warn("⚠️ No address data available for validation, showing popup as precaution");
+        setUnavailableAddressText(selectedLocation?.address || "Unknown location");
+        setShowLocationUnavailable(true);
+        return;
+      }
 
       const locationService = LocationDetectionService.getInstance();
       const availability = await locationService.checkLocationAvailability(
@@ -1527,12 +1616,17 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         setShowLocationUnavailable(true);
         return; // Don't save the address
       }
+
+      console.log("✅ Address validation passed, proceeding with save");
     } catch (error) {
       console.error("❌ Error checking address availability:", error);
-      // Continue with saving if location check fails
-      console.warn(
-        "⚠️ Location check failed, allowing address save to proceed",
-      );
+      console.error("❌ Validation error details:", error);
+
+      // Show popup on validation error to be safe - don't silently continue
+      console.warn("⚠️ Location check failed, showing unavailable popup as precaution");
+      setUnavailableAddressText(completeAddress || selectedLocation?.address || "Unknown location");
+      setShowLocationUnavailable(true);
+      return; // Don't save if validation fails
     }
 
     const addressData: AddressData = {

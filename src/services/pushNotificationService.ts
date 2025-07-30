@@ -13,12 +13,13 @@ export class PushNotificationService {
     return PushNotificationService.instance;
   }
 
-  // Register service worker and set up push notifications
+  // Use existing service worker registration for push notifications
   async initializePWA(): Promise<boolean> {
     try {
       if ("serviceWorker" in navigator) {
-        const registration = await navigator.serviceWorker.register("/sw.js");
-        console.log("Service Worker registered:", registration);
+        // Wait for existing service worker registration (from PWA plugin)
+        const registration = await navigator.serviceWorker.ready;
+        console.log("Using existing Service Worker registration:", registration);
 
         // Check for updates
         registration.addEventListener("updatefound", () => {
@@ -29,7 +30,7 @@ export class PushNotificationService {
       }
       return false;
     } catch (error) {
-      console.error("Service Worker registration failed:", error);
+      console.error("Service Worker initialization failed:", error);
       return false;
     }
   }

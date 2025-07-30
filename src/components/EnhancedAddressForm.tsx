@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Loader2, Navigation, X } from "lucide-react";
 import { locationService, Coordinates } from "@/services/locationService";
+import LocationUnavailableModal from "./LocationUnavailableModal";
+import { LocationDetectionService } from "@/services/locationDetectionService";
 
 interface AddressData {
   flatNo: string;
@@ -64,6 +66,10 @@ const EnhancedAddressForm: React.FC<EnhancedAddressFormProps> = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [detectedLocationText, setDetectedLocationText] = useState("");
+
+  const locationDetectionService = LocationDetectionService.getInstance();
 
   const autocompleteRef = useRef<any>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -298,6 +304,36 @@ const EnhancedAddressForm: React.FC<EnhancedAddressFormProps> = ({
     }
   };
 
+  // Validate address service area
+  const validateAddressServiceArea = async (addressData: AddressData): Promise<boolean> => {
+    try {
+      const city = addressData.city || addressData.village || "";
+      const pincode = addressData.pincode || "";
+      const fullAddress = addressData.fullAddress || "";
+
+      console.log("🔍 Validating address service area:", { city, pincode, fullAddress });
+
+      const availability = await locationDetectionService.checkLocationAvailability(
+        city,
+        pincode,
+        fullAddress
+      );
+
+      console.log("🏠 Address availability result:", availability);
+
+      if (!availability.is_available) {
+        setDetectedLocationText(fullAddress || `${city}${pincode ? `, ${pincode}` : ''}`);
+        setShowLocationUnavailable(true);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("❌ Address validation error:", error);
+      return true; // Allow on error to not block user
+    }
+  };
+
   const detectCurrentLocation = async () => {
     setIsDetectingLocation(true);
     setLocationDenied(false);
@@ -382,6 +418,10 @@ const EnhancedAddressForm: React.FC<EnhancedAddressFormProps> = ({
         const parsedAddress = parseAddressString(addressString, coordinates);
         setAddress(parsedAddress);
         setSearchValue(addressString);
+
+        // Validate service area
+        await validateAddressServiceArea(parsedAddress);
+
         if (onAddressChange) {
           onAddressChange(parsedAddress);
         }
@@ -390,6 +430,10 @@ const EnhancedAddressForm: React.FC<EnhancedAddressFormProps> = ({
         const coordsAddress = createCoordinatesAddress(coordinates);
         setAddress(coordsAddress);
         setSearchValue(coordsAddress.fullAddress);
+
+        // Validate service area
+        await validateAddressServiceArea(coordsAddress);
+
         if (onAddressChange) {
           onAddressChange(coordsAddress);
         }
@@ -1081,7 +1125,13 @@ const EnhancedAddressForm: React.FC<EnhancedAddressFormProps> = ({
         {onAddressUpdate && (
           <div className="mt-6 flex gap-3">
             <Button
-              onClick={() => onAddressUpdate(address)}
+              onClick={async () => {
+                // Validate address before saving
+                const isValid = await validateAddressServiceArea(address);
+                if (isValid) {
+                  onAddressUpdate(address);
+                }
+              }}
               className="flex-1 bg-green-600 hover:bg-green-700"
               disabled={!address.village || !address.city || !address.pincode}
             >
@@ -1090,6 +1140,16 @@ const EnhancedAddressForm: React.FC<EnhancedAddressFormProps> = ({
           </div>
         )}
       </CardContent>
+
+      {/* Location Unavailable Modal */}
+      <LocationUnavailableModal
+        isOpen={showLocationUnavailable}
+        onClose={() => setShowLocationUnavailable(false)}
+        detectedLocation={detectedLocationText}
+        onExplore={() => {
+          console.log("🔍 User chose to explore available services from EnhancedAddressForm");
+        }}
+      />
     </Card>
   );
 };

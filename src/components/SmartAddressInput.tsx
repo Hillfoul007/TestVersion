@@ -16,6 +16,8 @@ import useAddressAutofill, {
   AddressAutofillOptions,
 } from "@/hooks/useAddressAutofill";
 import { ParsedAddress } from "@/utils/autocompleteSuggestionService";
+import LocationUnavailableModal from "./LocationUnavailableModal";
+import { LocationDetectionService } from "@/services/locationDetectionService";
 
 export interface SmartAddressInputProps {
   initialAddress?: Partial<ParsedAddress>;
@@ -41,6 +43,10 @@ export const SmartAddressInput: React.FC<SmartAddressInputProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showAddressForm, setShowAddressForm] = useState(false);
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [detectedLocationText, setDetectedLocationText] = useState("");
+
+  const locationDetectionService = LocationDetectionService.getInstance();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
@@ -70,6 +76,36 @@ export const SmartAddressInput: React.FC<SmartAddressInputProps> = ({
     onValidationChange?.(validation.isValid, validation.missingFields);
   }, [validation, onValidationChange]);
 
+  // Validate address service area
+  const validateAddressServiceArea = async (addressData: ParsedAddress): Promise<boolean> => {
+    try {
+      const city = addressData.city || "";
+      const pincode = addressData.pincode || "";
+      const fullAddress = addressData.fullAddress || "";
+
+      console.log("🔍 Validating address service area:", { city, pincode, fullAddress });
+
+      const availability = await locationDetectionService.checkLocationAvailability(
+        city,
+        pincode,
+        fullAddress
+      );
+
+      console.log("🏠 Address availability result:", availability);
+
+      if (!availability.is_available) {
+        setDetectedLocationText(fullAddress || `${city}${pincode ? `, ${pincode}` : ''}`);
+        setShowLocationUnavailable(true);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("❌ Address validation error:", error);
+      return true; // Allow on error to not block user
+    }
+  };
+
   // Handle search input change - suggestions disabled
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -86,6 +122,8 @@ export const SmartAddressInput: React.FC<SmartAddressInputProps> = ({
 
     const result = await autofillFromSuggestion(suggestion);
     if (result) {
+      // Validate service area
+      await validateAddressServiceArea(result);
       setShowAddressForm(true);
     }
   };
@@ -94,6 +132,8 @@ export const SmartAddressInput: React.FC<SmartAddressInputProps> = ({
   const handleCurrentLocation = async () => {
     const result = await autofillFromCurrentLocation();
     if (result) {
+      // Validate service area
+      await validateAddressServiceArea(result);
       setSearchQuery("Current Location");
       setShowAddressForm(true);
     }
@@ -355,6 +395,16 @@ export const SmartAddressInput: React.FC<SmartAddressInputProps> = ({
           </CardContent>
         </Card>
       )}
+
+      {/* Location Unavailable Modal */}
+      <LocationUnavailableModal
+        isOpen={showLocationUnavailable}
+        onClose={() => setShowLocationUnavailable(false)}
+        detectedLocation={detectedLocationText}
+        onExplore={() => {
+          console.log("🔍 User chose to explore available services from SmartAddressInput");
+        }}
+      />
     </div>
   );
 };

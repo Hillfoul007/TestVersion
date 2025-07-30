@@ -85,18 +85,6 @@ class ModernGoogleMapsService {
 
     const mapConfig: any = {
       ...defaultConfig,
-      // Modern map styling options
-      styles: [
-        {
-          featureType: "poi.business",
-          stylers: [{ visibility: "off" }],
-        },
-        {
-          featureType: "poi.park",
-          elementType: "labels.text",
-          stylers: [{ visibility: "off" }],
-        },
-      ],
       // Enhanced user experience options
       clickableIcons: false,
       fullscreenControl: true,
@@ -107,9 +95,21 @@ class ModernGoogleMapsService {
     // Only add Map ID if it's configured and not empty
     if (mapId && mapId.trim() !== "") {
       mapConfig.mapId = mapId;
-      console.log("🗺️ Using Map ID for Advanced Markers:", mapId);
+      console.log("🗺️ Using Map ID for Advanced Markers (styles controlled via cloud console):", mapId);
     } else {
-      console.log("🗺️ No Map ID configured, using regular markers only");
+      // Only set styles when mapId is NOT present
+      mapConfig.styles = [
+        {
+          featureType: "poi.business",
+          stylers: [{ visibility: "off" }],
+        },
+        {
+          featureType: "poi.park",
+          elementType: "labels.text",
+          stylers: [{ visibility: "off" }],
+        },
+      ];
+      console.log("🗺️ No Map ID configured, using regular markers with custom styles");
     }
 
     this.map = new google.maps.Map(container, mapConfig);
@@ -309,8 +309,8 @@ class ModernGoogleMapsService {
 
     // Ensure minimum zoom level
     google.maps.event.addListenerOnce(this.map, "bounds_changed", () => {
-      if (this.map && this.map.getZoom() && this.map.getZoom()! > 15) {
-        this.map.setZoom(15);
+      if (this.map && this.map.getZoom() && this.map.getZoom()! > 13) {
+        this.map.setZoom(13); // Reduced max zoom to prevent resource issues
       }
     });
   }

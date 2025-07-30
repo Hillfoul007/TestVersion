@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Loader2, Navigation, Search, X, Sparkles } from "lucide-react";
 import SmartAddressInput from "./SmartAddressInput";
 import { ParsedAddress } from "@/utils/autocompleteSuggestionService";
+import LocationUnavailableModal from "./LocationUnavailableModal";
+import { LocationDetectionService } from "@/services/locationDetectionService";
 
 interface AddressData {
   flatNo: string;
@@ -63,6 +65,10 @@ const SimplifiedAddressForm: React.FC<SimplifiedAddressFormProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [locationError, setLocationError] = useState("");
   const [useSmartInput, setUseSmartInput] = useState(false);
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [detectedLocationText, setDetectedLocationText] = useState("");
+
+  const locationDetectionService = LocationDetectionService.getInstance();
 
   // Update parent when address changes
   useEffect(() => {
@@ -163,15 +169,20 @@ const SimplifiedAddressForm: React.FC<SimplifiedAddressFormProps> = ({
           // Reverse geocode the coordinates to get address
           const addressFromCoords = await reverseGeocode(latitude, longitude);
 
-          setAddress((prev) => ({
-            ...prev,
+          const newAddress = {
+            ...address,
             coordinates: { lat: latitude, lng: longitude, accuracy },
             ...addressFromCoords,
             fullAddress:
               `${addressFromCoords.flatNo || ""}, ${addressFromCoords.street || ""}, ${addressFromCoords.village || ""}, ${addressFromCoords.city || ""}, ${addressFromCoords.pincode || ""}`
                 .replace(/^, |, $|, , /g, ", ")
                 .replace(/^, |, $/g, ""),
-          }));
+          };
+
+          setAddress(newAddress);
+
+          // Validate service area for detected location
+          await validateAddressServiceArea(newAddress);
 
           setIsDetectingLocation(false);
         } catch (error) {
@@ -290,8 +301,38 @@ const SimplifiedAddressForm: React.FC<SimplifiedAddressFormProps> = ({
     return () => clearTimeout(timeoutId);
   };
 
+  // Validate address service area
+  const validateAddressServiceArea = async (addressData: AddressData): Promise<boolean> => {
+    try {
+      const city = addressData.city || addressData.village || "";
+      const pincode = addressData.pincode || "";
+      const fullAddress = addressData.fullAddress || "";
+
+      console.log("🔍 Validating address service area:", { city, pincode, fullAddress });
+
+      const availability = await locationDetectionService.checkLocationAvailability(
+        city,
+        pincode,
+        fullAddress
+      );
+
+      console.log("🏠 Address availability result:", availability);
+
+      if (!availability.is_available) {
+        setDetectedLocationText(fullAddress || `${city}${pincode ? `, ${pincode}` : ''}`);
+        setShowLocationUnavailable(true);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("❌ Address validation error:", error);
+      return true; // Allow on error to not block user
+    }
+  };
+
   // Select search result
-  const selectSearchResult = (result: any) => {
+  const selectSearchResult = async (result: any) => {
     const addressData = {
       street: result.locality || result.city || "",
       village: result.city || result.locality || "",
@@ -303,14 +344,19 @@ const SimplifiedAddressForm: React.FC<SimplifiedAddressFormProps> = ({
       },
     };
 
-    setAddress((prev) => ({
-      ...prev,
+    const newAddress = {
+      ...address,
       ...addressData,
       fullAddress:
         `${addressData.street}, ${addressData.village}, ${addressData.city}, ${addressData.pincode}`
           .replace(/^, |, $|, , /g, ", ")
           .replace(/^, |, $/g, ""),
-    }));
+    };
+
+    setAddress(newAddress);
+
+    // Validate service area
+    await validateAddressServiceArea(newAddress);
 
     setSearchValue(
       result.formattedAddress || `${addressData.city}, ${addressData.pincode}`,
@@ -613,7 +659,13 @@ const SimplifiedAddressForm: React.FC<SimplifiedAddressFormProps> = ({
         {/* Save Button */}
         {onAddressUpdate && (
           <Button
-            onClick={() => onAddressUpdate(address)}
+            onClick={async () => {
+              // Validate address before saving
+              const isValid = await validateAddressServiceArea(address);
+              if (isValid) {
+                onAddressUpdate(address);
+              }
+            }}
             className="w-full bg-green-600 hover:bg-green-700"
             disabled={!address.street || !address.city || !address.pincode}
           >
@@ -621,6 +673,16 @@ const SimplifiedAddressForm: React.FC<SimplifiedAddressFormProps> = ({
           </Button>
         )}
       </CardContent>
+
+      {/* Location Unavailable Modal */}
+      <LocationUnavailableModal
+        isOpen={showLocationUnavailable}
+        onClose={() => setShowLocationUnavailable(false)}
+        detectedLocation={detectedLocationText}
+        onExplore={() => {
+          console.log("🔍 User chose to explore available services from SimplifiedAddressForm");
+        }}
+      />
     </Card>
   );
 };
