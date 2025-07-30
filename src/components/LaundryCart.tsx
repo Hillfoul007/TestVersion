@@ -1362,6 +1362,14 @@ Confirm this booking?`;
         currentUser={currentUser}
       />
 
+      {/* New Address Selection Component */}
+      <AddressSelection
+        isOpen={showAddressSelection}
+        onClose={() => setShowAddressSelection(false)}
+        onAddressSelect={handleAddressSelectionSelect}
+        selectedAddress={selectedSavedAddress || addressData}
+      />
+
       {/* Location Unavailable Modal */}
       <LocationUnavailableModal
         isOpen={showLocationUnavailable}
