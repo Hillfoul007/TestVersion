@@ -120,7 +120,10 @@ export class AddressService {
       const possibleOldKeys = [
         `addresses_${currentUser.id}`,
         `addresses_${currentUser._id}`,
-        `addresses_guest`
+        `addresses_guest`,
+        // Also check for other common patterns
+        `laundry_addresses_${currentUser.phone}`,
+        `saved_addresses_${currentUser.phone}`,
       ].filter(Boolean);
 
       let migratedAddresses: AddressData[] = [];
@@ -142,16 +145,97 @@ export class AddressService {
 
       if (migratedAddresses.length > 0) {
         const newKey = `addresses_${phoneNumber}`;
-        localStorage.setItem(newKey, JSON.stringify(migratedAddresses));
-        console.log(`✅ Migrated ${migratedAddresses.length} addresses to ${newKey}`);
+
+        // Merge with any existing addresses
+        const existingAddresses = this.getAddressesFromLocalStorage(phoneNumber);
+        const mergedAddresses = this.mergeAddresses(existingAddresses, migratedAddresses);
+
+        localStorage.setItem(newKey, JSON.stringify(mergedAddresses));
+        console.log(`✅ Migrated and merged ${mergedAddresses.length} addresses to ${newKey}`);
 
         // Optionally clean up old storage keys
         for (const oldKey of possibleOldKeys) {
           localStorage.removeItem(oldKey);
+          console.log(`🧹 Cleaned up old key: ${oldKey}`);
         }
       }
     } catch (error) {
       console.error("Address migration failed:", error);
+    }
+  }
+
+  /**
+   * Merge addresses removing duplicates based on fullAddress similarity
+   */
+  private mergeAddresses(existing: AddressData[], incoming: AddressData[]): AddressData[] {
+    const merged = [...existing];
+
+    for (const newAddr of incoming) {
+      // Check if this address already exists (fuzzy match on full address)
+      const isDuplicate = existing.some(existingAddr =>
+        this.areAddressesSimilar(existingAddr.fullAddress, newAddr.fullAddress)
+      );
+
+      if (!isDuplicate) {
+        merged.push({
+          ...newAddr,
+          id: newAddr.id || `addr_migrated_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          createdAt: newAddr.createdAt || new Date().toISOString(),
+        });
+      }
+    }
+
+    console.log(`🔄 Merged ${existing.length} existing + ${incoming.length} incoming = ${merged.length} total addresses`);
+    return merged;
+  }
+
+  /**
+   * Check if two addresses are similar (for duplicate detection)
+   */
+  private areAddressesSimilar(addr1: string, addr2: string): boolean {
+    const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const norm1 = normalize(addr1);
+    const norm2 = normalize(addr2);
+
+    // Consider addresses similar if they're 80% the same
+    const similarity = this.calculateStringSimilarity(norm1, norm2);
+    return similarity > 0.8;
+  }
+
+  /**
+   * Calculate string similarity using Jaccard similarity
+   */
+  private calculateStringSimilarity(str1: string, str2: string): number {
+    const set1 = new Set(str1.split(''));
+    const set2 = new Set(str2.split(''));
+    const intersection = new Set([...set1].filter(x => set2.has(x)));
+    const union = new Set([...set1, ...set2]);
+    return intersection.size / union.size;
+  }
+
+  /**
+   * Force sync addresses across devices (call after login)
+   */
+  async syncAddressesAfterLogin(): Promise<void> {
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) {
+        console.log("🔄 No user ID available for address sync");
+        return;
+      }
+
+      console.log("🔄 Starting post-login address synchronization...");
+
+      // Force fetch from backend
+      const result = await this.getUserAddresses();
+
+      if (result.success) {
+        console.log(`✅ Address sync completed. ${(result.data as AddressData[]).length} addresses available.`);
+      } else {
+        console.warn("⚠️ Address sync had issues:", result.error);
+      }
+    } catch (error) {
+      console.error("❌ Address sync failed:", error);
     }
   }
 
