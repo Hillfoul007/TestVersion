@@ -4,8 +4,39 @@ import App from "./App.tsx";
 import "./index.css";
 import PerformanceMonitor from "./utils/performanceMonitor";
 
-// iOS Safari compatibility fixes
+// iOS Safari compatibility fixes with enhanced authentication
 const initializeiOSFixes = () => {
+  // Immediate iOS authentication initialization
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  if (isIOS) {
+    console.log("🍎 Early iOS authentication initialization");
+
+    // Import and initialize iOS auth fixes as early as possible
+    import("./utils/iosAuthFix").then(({ preventIosAutoLogout, restoreIosAuth }) => {
+      preventIosAutoLogout();
+      restoreIosAuth().then((restored) => {
+        if (restored) {
+          console.log("🍎📱 Early iOS auth restoration successful");
+        }
+      });
+    }).catch(error => {
+      console.warn("🍎⚠️ Early iOS auth import failed:", error);
+    });
+
+    // Initialize iOS Session Manager early
+    import("./utils/iosSessionManager").then(({ default: IosSessionManager }) => {
+      const sessionManager = IosSessionManager.getInstance();
+      sessionManager.forceSessionRestore().then((restored) => {
+        if (restored) {
+          console.log("🍎📱 Early iOS session manager restoration successful");
+        }
+      });
+    }).catch(error => {
+      console.warn("🍎⚠️ Early iOS session manager import failed:", error);
+    });
+  }
   // Fix for iOS viewport issues
   const viewport = document.querySelector('meta[name="viewport"]');
   if (viewport) {
