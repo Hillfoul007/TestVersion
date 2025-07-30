@@ -366,10 +366,21 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         setAdditionalDetails("");
         setAddressType("home");
 
+        // Clear individual address fields
+        setFlatNo("");
+        setStreet("");
+        setLandmark("");
+        setArea("");
+        setPincode("");
+
         // Autofill receiver details from current user account
         if (currentUser) {
           setReceiverName(currentUser.name || currentUser.full_name || "");
           setReceiverPhone(currentUser.phone || "");
+          console.log("✅ Auto-filled receiver details from user account:", {
+            name: currentUser.name || currentUser.full_name,
+            phone: currentUser.phone
+          });
         } else {
           setReceiverName("");
           setReceiverPhone("");
@@ -377,6 +388,22 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       }
     }
   }, [isOpen, editingAddress, mapInstance, currentUser]);
+
+  // Additional effect to ensure autofill happens when currentUser changes
+  // This is especially important for iOS where state updates might be delayed
+  useEffect(() => {
+    if (isOpen && !editingAddress && currentUser) {
+      // Only autofill if fields are empty to avoid overwriting user input
+      if (!receiverName && currentUser.name) {
+        setReceiverName(currentUser.name || currentUser.full_name || "");
+        console.log("🔄 iOS autofill - Set receiver name:", currentUser.name);
+      }
+      if (!receiverPhone && currentUser.phone) {
+        setReceiverPhone(currentUser.phone || "");
+        console.log("🔄 iOS autofill - Set receiver phone:", currentUser.phone);
+      }
+    }
+  }, [currentUser, isOpen, editingAddress, receiverName, receiverPhone]);
 
   const updateMapLocation = useCallback(
     (coordinates: Coordinates) => {
