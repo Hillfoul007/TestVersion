@@ -50,7 +50,8 @@ import LocationUnavailableModal from "./LocationUnavailableModal";
 import SavedAddressesModal from "./SavedAddressesModal";
 import ZomatoAddressSelector from "./ZomatoAddressSelector";
 import ZomatoAddAddressPage from "./ZomatoAddAddressPage";
-import { AddressService } from "@/services/addressService";
+import AddressSelection from "./AddressSelection";
+import { AddressService, AddressData } from "@/services/addressService";
 import { SessionManager } from "@/utils/sessionManager";
 import { CouponService } from "@/services/couponService";
 
@@ -973,7 +974,7 @@ Confirm this booking?`;
 
                 <div className="flex items-center gap-1">
                   <span className="font-semibold text-xs text-laundrify-red">
-                    ₹{service!.price * quantity}
+                    ��{service!.price * quantity}
                   </span>
                   <Button
                     variant="ghost"
