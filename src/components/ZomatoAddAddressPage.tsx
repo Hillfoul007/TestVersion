@@ -383,7 +383,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       if (!mapInstance) return;
 
       mapInstance.setCenter(coordinates);
-      mapInstance.setZoom(16);
+      mapInstance.setZoom(13); // Reduced zoom to prevent resource issues
 
       // Remove existing marker (works for both AdvancedMarkerElement and legacy Marker)
       if (marker) {
