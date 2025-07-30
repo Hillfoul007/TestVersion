@@ -1,5 +1,6 @@
-const getApiBaseUrl = async () => {
-  const { config } = await import("../config/env");
+import { config } from "../config/env";
+
+const getApiBaseUrl = () => {
   return config.API_BASE_URL;
 };
 
@@ -732,7 +733,7 @@ export class DVHostingSmsService {
       this.otpStorage.clear();
 
       // Call backend logout for session clearing (only if backend is available)
-      const apiBaseUrl = await this.getApiBaseUrl();
+      const apiBaseUrl = this.getApiBaseUrl();
       if (apiBaseUrl) {
         fetch(`${apiBaseUrl}/auth/logout`, {
           method: "POST",
@@ -751,7 +752,7 @@ export class DVHostingSmsService {
     }
   }
 
-  private async getApiBaseUrl(): Promise<string> {
+  private getApiBaseUrl(): string {
     // Check if we're in a hosted environment without backend
     const isHostedEnv =
       window.location.hostname.includes("fly.dev") ||
@@ -761,7 +762,6 @@ export class DVHostingSmsService {
       return ""; // Return empty string to indicate no backend available
     }
 
-    const { config } = await import("../config/env");
     return config.API_BASE_URL;
   }
 
