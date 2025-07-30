@@ -205,7 +205,7 @@ const LocationConfigManager: React.FC = () => {
                 onChange={(e) =>
                   setNewLocation({ ...newLocation, area: e.target.value })
                 }
-                placeholder="e.g., Sector 69"
+                placeholder="e.g., All Areas"
               />
             </div>
             <div>
