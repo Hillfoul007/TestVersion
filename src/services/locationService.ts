@@ -220,7 +220,7 @@ class LocationService {
     // Method 2: Enhanced Nominatim with maximum zoom for street-level detail
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coordinates.lat}&lon=${coordinates.lng}&zoom=19&addressdetails=1&extratags=1&namedetails=1&accept-language=en&countrycodes=in`,
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coordinates.lat}&lon=${coordinates.lng}&zoom=16&addressdetails=1&extratags=1&namedetails=1&accept-language=en&countrycodes=in`,
         {
           headers: {
             "User-Agent": "CleanCarePro-LocationService/1.0",
@@ -559,7 +559,7 @@ class LocationService {
     // Fallback to Nominatim for detailed components
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coordinates.lat}&lon=${coordinates.lng}&zoom=20&addressdetails=1`,
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coordinates.lat}&lon=${coordinates.lng}&zoom=16&addressdetails=1`,
         {
           headers: {
             "User-Agent": "LaundaryFlash-App/1.0",
