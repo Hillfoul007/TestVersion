@@ -421,21 +421,17 @@ export class DVHostingSmsService {
           this.otpStorage.delete(cleanPhone);
           this.currentPhone = "";
 
+          // Import createUserByPhone for consistent user generation
+          const { createUserByPhone } = await import("../utils/authUtils");
+
           // Try to restore user from backend first
           let user = await this.restoreUserFromBackend(cleanPhone);
 
           if (!user) {
-            // Create new user if not found in backend
-            user = {
-              id: `user_${cleanPhone}`,
-              phone: cleanPhone,
-              name:
-                name && name.trim()
-                  ? name.trim()
-                  : `User ${cleanPhone.slice(-4)}`,
-              isVerified: true,
-              createdAt: new Date().toISOString(),
-            };
+            // Create new user using consistent phone-based generation
+            user = createUserByPhone(cleanPhone, name);
+            user.isVerified = true;
+            user.createdAt = new Date().toISOString();
 
             // Save new user to backend
             await this.saveUserToBackend(user);
