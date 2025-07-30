@@ -1501,6 +1501,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         autoFillAddressFields(
           place.formatted_address || suggestion.description,
         );
+
+        // Immediate validation for place details
+        await validateLocationAvailability(place.formatted_address || suggestion.description);
       } else {
         console.log("🗺️ No place geometry found, using fallback");
         throw new Error("No place geometry found");
