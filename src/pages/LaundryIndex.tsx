@@ -1289,6 +1289,14 @@ const LaundryIndex = () => {
           setCurrentView('home');
         }}
       />
+
+      {/* Address Sync Notification */}
+      <AddressSyncNotification
+        isVisible={showAddressSyncNotification}
+        onClose={() => setShowAddressSyncNotification(false)}
+        addressCount={syncedAddressCount}
+        syncStatus={addressSyncStatus}
+      />
     </div>
   );
 };
