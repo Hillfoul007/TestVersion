@@ -126,7 +126,8 @@ const LocationUnavailableModal: React.FC<LocationUnavailableModalProps> = ({
         </div>
       </DialogContent>
       </Dialog>
-    </div>
+    </div>,
+    document.body
   );
 };
 
