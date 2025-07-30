@@ -129,11 +129,19 @@ class AutocompleteSuggestionService {
    */
   async searchGlobal(
     input: string,
-    regionCodes: string[] = ["in", "us", "ca", "gb", "au"],
+    regionCodes: string[] = ["IN", "US", "CA", "GB", "AU"],
     sessionToken?: any,
   ): Promise<AutocompletePrediction[]> {
-    // Search suggestions disabled to prevent errors
-    return [];
+    if (!input || input.length < 2) {
+      return [];
+    }
+
+    return this.fetchSuggestions({
+      input,
+      sessionToken,
+      includedRegionCodes: regionCodes,
+      types: ["address", "establishment", "geocode"],
+    });
   }
 
   /**
