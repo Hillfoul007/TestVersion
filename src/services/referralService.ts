@@ -282,7 +282,7 @@ export class ReferralService {
   }
 
   // Generate social sharing URLs
-  generateSocialShareUrls(shareUrl: string, referralCode: string) {
+  async generateSocialShareUrls(shareUrl: string, referralCode: string) {
     const message = `🧼 Join me on CleanCare Pro and get 50% OFF your first laundry service! Click my link to sign up: ${shareUrl} or use my referral code: ${referralCode}`;
     const encodedMessage = encodeURIComponent(message);
     const encodedUrl = encodeURIComponent(shareUrl);
