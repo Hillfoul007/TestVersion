@@ -16,6 +16,8 @@ import {
   createSuccessNotification,
   createErrorNotification,
 } from "@/utils/notificationUtils";
+import { loginLocationChecker } from "@/services/loginLocationChecker";
+import LocationUnavailableModal from "@/components/LocationUnavailableModal";
 
 // Helper function for coordinate-based location detection (fallback)
 const getCoordinateBasedLocation = (
@@ -219,6 +221,8 @@ const LaundryIndex = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<string>("");
   const [showFirst30Notification, setShowFirst30Notification] = useState(false);
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [detectedLocationText, setDetectedLocationText] = useState("");
 
   // Single iOS detection for the entire component
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -603,6 +607,9 @@ const LaundryIndex = () => {
                 localStorage.removeItem("ios_auth_timestamp");
               }, 2000);
             }
+
+            // Check location availability after successful login
+            checkLocationAfterLogin(storedUser);
 
             return; // Exit early - user is authenticated
           }
