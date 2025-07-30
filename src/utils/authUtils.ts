@@ -112,10 +112,44 @@ export const createGuestSession = (): UserData => {
     name: 'Guest User',
     phone: '',
   };
-  
+
   // Store guest session
   localStorage.setItem('current_user', JSON.stringify(guestUser));
   console.log('👤 Created guest session:', guestUser);
-  
+
   return guestUser;
+};
+
+/**
+ * Create or get user based on phone number (ensures uniqueness)
+ */
+export const createUserByPhone = (phone: string, name?: string): UserData => {
+  // Clean phone number
+  const cleanPhone = phone.replace(/\D/g, '');
+
+  // Generate consistent user ID based on phone number
+  const userId = `user_${cleanPhone}`;
+
+  const userData: UserData = {
+    id: userId,
+    phone: cleanPhone,
+    name: name?.trim() || `User ${cleanPhone.slice(-4)}`,
+    full_name: name?.trim() || `User ${cleanPhone.slice(-4)}`,
+  };
+
+  // Store user data (this will be consistent across sessions)
+  localStorage.setItem('current_user', JSON.stringify(userData));
+  localStorage.setItem('cleancare_user', JSON.stringify(userData));
+
+  console.log('👤 Created/updated user by phone:', userData);
+
+  return userData;
+};
+
+/**
+ * Get or create user ID based on phone number
+ */
+export const getUserIdByPhone = (phone: string): string => {
+  const cleanPhone = phone.replace(/\D/g, '');
+  return `user_${cleanPhone}`;
 };
