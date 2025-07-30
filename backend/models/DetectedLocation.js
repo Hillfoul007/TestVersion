@@ -147,10 +147,11 @@ detectedLocationSchema.statics.saveDetectedLocation = async function (
       return recentDetection; // Don't create duplicate
     }
 
-    // Check if location is available
+    // Check if location is available with full address context
     const isAvailable = this.checkAvailability(
       locationData.city,
       locationData.pincode,
+      locationData.full_address,
     );
 
     const detectedLocation = new this({
