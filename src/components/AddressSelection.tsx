@@ -104,7 +104,7 @@ const AddressSelection: React.FC<AddressSelectionProps> = ({
               <SavedAddresses
                 onAddressSelect={handleAddressSelect}
                 showSelectAction={true}
-                showAddButton={true}
+                showAddButton={false}
                 onAddNew={handleAddNewAddress}
                 onEditAddress={handleEditAddress}
               />
