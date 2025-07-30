@@ -593,7 +593,7 @@ class EnhancedApiClient {
 }
 
 // Create and export the enhanced API client instance
-export const apiClient = new EnhancedApiClient(API_BASE_URL);
+export const apiClient = new EnhancedApiClient();
 
 // Export types for better TypeScript support
 export type { ApiResponse, RequestOptions };
