@@ -438,8 +438,8 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
                         </Button>
                       </div>
                       <div className="text-right">
-                        <div className="font-semibold text-gray-900">
-                          ��{service!.price * quantity}
+                        <div className="font-semibold text-gray-900 currency-symbol">
+                          ₹{service!.price * quantity}
                         </div>
                         {quantity > 1 && (
                           <div className="text-xs text-gray-500">
