@@ -1125,7 +1125,13 @@ const EnhancedAddressForm: React.FC<EnhancedAddressFormProps> = ({
         {onAddressUpdate && (
           <div className="mt-6 flex gap-3">
             <Button
-              onClick={() => onAddressUpdate(address)}
+              onClick={async () => {
+                // Validate address before saving
+                const isValid = await validateAddressServiceArea(address);
+                if (isValid) {
+                  onAddressUpdate(address);
+                }
+              }}
               className="flex-1 bg-green-600 hover:bg-green-700"
               disabled={!address.village || !address.city || !address.pincode}
             >
@@ -1134,6 +1140,16 @@ const EnhancedAddressForm: React.FC<EnhancedAddressFormProps> = ({
           </div>
         )}
       </CardContent>
+
+      {/* Location Unavailable Modal */}
+      <LocationUnavailableModal
+        isOpen={showLocationUnavailable}
+        onClose={() => setShowLocationUnavailable(false)}
+        detectedLocation={detectedLocationText}
+        onExplore={() => {
+          console.log("🔍 User chose to explore available services from EnhancedAddressForm");
+        }}
+      />
     </Card>
   );
 };
