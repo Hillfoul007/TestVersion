@@ -685,7 +685,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
               Processing...
             </>
           ) : (
-            <>Proceed to Pay ���{getTotal()}</>
+            <span className="currency-symbol">Proceed to Pay ₹{getTotal()}</span>
           )}
         </Button>
 
