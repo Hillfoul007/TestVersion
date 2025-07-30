@@ -95,7 +95,8 @@ export const initializeAuthPersistence = () => {
 
   window.addEventListener("pagehide", handlePageHide);
 
-  // Add session heartbeat to keep auth alive
+  // Add session heartbeat to keep auth alive - more frequent for iOS devices
+  const heartbeatInterval = isIosDevice() ? 2 * 60 * 1000 : 5 * 60 * 1000; // iOS: 2 min, Others: 5 min
   const sessionHeartbeat = setInterval(
     () => {
       const user = authService.getCurrentUser();
@@ -103,12 +104,22 @@ export const initializeAuthPersistence = () => {
         // Update localStorage timestamp to show session is active
         localStorage.setItem("auth_last_active", Date.now().toString());
 
+        // For iOS, also save to emergency storage
+        if (isIosDevice()) {
+          const token = localStorage.getItem("auth_token") || localStorage.getItem("cleancare_auth_token");
+          if (token) {
+            sessionStorage.setItem("ios_heartbeat_user", JSON.stringify(user));
+            sessionStorage.setItem("ios_heartbeat_token", token);
+            sessionStorage.setItem("ios_heartbeat_timestamp", Date.now().toString());
+          }
+        }
+
         // Sync auth storage to ensure consistency
         syncAuthStorage();
       }
     },
-    5 * 60 * 1000,
-  ); // Every 5 minutes
+    heartbeatInterval,
+  );
 
   // Clear heartbeat on page unload
   window.addEventListener("beforeunload", () => {
