@@ -130,9 +130,12 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
         if (!availability.is_available) {
           // Show unavailable popup instead of reloading
+          console.log("🚨 Manual location check - service not available, showing popup");
           setShowLocationUnavailable(true);
           setIsRequestingLocation(false);
           return;
+        } else {
+          console.log("✅ Manual location check - service is available");
         }
       }
 
