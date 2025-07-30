@@ -206,6 +206,30 @@ export const preventIosAutoLogout = (): void => {
     }
   });
 
+  // Enhanced iOS session persistence on app lifecycle events
+  // Handle app termination/backgrounding
+  window.addEventListener("beforeunload", () => {
+    const user = localStorage.getItem("current_user") || localStorage.getItem("cleancare_user");
+    const token = localStorage.getItem("auth_token") || localStorage.getItem("cleancare_auth_token");
+
+    if (user && token) {
+      // Save to all possible storage locations before app termination
+      sessionStorage.setItem("ios_emergency_user", user);
+      sessionStorage.setItem("ios_emergency_token", token);
+      sessionStorage.setItem("ios_emergency_timestamp", Date.now().toString());
+
+      // Immediate IndexedDB save
+      try {
+        const userObj = JSON.parse(user);
+        saveIosAuthToIndexedDB(userObj, token);
+      } catch (e) {
+        console.warn("🍎⚠️ Emergency IndexedDB save failed:", e);
+      }
+
+      console.log("🍎💾 Emergency auth backup created before app termination");
+    }
+  });
+
   // Handle iOS app resume/focus
   window.addEventListener("pageshow", async (event) => {
     if (event.persisted) {
@@ -437,13 +461,15 @@ export const restoreIosAuth = async (): Promise<boolean> => {
     return true;
   }
 
-  // Try to restore from backups
+  // Try to restore from backups (including emergency backups)
   const backupUser =
     localStorage.getItem("ios_backup_user") ||
-    sessionStorage.getItem("ios_session_user");
+    sessionStorage.getItem("ios_session_user") ||
+    sessionStorage.getItem("ios_emergency_user");
   const backupToken =
     localStorage.getItem("ios_backup_token") ||
-    sessionStorage.getItem("ios_session_token");
+    sessionStorage.getItem("ios_session_token") ||
+    sessionStorage.getItem("ios_emergency_token");
 
   if (backupUser && backupToken) {
     localStorage.setItem("current_user", backupUser);
