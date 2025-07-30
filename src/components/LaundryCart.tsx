@@ -1065,7 +1065,7 @@ Confirm this booking?`;
                         );
                       }
                     } else {
-                      setShowZomatoAddressSelector(true);
+                      setShowAddressSelection(true);
                     }
                   }}
                   variant="outline"
