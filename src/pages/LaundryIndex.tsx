@@ -744,6 +744,9 @@ const LaundryIndex = () => {
     console.log("✅ User logged in successfully:", user.name || user.phone);
     console.log("📍 Redirecting to:", targetView);
 
+    // Sync addresses across devices
+    syncAddressesAfterLogin();
+
     // Check if this is a first-time user for FIRST30 notification
     const isFirstTime = referralService.isFirstTimeUser(user);
     if (isFirstTime && targetView === "home") {
@@ -763,6 +766,18 @@ const LaundryIndex = () => {
 
     // Check location availability after login
     checkLocationAfterLogin(user);
+  };
+
+  // Sync addresses across devices after login
+  const syncAddressesAfterLogin = async () => {
+    try {
+      const { AddressService } = await import("@/services/addressService");
+      const addressService = AddressService.getInstance();
+      await addressService.syncAddressesAfterLogin();
+      console.log("✅ Address synchronization completed after login");
+    } catch (error) {
+      console.warn("⚠️ Address synchronization failed after login:", error);
+    }
   };
 
   // Check location availability after user logs in
