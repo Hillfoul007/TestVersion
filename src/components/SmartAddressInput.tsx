@@ -395,6 +395,16 @@ export const SmartAddressInput: React.FC<SmartAddressInputProps> = ({
           </CardContent>
         </Card>
       )}
+
+      {/* Location Unavailable Modal */}
+      <LocationUnavailableModal
+        isOpen={showLocationUnavailable}
+        onClose={() => setShowLocationUnavailable(false)}
+        detectedLocation={detectedLocationText}
+        onExplore={() => {
+          console.log("🔍 User chose to explore available services from SmartAddressInput");
+        }}
+      />
     </div>
   );
 };
