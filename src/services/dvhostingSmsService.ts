@@ -595,36 +595,26 @@ export class DVHostingSmsService {
   private async sendDirectDVHostingOTP(phoneNumber: string): Promise<boolean> {
     try {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      // Generate OTP for simulation (API key handled by backend)
-      console.log("DVHosting SMS: Using backend API for OTP sending");
 
-      console.log("DVHosting SMS: Calling DVHosting API directly");
-      console.log("DVHosting SMS: Phone:", phoneNumber, "OTP:", otp);
+      console.log("DVHosting SMS: Simulation mode - no direct API calls from frontend");
+      console.log("DVHosting SMS: Phone:", phoneNumber);
 
-      // DVHosting v4 API endpoint with Fast2SMS compatible parameters
-      const url = `https://dvhosting.in/api-sms-v4.php?authorization=${apiKey}&route=otp&variables_values=${otp}&numbers=${phoneNumber}`;
-
-      const response = await fetch(url, {
-        method: "GET",
-        mode: "no-cors", // To avoid CORS issues
-      });
-
-      // Store OTP locally for verification since we can't read response due to no-cors
+      // Store OTP locally for verification (simulation mode for frontend-only environments)
       this.otpStorage.set(phoneNumber, {
         otp: otp,
         expiresAt: Date.now() + 5 * 60 * 1000,
       });
 
-      console.log("✅ OTP sent directly via DVHosting API");
+      console.log("✅ OTP generated (simulation mode for security)");
       console.log(
-        "📱 Your OTP is:",
+        "📱 Your simulation OTP is:",
         otp,
-        "(for testing - check your phone for actual OTP)",
+        "(for testing - in production, real SMS would be sent by backend)",
       );
 
       return true;
     } catch (error) {
-      console.error("❌ Direct DVHosting API call failed:", error);
+      console.error("❌ Simulation OTP generation failed:", error);
 
       // Fallback to simulation mode
       const mockOtp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -633,8 +623,8 @@ export class DVHostingSmsService {
         expiresAt: Date.now() + 5 * 60 * 1000,
       });
 
-      console.log("✅ OTP sent (simulation mode - API call failed)");
-      console.log("📱 Simulation OTP:", mockOtp, "(for testing only)");
+      console.log("✅ OTP sent (fallback simulation mode)");
+      console.log("📱 Fallback OTP:", mockOtp, "(for testing only)");
 
       return true;
     }
