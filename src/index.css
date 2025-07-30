@@ -103,10 +103,15 @@
       BlinkMacSystemFont,
       "Segoe UI",
       Roboto,
+      "Noto Sans",
+      "Apple Color Emoji",
+      "Segoe UI Emoji",
       sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Ensure proper Unicode rendering for currency symbols */
+    unicode-bidi: isolate;
     /* Safe area support for PWA on iPhone */
     padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0)
       env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
@@ -141,6 +146,15 @@
 
   .card-compact {
     @apply bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+
+  /* Ensure proper currency symbol rendering */
+  .currency-symbol {
+    font-family: "Segoe UI", "Roboto", "Noto Sans", system-ui, sans-serif;
+    font-feature-settings: "tnum" 1; /* Tabular numbers for better alignment */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   /* PWA safe area utilities */

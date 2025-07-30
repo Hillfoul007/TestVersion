@@ -666,7 +666,7 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
 Booking Confirmation:
 
 Services: ${services.length} items
-${services.map((s) => `• ${s.name} x${s.quantity} - ���${s.price * s.quantity}`).join("\n")}
+${services.map((s) => `• ${s.name} x${s.quantity} - ₹${s.price * s.quantity}`).join("\n")}
 
 Pickup: ${selectedDate.toLocaleDateString()} at ${selectedTime}
 Delivery: ${finalDeliveryDate.toLocaleDateString()} at ${finalDeliveryTime}
@@ -1073,7 +1073,7 @@ Confirm this booking?`;
                   <h4 className="font-medium text-xs break-words leading-tight">
                     {service!.name}
                   </h4>
-                  <p className="text-xs text-laundrify-red">₹{service!.price}</p>
+                  <p className="text-xs text-laundrify-red currency-symbol">₹{service!.price}</p>
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -1099,8 +1099,8 @@ Confirm this booking?`;
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <span className="font-semibold text-xs text-laundrify-red">
-                    ��{service!.price * quantity}
+                  <span className="font-semibold text-xs text-laundrify-red currency-symbol">
+                    ₹{service!.price * quantity}
                   </span>
                   <Button
                     variant="ghost"
@@ -1277,7 +1277,7 @@ Confirm this booking?`;
           <CardContent className="space-y-1.5 px-3 pb-2 pt-0">
             <div className="flex justify-between text-sm">
               <span>Subtotal ({cartItems.length} items)</span>
-              <span>₹{getSubtotal()}</span>
+              <span className="currency-symbol">₹{getSubtotal()}</span>
             </div>
 
             <div className="flex justify-between text-sm text-laundrify-blue">
@@ -1371,7 +1371,7 @@ Confirm this booking?`;
             {appliedCoupon && (
               <div className="flex justify-between text-laundrify-blue text-sm">
                 <span>Discount</span>
-                <span>-₹{getCouponDiscount()}</span>
+                <span className="currency-symbol">-₹{getCouponDiscount()}</span>
               </div>
             )}
 
@@ -1379,7 +1379,7 @@ Confirm this booking?`;
 
             <div className="flex justify-between font-semibold">
               <span>Total</span>
-              <span className="text-laundrify-red">₹{getTotal()}</span>
+              <span className="text-laundrify-red currency-symbol">₹{getTotal()}</span>
             </div>
           </CardContent>
         </Card>
@@ -1425,7 +1425,7 @@ Confirm this booking?`;
             ) : (
               <>
                 <CreditCard className="h-4 w-4" />
-                Proceed to Book • ₹{getTotal()}
+                <span className="currency-symbol">Proceed to Book • ₹{getTotal()}</span>
               </>
             )}
           </Button>

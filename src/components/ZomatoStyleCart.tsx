@@ -373,7 +373,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
           <div className="flex items-center gap-2">
             <Tag className="h-4 w-4 text-laundrify-blue" />
             <span className="text-sm font-medium text-laundrify-blue">
-              You saved ₹{savingsAmount} on this order
+              <span className="currency-symbol">You saved ₹{savingsAmount} on this order</span>
             </span>
           </div>
         </div>
@@ -438,12 +438,12 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
                         </Button>
                       </div>
                       <div className="text-right">
-                        <div className="font-semibold text-gray-900">
-                          ��{service!.price * quantity}
+                        <div className="font-semibold text-gray-900 currency-symbol">
+                          ₹{service!.price * quantity}
                         </div>
                         {quantity > 1 && (
                           <div className="text-xs text-gray-500">
-                            ₹{service!.price} each
+                            <span className="currency-symbol">₹{service!.price} each</span>
                           </div>
                         )}
                       </div>
@@ -612,9 +612,9 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-4">
               <CreditCard className="h-4 w-4 text-gray-600" />
-              <span className="font-medium">Total Bill ��{getSubtotal()}</span>
+              <span className="font-medium currency-symbol">Total Bill ₹{getSubtotal()}</span>
               <span className="text-sm text-laundrify-red font-medium">
-                ₹{getTotal()}
+                <span className="currency-symbol">₹{getTotal()}</span>
               </span>
               <Button variant="ghost" size="sm" className="ml-auto">
                 <ArrowLeft className="h-4 w-4 rotate-180" />
@@ -624,7 +624,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span>Item Total</span>
-                <span>₹{getSubtotal()}</span>
+                <span className="currency-symbol">₹{getSubtotal()}</span>
               </div>
 
               <div className="flex justify-between text-laundrify-blue">
@@ -648,13 +648,13 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
               {appliedCoupon && (
                 <div className="flex justify-between text-laundrify-blue">
                   <span>Coupon Discount</span>
-                  <span>-₹{getCouponDiscount()}</span>
+                  <span className="currency-symbol">-₹{getCouponDiscount()}</span>
                 </div>
               )}
 
               <div className="border-t pt-2 flex justify-between font-medium">
                 <span>Grand Total</span>
-                <span>₹{getTotal()}</span>
+                <span className="currency-symbol">₹{getTotal()}</span>
               </div>
             </div>
 
@@ -685,7 +685,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
               Processing...
             </>
           ) : (
-            <>Proceed to Pay ���{getTotal()}</>
+            <span className="currency-symbol">Proceed to Pay ₹{getTotal()}</span>
           )}
         </Button>
 
