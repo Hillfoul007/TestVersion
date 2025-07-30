@@ -33,6 +33,7 @@ const SavedAddresses: React.FC<SavedAddressesProps> = ({
   showSelectAction = false,
   showAddButton = true,
   onAddNew,
+  onEditAddress,
 }) => {
   const [addresses, setAddresses] = useState<AddressData[]>([]);
   const [loading, setLoading] = useState(false);
