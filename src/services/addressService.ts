@@ -278,7 +278,7 @@ export class AddressService {
   }
 
   /**
-   * Get user addresses (active only)
+   * Get user addresses (active only) with cross-device synchronization
    */
   async getUserAddresses(): Promise<AddressResponse> {
     try {
@@ -294,9 +294,13 @@ export class AddressService {
         };
       }
 
-      // Try backend first
+      let backendAddresses: AddressData[] = [];
+      let backendSuccess = false;
+
+      // Try backend first for cross-device sync
       if (this.apiBaseUrl) {
         try {
+          console.log(`🔄 Fetching addresses from backend for user: ${userId}`);
           const response = await fetch(`${this.apiBaseUrl}/addresses`, {
             headers: {
               "Content-Type": "application/json",
@@ -306,8 +310,10 @@ export class AddressService {
 
           if (response.ok) {
             const result = await response.json();
+            console.log(`✅ Backend returned ${(result.data || []).length} addresses`);
+
             // Transform backend format to frontend format
-            const transformedAddresses = (result.data || []).map(
+            backendAddresses = (result.data || []).map(
               (addr: any) => ({
                 id: addr._id,
                 _id: addr._id,
@@ -327,21 +333,36 @@ export class AddressService {
               }),
             );
 
+            backendSuccess = true;
+
+            // Update localStorage with backend data for offline access
+            this.syncAddressesToLocalStorage(userId, backendAddresses);
+
             return {
               success: true,
-              data: transformedAddresses,
+              data: backendAddresses,
             };
+          } else {
+            console.warn(`❌ Backend returned ${response.status}: ${response.statusText}`);
           }
         } catch (error) {
-          console.warn("Backend fetch failed, using localStorage:", error);
+          console.warn("❌ Backend fetch failed, using localStorage fallback:", error);
         }
       }
 
-      // Fallback to localStorage
-      const addresses = this.getAddressesFromLocalStorage(userId);
+      // Fallback to localStorage with potential sync-back to backend
+      const localAddresses = this.getAddressesFromLocalStorage(userId);
+      console.log(`💾 Found ${localAddresses.length} addresses in localStorage`);
+
+      // If backend failed but we have local addresses, try to sync them back
+      if (!backendSuccess && localAddresses.length > 0 && this.apiBaseUrl) {
+        console.log("🔄 Attempting to sync local addresses to backend...");
+        this.syncLocalAddressesToBackend(userId, localAddresses);
+      }
+
       return {
         success: true,
-        data: addresses,
+        data: localAddresses,
       };
     } catch (error) {
       console.error("Failed to get user addresses:", error);
@@ -351,6 +372,38 @@ export class AddressService {
           error instanceof Error ? error.message : "Failed to get addresses",
         data: [],
       };
+    }
+  }
+
+  /**
+   * Sync addresses to localStorage for offline access
+   */
+  private syncAddressesToLocalStorage(userId: string, addresses: AddressData[]): void {
+    try {
+      const storageKey = `addresses_${userId}`;
+      localStorage.setItem(storageKey, JSON.stringify(addresses));
+      console.log(`✅ Synced ${addresses.length} addresses to localStorage`);
+    } catch (error) {
+      console.error("❌ Failed to sync addresses to localStorage:", error);
+    }
+  }
+
+  /**
+   * Attempt to sync local addresses back to backend (fire-and-forget)
+   */
+  private async syncLocalAddressesToBackend(userId: string, localAddresses: AddressData[]): Promise<void> {
+    try {
+      // Don't await this - run in background
+      for (const address of localAddresses) {
+        // Only sync addresses that don't have backend IDs
+        if (!address._id && !address.id?.startsWith('addr_backend_')) {
+          this.saveAddress(address).catch(error => {
+            console.warn(`Failed to sync address "${address.fullAddress}" to backend:`, error);
+          });
+        }
+      }
+    } catch (error) {
+      console.warn("Failed to sync local addresses to backend:", error);
     }
   }
 
