@@ -714,6 +714,40 @@ export class DVHostingSmsService {
     }
   }
 
+  private isIosDevice(): boolean {
+    return (
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+    );
+  }
+
+  private async createIosPersistentSession(user: any, token: string): Promise<void> {
+    try {
+      // Import iOS session manager and create emergency backup
+      const { default: IosSessionManager } = await import("../utils/iosSessionManager");
+      const sessionManager = IosSessionManager.getInstance();
+      await sessionManager.forceEmergencyBackup();
+
+      // Also save to traditional iOS backup locations
+      sessionStorage.setItem("ios_session_user", JSON.stringify(user));
+      sessionStorage.setItem("ios_session_token", token);
+      localStorage.setItem("ios_backup_user", JSON.stringify(user));
+      localStorage.setItem("ios_backup_token", token);
+      localStorage.setItem("ios_auth_timestamp", Date.now().toString());
+
+      // Set cookie with 30-day expiration
+      try {
+        document.cookie = `ios_auth_backup=${encodeURIComponent(JSON.stringify(user))}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Strict; Secure`;
+      } catch (e) {
+        // Cookie save failed, continue
+      }
+
+      console.log("🍎 Enhanced iOS 30-day session persistence created");
+    } catch (error) {
+      console.warn("🍎⚠️ Failed to create iOS persistent session:", error);
+    }
+  }
+
   logout(): void {
     try {
       // Clear all auth-related localStorage
