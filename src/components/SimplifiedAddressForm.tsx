@@ -169,15 +169,20 @@ const SimplifiedAddressForm: React.FC<SimplifiedAddressFormProps> = ({
           // Reverse geocode the coordinates to get address
           const addressFromCoords = await reverseGeocode(latitude, longitude);
 
-          setAddress((prev) => ({
-            ...prev,
+          const newAddress = {
+            ...address,
             coordinates: { lat: latitude, lng: longitude, accuracy },
             ...addressFromCoords,
             fullAddress:
               `${addressFromCoords.flatNo || ""}, ${addressFromCoords.street || ""}, ${addressFromCoords.village || ""}, ${addressFromCoords.city || ""}, ${addressFromCoords.pincode || ""}`
                 .replace(/^, |, $|, , /g, ", ")
                 .replace(/^, |, $/g, ""),
-          }));
+          };
+
+          setAddress(newAddress);
+
+          // Validate service area for detected location
+          await validateAddressServiceArea(newAddress);
 
           setIsDetectingLocation(false);
         } catch (error) {
