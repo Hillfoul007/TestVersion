@@ -293,7 +293,7 @@ export const preventIosAutoLogout = (): void => {
 
       // Use a more persistent storage method
       try {
-        document.cookie = `ios_auth_backup=${encodeURIComponent(user)}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Strict`;
+        document.cookie = `ios_auth_backup=${encodeURIComponent(user)}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Strict; Secure`;
       } catch (e) {
         // Cookie storage failed, continue
       }
@@ -405,6 +405,7 @@ export const restoreIosAuth = async (): Promise<boolean> => {
     };
 
     // Use MONTH (30 days) to prevent automatic logout - extended UX for laundry app
+    // This ensures users stay logged in for 30 days unless they explicitly logout
     const logoutDuration = LOGOUT_DURATION_OPTIONS.MONTH;
 
     if (logoutAge < logoutDuration) {
@@ -571,10 +572,9 @@ export const restoreIosAuthFromIndexedDB = async (): Promise<boolean> => {
       request.onsuccess = () => {
         const result = request.result;
         if (result && result.user && result.token) {
-          // Check if data is not too old (30 days for PWA, 7 days for Safari)
-          const maxAge = isPWAMode()
-            ? 30 * 24 * 60 * 60 * 1000
-            : 7 * 24 * 60 * 60 * 1000;
+          // Check if data is not too old (30 days for all iOS devices)
+          // Extended to 30 days for both PWA and Safari to maintain user sessions
+          const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days for both PWA and Safari
           const age = Date.now() - result.timestamp;
           if (age < maxAge) {
             localStorage.setItem("current_user", result.user);
