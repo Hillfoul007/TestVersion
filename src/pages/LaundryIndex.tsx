@@ -1228,6 +1228,22 @@ const LaundryIndex = () => {
           onViewBookings={() => setCurrentView("bookings")}
         />
       )}
+
+      {/* Service Area Unavailable Modal */}
+      <LocationUnavailableModal
+        isOpen={showLocationUnavailable}
+        onClose={() => setShowLocationUnavailable(false)}
+        detectedLocation={detectedLocationText}
+        onExplore={() => {
+          console.log('🔍 User chose to explore available services');
+          setShowLocationUnavailable(false);
+          // User can continue using the app normally
+        }}
+        onNavigateHome={() => {
+          console.log('🏠 User navigating to home from location unavailable modal');
+          setCurrentView('home');
+        }}
+      />
     </div>
   );
 };
