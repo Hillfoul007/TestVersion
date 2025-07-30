@@ -1,7 +1,7 @@
 // Enhanced API client with better error handling and CORS support
 import { config } from "@/config/env";
 
-const API_BASE_URL = config.apiBaseUrl;
+const API_BASE_URL = config.API_BASE_URL;
 
 interface ApiResponse<T> {
   data?: T;
@@ -22,8 +22,10 @@ class EnhancedApiClient {
   private token: string | null = null;
   private requestQueue: Map<string, Promise<any>> = new Map();
 
-  constructor(baseURL: string) {
-    this.baseURL = baseURL.replace(/\/$/, ""); // Remove trailing slash
+  constructor(baseURL?: string) {
+    // Handle undefined baseURL gracefully
+    const url = baseURL || API_BASE_URL || '';
+    this.baseURL = url ? url.replace(/\/$/, "") : ""; // Remove trailing slash if URL exists
     this.token = localStorage.getItem("auth_token");
   }
 
