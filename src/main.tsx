@@ -69,16 +69,5 @@ if (rootElement) {
   console.error('Root element not found');
 }
 
-// Register service worker for caching
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/sw.js")
-      .then((registration) => {
-        console.log("SW registered: ", registration);
-      })
-      .catch((registrationError) => {
-        console.log("SW registration failed: ", registrationError);
-      });
-  });
-}
+// Service worker registration is handled by Vite PWA plugin
+// Manual registration removed to avoid conflicts
