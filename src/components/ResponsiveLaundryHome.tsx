@@ -226,6 +226,31 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
     return () => clearTimeout(timer);
   }, [userLocation, locationDetectionService]);
 
+  // Test function to simulate location outside service area
+  const testLocationUnavailable = async () => {
+    console.log("🧪 Testing location unavailable popup");
+    setDetectedLocationText("Test Location: Outside Service Area");
+    setShowLocationUnavailable(true);
+  };
+
+  // Add debugging function to window for console testing
+  useEffect(() => {
+    (window as any).testLocationPopup = testLocationUnavailable;
+    (window as any).checkLocationAvailability = async (city: string, pincode?: string, fullAddress?: string) => {
+      const result = await locationDetectionService.checkLocationAvailability(city, pincode, fullAddress);
+      console.log('Manual availability check result:', result);
+      if (!result.is_available) {
+        setDetectedLocationText(fullAddress || `${city}${pincode ? `, ${pincode}` : ''}`);
+        setShowLocationUnavailable(true);
+      }
+      return result;
+    };
+    return () => {
+      delete (window as any).testLocationPopup;
+      delete (window as any).checkLocationAvailability;
+    };
+  }, [locationDetectionService]);
+
   // Add keyboard shortcut for booking debug panel
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -243,6 +268,11 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
       if (event.ctrlKey && event.shiftKey && event.key === "A") {
         event.preventDefault();
         setShowAdminServices(true);
+      }
+      // Ctrl+Shift+L to test location popup
+      if (event.ctrlKey && event.shiftKey && event.key === "L") {
+        event.preventDefault();
+        testLocationUnavailable();
       }
     };
 
