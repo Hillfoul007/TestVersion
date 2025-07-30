@@ -765,6 +765,20 @@ Confirm this booking?`;
     console.log("✅ Address selected:", address.label || address.type);
   };
 
+  const handleAddressSelectionSelect = (address: AddressData) => {
+    setSelectedSavedAddress(address);
+    setAddressData(address);
+    setShowAddressSelection(false);
+    console.log("✅ Address selected from new component:", address.label || address.type);
+
+    addNotification(
+      createSuccessNotification(
+        "Address Selected",
+        `Selected ${address.label || address.type} address`,
+      ),
+    );
+  };
+
   // Handle new address creation
   const handleNewAddressSave = async (newAddress: any) => {
     if (!currentUser) return;
