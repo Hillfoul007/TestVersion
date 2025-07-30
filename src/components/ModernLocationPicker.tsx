@@ -83,7 +83,7 @@ export const ModernLocationPicker: React.FC<ModernLocationPickerProps> = ({
 
         const mapConfig: MapConfig = {
           center: defaultCenter,
-          zoom: 15,
+          zoom: 12, // Reduced zoom to prevent resource issues
           gestureHandling: "auto",
           disableDefaultUI: false,
         };
