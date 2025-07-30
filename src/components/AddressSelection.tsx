@@ -22,6 +22,7 @@ const AddressSelection: React.FC<AddressSelectionProps> = ({
   selectedAddress,
 }) => {
   const [showAddAddressForm, setShowAddAddressForm] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<AddressData | null>(null);
   const [currentUser] = useState(() => getCurrentUser());
 
   const handleAddressSelect = (address: AddressData) => {
@@ -30,11 +31,18 @@ const AddressSelection: React.FC<AddressSelectionProps> = ({
   };
 
   const handleAddNewAddress = () => {
+    setEditingAddress(null);
+    setShowAddAddressForm(true);
+  };
+
+  const handleEditAddress = (address: AddressData) => {
+    setEditingAddress(address);
     setShowAddAddressForm(true);
   };
 
   const handleAddressSave = (address: AddressData) => {
     setShowAddAddressForm(false);
+    setEditingAddress(null);
     onAddressSelect(address);
     onClose();
   };
