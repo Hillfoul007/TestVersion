@@ -760,6 +760,33 @@ const LaundryIndex = () => {
         `Hello ${user.name || user.phone}, you're now logged in.`,
       ),
     );
+
+    // Check location availability after login
+    checkLocationAfterLogin(user);
+  };
+
+  // Check location availability after user logs in
+  const checkLocationAfterLogin = async (user: any) => {
+    try {
+      console.log('📍 Checking location availability after login for user:', user.phone || user.id);
+
+      // Only check if user is authenticated and hasn't been checked this session
+      if (!user || loginLocationChecker.hasCheckedLocation()) {
+        return;
+      }
+
+      const locationResult = await loginLocationChecker.checkLocationAfterLogin();
+
+      if (locationResult && !locationResult.isInServiceArea) {
+        console.log('🚫 User location not in service area, showing popup');
+        setDetectedLocationText(locationResult.detectedLocation);
+        setShowLocationUnavailable(true);
+      } else if (locationResult && locationResult.isInServiceArea) {
+        console.log('✅ User location is in service area');
+      }
+    } catch (error) {
+      console.error('❌ Error checking location after login:', error);
+    }
   };
 
   const handleLogout = () => {
