@@ -54,58 +54,58 @@ const ConnectionStatusInner: React.FC<ConnectionStatusProps> = ({
     };
   }, []);
 
- const checkBackendStatus = async () => {
-  try {
-    setBackendStatus("checking");
+  const checkBackendStatus = async () => {
+    try {
+      setBackendStatus("checking");
 
-    // Check if API base URL is configured
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-    if (!apiBaseUrl) {
-      console.warn("⚠️ VITE_API_BASE_URL not configured, backend status will show offline");
+      // Check if API base URL is configured
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+      if (!apiBaseUrl) {
+        console.warn("⚠️ VITE_API_BASE_URL not configured, backend status will show offline");
+        setBackendStatus("offline");
+        return;
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+        console.warn("⚠️ Backend health check timed out");
+      }, 5000); // Increased timeout to 5 seconds
+
+      const healthUrl = `${apiBaseUrl}/health`;
+      console.log("🔍 Checking backend status at:", healthUrl);
+
+      const response = await fetch(healthUrl, {
+        signal: controller.signal,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // Add no-cors mode for development
+        mode: "cors",
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        console.log("✅ Backend is online");
+        setBackendStatus("online");
+      } else {
+        console.warn("⚠️ Backend responded with error:", response.status);
+        setBackendStatus("offline");
+      }
+    } catch (error) {
+      // Handle different types of errors more specifically
+      if (error?.name === 'AbortError') {
+        console.warn("⚠️ Backend health check was aborted (timeout)");
+      } else if (error?.name === 'TypeError' && error?.message?.includes('Failed to fetch')) {
+        console.warn("⚠️ Network error: Cannot reach backend server");
+      } else {
+        console.warn("⚠️ Backend status check failed:", error?.message || 'Unknown error');
+      }
       setBackendStatus("offline");
-      return;
     }
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      controller.abort();
-      console.warn("⚠️ Backend health check timed out");
-    }, 5000); // Increased timeout to 5 seconds
-
-    const healthUrl = `${apiBaseUrl}/health`;
-    console.log("🔍 Checking backend status at:", healthUrl);
-
-    const response = await fetch(healthUrl, {
-      signal: controller.signal,
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // Add no-cors mode for development
-      mode: "cors",
-    });
-
-    clearTimeout(timeoutId);
-
-    if (response.ok) {
-      console.log("✅ Backend is online");
-      setBackendStatus("online");
-    } else {
-      console.warn("⚠️ Backend responded with error:", response.status);
-      setBackendStatus("offline");
-    }
-  } catch (error) {
-    // Handle different types of errors more specifically
-    if (error.name === 'AbortError') {
-      console.warn("⚠️ Backend health check was aborted (timeout)");
-    } else if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-      console.warn("⚠️ Network error: Cannot reach backend server");
-    } else {
-      console.warn("⚠️ Backend status check failed:", error.message);
-    }
-    setBackendStatus("offline");
-  }
-};
+  };
 
 
   // Don't show anything if everything is working normally
