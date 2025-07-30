@@ -76,14 +76,16 @@ router.post("/check-availability", async (req, res) => {
       });
     }
 
-    const isAvailable = DetectedLocation.checkAvailability(city, pincode);
+    console.log('📍 Backend checking availability for:', { city, pincode, full_address });
+
+    const isAvailable = DetectedLocation.checkAvailability(city, pincode, full_address);
 
     res.json({
       success: true,
       is_available: isAvailable,
       message: isAvailable
         ? "Service available in your area"
-        : "Service not available in your area",
+        : "Service currently only available in Sector 69, Gurugram (Pincode: 122505)",
     });
   } catch (error) {
     console.error("Error checking availability:", error);
