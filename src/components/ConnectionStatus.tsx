@@ -17,7 +17,10 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      checkBackendStatus();
+      // Delay backend check to avoid immediate fetch errors
+      setTimeout(() => {
+        checkBackendStatus();
+      }, 1000);
     };
 
     const handleOffline = () => {
@@ -28,9 +31,11 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    // Initial backend check
+    // Initial backend check with delay to avoid immediate errors
     if (isOnline) {
-      checkBackendStatus();
+      setTimeout(() => {
+        checkBackendStatus();
+      }, 2000); // Wait 2 seconds before first check
     }
 
     return () => {
@@ -80,7 +85,14 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
       setBackendStatus("offline");
     }
   } catch (error) {
-    console.warn("⚠️ Backend status check failed:", error.message);
+    // Handle different types of errors more specifically
+    if (error.name === 'AbortError') {
+      console.warn("⚠️ Backend health check was aborted (timeout)");
+    } else if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+      console.warn("⚠️ Network error: Cannot reach backend server");
+    } else {
+      console.warn("⚠️ Backend status check failed:", error.message);
+    }
     setBackendStatus("offline");
   }
 };
