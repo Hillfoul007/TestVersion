@@ -50,7 +50,8 @@ import LocationUnavailableModal from "./LocationUnavailableModal";
 import SavedAddressesModal from "./SavedAddressesModal";
 import ZomatoAddressSelector from "./ZomatoAddressSelector";
 import ZomatoAddAddressPage from "./ZomatoAddAddressPage";
-import { AddressService } from "@/services/addressService";
+import AddressSelection from "./AddressSelection";
+import { AddressService, AddressData } from "@/services/addressService";
 import { SessionManager } from "@/utils/sessionManager";
 import { CouponService } from "@/services/couponService";
 
@@ -435,6 +436,7 @@ const LaundryCart: React.FC<LaundryCartProps> = ({
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
   const [showZomatoAddressSelector, setShowZomatoAddressSelector] =
     useState(false);
+  const [showAddressSelection, setShowAddressSelection] = useState(false);
   const [showZomatoAddAddressPage, setShowZomatoAddAddressPage] =
     useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
@@ -763,6 +765,20 @@ Confirm this booking?`;
     console.log("✅ Address selected:", address.label || address.type);
   };
 
+  const handleAddressSelectionSelect = (address: AddressData) => {
+    setSelectedSavedAddress(address);
+    setAddressData(address);
+    setShowAddressSelection(false);
+    console.log("✅ Address selected from new component:", address.label || address.type);
+
+    addNotification(
+      createSuccessNotification(
+        "Address Selected",
+        `Selected ${address.label || address.type} address`,
+      ),
+    );
+  };
+
   // Handle new address creation
   const handleNewAddressSave = async (newAddress: any) => {
     if (!currentUser) return;
@@ -973,7 +989,7 @@ Confirm this booking?`;
 
                 <div className="flex items-center gap-1">
                   <span className="font-semibold text-xs text-laundrify-red">
-                    ₹{service!.price * quantity}
+                    ��{service!.price * quantity}
                   </span>
                   <Button
                     variant="ghost"
@@ -1012,7 +1028,7 @@ Confirm this booking?`;
                 variant="ghost"
                 size="sm"
                 className="text-laundrify-blue"
-                onClick={() => setShowZomatoAddressSelector(true)}
+                onClick={() => setShowAddressSelection(true)}
               >
                 <ArrowLeft className="h-4 w-4 rotate-180" />
               </Button>
@@ -1063,7 +1079,7 @@ Confirm this booking?`;
                         );
                       }
                     } else {
-                      setShowZomatoAddressSelector(true);
+                      setShowAddressSelection(true);
                     }
                   }}
                   variant="outline"
@@ -1344,6 +1360,14 @@ Confirm this booking?`;
           setShowSavedAddresses(false);
         }}
         currentUser={currentUser}
+      />
+
+      {/* New Address Selection Component */}
+      <AddressSelection
+        isOpen={showAddressSelection}
+        onClose={() => setShowAddressSelection(false)}
+        onAddressSelect={handleAddressSelectionSelect}
+        selectedAddress={selectedSavedAddress || addressData}
       />
 
       {/* Location Unavailable Modal */}

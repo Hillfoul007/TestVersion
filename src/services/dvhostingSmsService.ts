@@ -1,18 +1,7 @@
+import { config } from "../config/env";
+
 const getApiBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_BASE_URL;
-  if (envUrl && envUrl !== "") {
-    return envUrl;
-  }
-
-  const hostname = window.location.hostname;
-  const isProduction =
-    !hostname.includes("localhost") && !hostname.includes("127.0.0.1");
-
-  if (isProduction) {
-    return "https://cleancare-pro-api-production-129e.up.railway.app/api";
-  }
-
-  return "http://localhost:3001/api";
+  return config.API_BASE_URL;
 };
 
 const apiBaseUrl = getApiBaseUrl();
@@ -421,21 +410,17 @@ export class DVHostingSmsService {
           this.otpStorage.delete(cleanPhone);
           this.currentPhone = "";
 
+          // Import createUserByPhone for consistent user generation
+          const { createUserByPhone } = await import("../utils/authUtils");
+
           // Try to restore user from backend first
           let user = await this.restoreUserFromBackend(cleanPhone);
 
           if (!user) {
-            // Create new user if not found in backend
-            user = {
-              id: `user_${cleanPhone}`,
-              phone: cleanPhone,
-              name:
-                name && name.trim()
-                  ? name.trim()
-                  : `User ${cleanPhone.slice(-4)}`,
-              isVerified: true,
-              createdAt: new Date().toISOString(),
-            };
+            // Create new user using consistent phone-based generation
+            user = createUserByPhone(cleanPhone, name);
+            user.isVerified = true;
+            user.createdAt = new Date().toISOString();
 
             // Save new user to backend
             await this.saveUserToBackend(user);
@@ -514,16 +499,12 @@ export class DVHostingSmsService {
           this.otpStorage.delete(cleanPhone);
           this.currentPhone = "";
 
-          const mockUser = {
-            id: `user_${cleanPhone}`,
-            phone: cleanPhone,
-            name:
-              name && name.trim()
-                ? name.trim()
-                : `User ${cleanPhone.slice(-4)}`,
-            isVerified: true,
-            createdAt: new Date().toISOString(),
-          };
+          // Import createUserByPhone for consistent user generation
+          const { createUserByPhone } = await import("../utils/authUtils");
+
+          const mockUser = createUserByPhone(cleanPhone, name);
+          mockUser.isVerified = true;
+          mockUser.createdAt = new Date().toISOString();
 
           return {
             success: true,
@@ -595,35 +576,26 @@ export class DVHostingSmsService {
   private async sendDirectDVHostingOTP(phoneNumber: string): Promise<boolean> {
     try {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const apiKey = import.meta.env.VITE_DVHOSTING_API_KEY || "GLX2yKgdb9";
 
-      console.log("DVHosting SMS: Calling DVHosting API directly");
-      console.log("DVHosting SMS: Phone:", phoneNumber, "OTP:", otp);
+      console.log("DVHosting SMS: Simulation mode - no direct API calls from frontend");
+      console.log("DVHosting SMS: Phone:", phoneNumber);
 
-      // DVHosting v4 API endpoint with Fast2SMS compatible parameters
-      const url = `https://dvhosting.in/api-sms-v4.php?authorization=${apiKey}&route=otp&variables_values=${otp}&numbers=${phoneNumber}`;
-
-      const response = await fetch(url, {
-        method: "GET",
-        mode: "no-cors", // To avoid CORS issues
-      });
-
-      // Store OTP locally for verification since we can't read response due to no-cors
+      // Store OTP locally for verification (simulation mode for frontend-only environments)
       this.otpStorage.set(phoneNumber, {
         otp: otp,
         expiresAt: Date.now() + 5 * 60 * 1000,
       });
 
-      console.log("✅ OTP sent directly via DVHosting API");
+      console.log("✅ OTP generated (simulation mode for security)");
       console.log(
-        "📱 Your OTP is:",
+        "📱 Your simulation OTP is:",
         otp,
-        "(for testing - check your phone for actual OTP)",
+        "(for testing - in production, real SMS would be sent by backend)",
       );
 
       return true;
     } catch (error) {
-      console.error("❌ Direct DVHosting API call failed:", error);
+      console.error("❌ Simulation OTP generation failed:", error);
 
       // Fallback to simulation mode
       const mockOtp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -632,8 +604,8 @@ export class DVHostingSmsService {
         expiresAt: Date.now() + 5 * 60 * 1000,
       });
 
-      console.log("✅ OTP sent (simulation mode - API call failed)");
-      console.log("📱 Simulation OTP:", mockOtp, "(for testing only)");
+      console.log("✅ OTP sent (fallback simulation mode)");
+      console.log("📱 Fallback OTP:", mockOtp, "(for testing only)");
 
       return true;
     }
@@ -790,7 +762,7 @@ export class DVHostingSmsService {
       return ""; // Return empty string to indicate no backend available
     }
 
-    return import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+    return config.API_BASE_URL;
   }
 
   /**
@@ -805,24 +777,14 @@ export class DVHostingSmsService {
 
       if (isHostedEnv) {
         this.log(
-          "🌐 No backend available in hosted environment, using localStorage only",
+          "��� No backend available in hosted environment, using localStorage only",
         );
         return false; // Return false instead of throwing error
       }
 
       // Use the same URL detection as booking helpers
-      let apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
-      if (!apiBaseUrl || apiBaseUrl === "") {
-        if (
-          window.location.hostname.includes("vercel.app") ||
-          window.location.hostname.includes("builder.codes")
-        ) {
-          apiBaseUrl = "https://cleancare-pro-api-production-129e.up.railway.app/api";
-        } else {
-          apiBaseUrl = "http://localhost:3001/api";
-        }
-      }
+      const { config } = await import("../config/env");
+      const apiBaseUrl = config.API_BASE_URL;
 
       // Clean the phone number
       const cleanedPhone = this.cleanPhone(user.phone);
@@ -899,15 +861,8 @@ export class DVHostingSmsService {
       }
 
       // Use the same URL detection as other services
-      let apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
-      if (!apiBaseUrl || apiBaseUrl === "") {
-        if (window.location.hostname.includes("vercel.app")) {
-          apiBaseUrl = "https://cleancare-pro-api-production-129e.up.railway.app/api";
-        } else {
-          apiBaseUrl = "http://localhost:3001/api";
-        }
-      }
+      const { config } = await import("../config/env");
+      const apiBaseUrl = config.API_BASE_URL;
 
       this.log("🔄 Restoring user from backend:", phone);
 

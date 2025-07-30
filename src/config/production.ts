@@ -1,25 +1,23 @@
 // Production configuration settings
 // This file contains all production-specific configurations
+import { config } from "./env";
 
 export const PRODUCTION_CONFIG = {
   // Environment
-  NODE_ENV: import.meta.env.VITE_NODE_ENV || "production",
-  IS_PRODUCTION: import.meta.env.VITE_NODE_ENV === "production",
+  NODE_ENV: config.NODE_ENV,
+  IS_PRODUCTION: config.IS_PRODUCTION,
 
-  // API Configuration
-  API_BASE_URL:
-    import.meta.env.VITE_API_BASE_URL ||
-    "https://cleancare-pro-api-production-129e.up.railway.app/api",
+  // API Configuration - Must be set in environment variables
+  API_BASE_URL: config.API_BASE_URL,
 
   // Authentication
   AUTH_TOKEN_KEY: "laundrify_token",
   USER_DATA_KEY: "laundrify_user",
 
   // Google Services
-  GOOGLE_MAPS_API_KEY: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+  GOOGLE_MAPS_API_KEY: config.GOOGLE_MAPS_API_KEY,
 
-  // SMS Service
-  DVHOSTING_API_KEY: import.meta.env.VITE_DVHOSTING_API_KEY,
+  // SMS Service - API key handled by backend only
 
   // App Settings
   APP_NAME: "Laundrify",
@@ -51,7 +49,7 @@ export const PRODUCTION_CONFIG = {
 
   // Security Settings
   SECURITY: {
-    SESSION_TIMEOUT: 30 * 60 * 1000, // 30 minutes
+    SESSION_TIMEOUT: 30 * 24 * 60 * 60 * 1000, // 30 days - extended for better UX
     MAX_LOGIN_ATTEMPTS: 5,
     LOCKOUT_DURATION: 15 * 60 * 1000, // 15 minutes
   },
@@ -90,9 +88,7 @@ export const validateEnvironment = () => {
     warnings.push("Google Maps API key not configured");
   }
 
-  if (!PRODUCTION_CONFIG.DVHOSTING_API_KEY) {
-    errors.push("DVHosting API key is required");
-  }
+  // DVHosting API key validation removed - handled by backend
 
   if (!PRODUCTION_CONFIG.API_BASE_URL) {
     errors.push("API base URL is required");

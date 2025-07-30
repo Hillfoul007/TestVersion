@@ -290,11 +290,14 @@ export class ReferralService {
       `Sign up with CleanCare Pro and get 50% OFF your first order with code ${referralCode}!`,
     );
 
+    // Import at the top instead of dynamic import to avoid async issues
+    const { config } = require("../config/env");
+
     return {
-      whatsapp: `https://wa.me/?text=${encodedMessage}`,
-      twitter: `https://twitter.com/intent/tweet?text=${shortMessage}&url=${encodedUrl}`,
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${shortMessage}`,
-      telegram: `https://t.me/share/url?url=${encodedUrl}&text=${shortMessage}`,
+      whatsapp: `${config.WHATSAPP_BASE_URL}?text=${encodedMessage}`,
+      twitter: `${config.TWITTER_SHARE_URL}?text=${shortMessage}&url=${encodedUrl}`,
+      facebook: `${config.FACEBOOK_SHARE_URL}?u=${encodedUrl}&quote=${shortMessage}`,
+      telegram: `${config.TELEGRAM_SHARE_URL}?url=${encodedUrl}&text=${shortMessage}`,
       sms: `sms:?body=${encodedMessage}`,
       email: `mailto:?subject=${encodeURIComponent("Get 50% OFF with CleanCare Pro!")}&body=${encodedMessage}`,
     };

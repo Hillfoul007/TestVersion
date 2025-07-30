@@ -393,18 +393,19 @@ export const restoreIosAuth = async (): Promise<boolean> => {
     const logoutAge = logoutTimestamp ? Date.now() - parseInt(logoutTimestamp) : 0;
 
     // Configurable logout duration (default: 15 minutes for better UX)
-    // Options: 5 min, 15 min, 30 min, 1 hour, 24 hours, never expire
+    // Options: 5 min, 15 min, 30 min, 1 hour, 24 hours, 30 days, never expire
     const LOGOUT_DURATION_OPTIONS = {
-      QUICK: 5 * 60 * 1000,      // 5 minutes - for quick privacy
-      DEFAULT: 15 * 60 * 1000,   // 15 minutes - good balance
-      MEDIUM: 30 * 60 * 1000,    // 30 minutes - moderate security
-      LONG: 60 * 60 * 1000,      // 1 hour - higher security
-      DAY: 24 * 60 * 60 * 1000,  // 24 hours - maximum security
-      NEVER: Infinity            // Never expire - permanent logout until manual login
+      QUICK: 5 * 60 * 1000,        // 5 minutes - for quick privacy
+      DEFAULT: 15 * 60 * 1000,     // 15 minutes - good balance
+      MEDIUM: 30 * 60 * 1000,      // 30 minutes - moderate security
+      LONG: 60 * 60 * 1000,        // 1 hour - higher security
+      DAY: 24 * 60 * 60 * 1000,    // 24 hours - daily sessions
+      MONTH: 30 * 24 * 60 * 60 * 1000, // 30 days - extended sessions
+      NEVER: Infinity              // Never expire - permanent logout until manual login
     };
 
-    // Use DEFAULT (15 minutes) - better UX than 1 hour
-    const logoutDuration = LOGOUT_DURATION_OPTIONS.DEFAULT;
+    // Use MONTH (30 days) to prevent automatic logout - extended UX for laundry app
+    const logoutDuration = LOGOUT_DURATION_OPTIONS.MONTH;
 
     if (logoutAge < logoutDuration) {
       const remainingTime = Math.ceil((logoutDuration - logoutAge) / (60 * 1000));

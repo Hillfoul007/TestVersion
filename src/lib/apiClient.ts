@@ -1,7 +1,7 @@
 // Enhanced API client with better error handling and CORS support
 import { config } from "@/config/env";
 
-const API_BASE_URL = config.apiBaseUrl;
+const API_BASE_URL = config.API_BASE_URL;
 
 interface ApiResponse<T> {
   data?: T;
@@ -22,9 +22,16 @@ class EnhancedApiClient {
   private token: string | null = null;
   private requestQueue: Map<string, Promise<any>> = new Map();
 
-  constructor(baseURL: string) {
-    this.baseURL = baseURL.replace(/\/$/, ""); // Remove trailing slash
+  constructor(baseURL?: string) {
+    // Handle undefined baseURL gracefully
+    const url = baseURL || API_BASE_URL || '';
+    this.baseURL = url ? url.replace(/\/$/, "") : ""; // Remove trailing slash if URL exists
     this.token = localStorage.getItem("auth_token");
+
+    // Log warning if no API URL is configured
+    if (!this.baseURL) {
+      console.warn("⚠️ No API_BASE_URL configured. Set VITE_API_BASE_URL environment variable.");
+    }
   }
 
   private async sleep(ms: number): Promise<void> {
@@ -64,6 +71,14 @@ class EnhancedApiClient {
     endpoint: string,
     options: RequestOptions = {},
   ): Promise<ApiResponse<T>> {
+    // Return error if no API URL is configured
+    if (!this.baseURL && !endpoint.startsWith("http")) {
+      return {
+        error: "API_BASE_URL not configured. Please set VITE_API_BASE_URL environment variable.",
+        status: 0,
+      };
+    }
+
     const {
       body,
       timeout = 30000,
@@ -591,7 +606,7 @@ class EnhancedApiClient {
 }
 
 // Create and export the enhanced API client instance
-export const apiClient = new EnhancedApiClient(API_BASE_URL);
+export const apiClient = new EnhancedApiClient();
 
 // Export types for better TypeScript support
 export type { ApiResponse, RequestOptions };

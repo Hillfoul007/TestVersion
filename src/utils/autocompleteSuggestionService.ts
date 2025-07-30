@@ -77,10 +77,30 @@ class AutocompleteSuggestionService {
     }
 
     try {
-      // Search suggestions disabled to prevent errors
+      console.log("🔍 Fetching autocomplete suggestions for:", request.input);
+
+      const result = await this.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+        input: request.input,
+        sessionToken: request.sessionToken,
+        includedRegionCodes: request.includedRegionCodes || ["IN"], // Focus on India
+        types: request.types || ["address", "establishment", "geocode"],
+      });
+
+      if (result?.suggestions) {
+        console.log(`✅ Found ${result.suggestions.length} suggestions`);
+        return result.suggestions.map((suggestion: any) => ({
+          description: suggestion.placePrediction?.text?.text || "",
+          place_id: suggestion.placePrediction?.placeId || "",
+          structured_formatting: {
+            main_text: suggestion.placePrediction?.structuredFormat?.mainText?.text || "",
+            secondary_text: suggestion.placePrediction?.structuredFormat?.secondaryText?.text || "",
+          },
+        }));
+      }
+
       return [];
     } catch (error) {
-      console.error("Error fetching autocomplete suggestions (disabled):", error);
+      console.error("❌ Error fetching autocomplete suggestions:", error);
       return [];
     }
   }
@@ -92,8 +112,16 @@ class AutocompleteSuggestionService {
     input: string,
     sessionToken?: any,
   ): Promise<AutocompletePrediction[]> {
-    // Search suggestions disabled to prevent errors
-    return [];
+    if (!input || input.length < 2) {
+      return [];
+    }
+
+    return this.fetchSuggestions({
+      input,
+      sessionToken,
+      includedRegionCodes: ["IN"],
+      types: ["address", "establishment", "geocode"],
+    });
   }
 
   /**
@@ -101,11 +129,19 @@ class AutocompleteSuggestionService {
    */
   async searchGlobal(
     input: string,
-    regionCodes: string[] = ["in", "us", "ca", "gb", "au"],
+    regionCodes: string[] = ["IN", "US", "CA", "GB", "AU"],
     sessionToken?: any,
   ): Promise<AutocompletePrediction[]> {
-    // Search suggestions disabled to prevent errors
-    return [];
+    if (!input || input.length < 2) {
+      return [];
+    }
+
+    return this.fetchSuggestions({
+      input,
+      sessionToken,
+      includedRegionCodes: regionCodes,
+      types: ["address", "establishment", "geocode"],
+    });
   }
 
   /**
@@ -162,6 +198,32 @@ class AutocompleteSuggestionService {
           })) || [],
         types: place.types || [],
       };
+
+      // Auto-save detected location to database
+      try {
+        if (convertedPlace.geometry?.location && convertedPlace.formatted_address) {
+          const { LocationDetectionService } = await import("../services/locationDetectionService");
+          const locationService = LocationDetectionService.getInstance();
+
+          const detectedLocation = {
+            full_address: convertedPlace.formatted_address,
+            city: this.extractCityFromAddressComponents(convertedPlace.address_components),
+            state: this.extractStateFromAddressComponents(convertedPlace.address_components),
+            country: this.extractCountryFromAddressComponents(convertedPlace.address_components),
+            pincode: this.extractPincodeFromAddressComponents(convertedPlace.address_components),
+            coordinates: {
+              lat: convertedPlace.geometry.location.lat,
+              lng: convertedPlace.geometry.location.lng,
+            },
+            detection_method: "autocomplete" as const,
+          };
+
+          await locationService.saveDetectedLocation(detectedLocation);
+          console.log("✅ Autocomplete location saved to database");
+        }
+      } catch (error) {
+        console.warn("⚠️ Failed to save autocomplete location to database:", error);
+      }
 
       return convertedPlace;
     } catch (error) {
@@ -231,6 +293,37 @@ class AutocompleteSuggestionService {
       initialized: this.isInitialized,
       error: this.isInitialized ? undefined : "Service not initialized",
     };
+  }
+
+  /**
+   * Helper methods to extract address components
+   */
+  private extractCityFromAddressComponents(components: any[]): string {
+    const cityComponent = components.find(c =>
+      c.types.includes("locality") || c.types.includes("administrative_area_level_2")
+    );
+    return cityComponent?.long_name || "Unknown";
+  }
+
+  private extractStateFromAddressComponents(components: any[]): string {
+    const stateComponent = components.find(c =>
+      c.types.includes("administrative_area_level_1")
+    );
+    return stateComponent?.long_name || "";
+  }
+
+  private extractCountryFromAddressComponents(components: any[]): string {
+    const countryComponent = components.find(c =>
+      c.types.includes("country")
+    );
+    return countryComponent?.long_name || "India";
+  }
+
+  private extractPincodeFromAddressComponents(components: any[]): string {
+    const pincodeComponent = components.find(c =>
+      c.types.includes("postal_code")
+    );
+    return pincodeComponent?.long_name || "";
   }
 }
 

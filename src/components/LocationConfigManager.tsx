@@ -33,17 +33,25 @@ const LocationConfigManager: React.FC = () => {
   >([
     {
       id: "1",
-      city: "Gurgaon",
-      area: "Sector 69",
-      pincode: "122018",
+      city: "Delhi",
+      area: "All Areas",
+      pincode: "",
       isActive: true,
       addedAt: new Date().toISOString(),
     },
     {
       id: "2",
-      city: "Gurugram",
-      area: "Sector 69",
-      pincode: "122018",
+      city: "Gurgaon",
+      area: "All Areas",
+      pincode: "",
+      isActive: true,
+      addedAt: new Date().toISOString(),
+    },
+    {
+      id: "3",
+      city: "Noida",
+      area: "All Areas",
+      pincode: "",
       isActive: true,
       addedAt: new Date().toISOString(),
     },
@@ -197,7 +205,7 @@ const LocationConfigManager: React.FC = () => {
                 onChange={(e) =>
                   setNewLocation({ ...newLocation, area: e.target.value })
                 }
-                placeholder="e.g., Sector 69"
+                placeholder="e.g., All Areas"
               />
             </div>
             <div>

@@ -89,12 +89,53 @@ export const useAddressAutofill = (
     [enableValidation],
   );
 
-  // Search for address suggestions - DISABLED to prevent errors
+  // Search for address suggestions with optimization
   const searchAddresses = useCallback(
     async (query: string) => {
-      // Search suggestions disabled - return empty suggestions immediately
-      setState((prev) => ({ ...prev, suggestions: [], error: null, isLoading: false }));
-      return;
+      if (!query || query.length < 2) {
+        setState((prev) => ({ ...prev, suggestions: [], error: null, isLoading: false }));
+        return;
+      }
+
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+      // Clear previous timeout
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+
+      // Debounce search requests for better performance
+      searchTimeoutRef.current = setTimeout(async () => {
+        try {
+          await autocompleteSuggestionService.initialize();
+
+          let sessionToken = sessionTokenRef.current;
+          if (!sessionToken) {
+            sessionToken = autocompleteSuggestionService.createSessionToken();
+            sessionTokenRef.current = sessionToken;
+          }
+
+          const suggestions = await autocompleteSuggestionService.searchInIndia(
+            query,
+            sessionToken
+          );
+
+          setState((prev) => ({
+            ...prev,
+            suggestions,
+            isLoading: false,
+            error: null,
+          }));
+        } catch (error) {
+          console.error("Search error:", error);
+          setState((prev) => ({
+            ...prev,
+            suggestions: [],
+            isLoading: false,
+            error: "Search failed",
+          }));
+        }
+      }, 300); // 300ms debounce
     },
     [],
   );

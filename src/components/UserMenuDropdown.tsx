@@ -64,7 +64,8 @@ const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
   const handleWhatsAppShare = () => {
     const loginUrl = `${window.location.origin}/`;
     const message = `Check out Laundrify - Quick clean & convenient! Sign up here: ${loginUrl}`;
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    const { config } = require("../config/env");
+    const whatsappUrl = `${config.WHATSAPP_BASE_URL}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
 

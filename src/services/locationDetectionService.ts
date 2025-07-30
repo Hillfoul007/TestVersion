@@ -128,35 +128,19 @@ export class LocationDetectionService {
   }
 
   /**
-   * Local fallback for availability check
+   * Local fallback for availability check - Service available everywhere
    */
   private checkAvailabilityLocal(
     city: string,
     pincode?: string,
   ): LocationAvailabilityResponse {
-    const normalizedCity = city?.toLowerCase().trim();
-
-    // Available locations - you can edit this list to add more areas
-    const availableLocations = [
-      { city: "gurgaon", area: "sector 69" },
-      { city: "gurugram", area: "sector 69" },
-      { city: "gurgaon", area: "sector-69" },
-      { city: "gurugram", area: "sector-69" },
-    ];
-
-    const isAvailable = availableLocations.some(
-      (location) =>
-        normalizedCity?.includes(location.city) &&
-        (normalizedCity?.includes("sector 69") ||
-          normalizedCity?.includes("sector-69")),
-    );
+    // Service is now available everywhere - no location restrictions
+    console.log("📍 Location availability check:", { city, pincode });
 
     return {
       success: true,
-      is_available: isAvailable,
-      message: isAvailable
-        ? "Service available in your area"
-        : "Service not available in your area",
+      is_available: true,
+      message: "Service available in your area",
     };
   }
 
@@ -185,20 +169,31 @@ export class LocationDetectionService {
       // Try to get address from coordinates using reverse geocoding
       const addressData = await this.reverseGeocode(latitude, longitude);
 
+      let detectedLocation: DetectedLocationData;
       if (addressData) {
-        return {
+        detectedLocation = {
           ...addressData,
+          coordinates: { lat: latitude, lng: longitude },
+          detection_method: "gps",
+        };
+      } else {
+        detectedLocation = {
+          full_address: `Coordinates: ${latitude}, ${longitude}`,
+          city: "Unknown",
           coordinates: { lat: latitude, lng: longitude },
           detection_method: "gps",
         };
       }
 
-      return {
-        full_address: `Coordinates: ${latitude}, ${longitude}`,
-        city: "Unknown",
-        coordinates: { lat: latitude, lng: longitude },
-        detection_method: "gps",
-      };
+      // Auto-save detected location to database
+      try {
+        await this.saveDetectedLocation(detectedLocation);
+        console.log("✅ GPS location saved to database");
+      } catch (error) {
+        console.warn("⚠️ Failed to save GPS location to database:", error);
+      }
+
+      return detectedLocation;
     } catch (error) {
       console.error("❌ GPS detection failed:", error);
       return null;
@@ -236,8 +231,9 @@ export class LocationDetectionService {
       }
 
       // Fallback to a free geocoding service (example with Nominatim)
+      const { config } = require("../config/env");
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+        `${config.NOMINATIM_API_URL}/reverse?lat=${lat}&lon=${lng}&format=json`,
       );
 
       if (!response.ok) throw new Error("Nominatim request failed");
