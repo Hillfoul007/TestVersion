@@ -8,6 +8,7 @@ import ReferralCodeHandler from "@/components/ReferralCodeHandler";
 import ReferralDiscountBanner from "@/components/ReferralDiscountBanner";
 import First30OfferNotification from "@/components/First30OfferNotification";
 import LaundrifySplashLoader from "@/components/LaundrifySplashLoader";
+import AddressSyncNotification from "@/components/AddressSyncNotification";
 import { DVHostingSmsService } from "../services/dvhostingSmsService";
 import PushNotificationService from "../services/pushNotificationService";
 import { ReferralService } from "@/services/referralService";
