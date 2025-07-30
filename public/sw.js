@@ -38,9 +38,18 @@ self.addEventListener("activate", (event) => {
           }
         }),
       );
-    }),
+    }).then(() => {
+      // Only claim clients after cleanup is complete and if this is the active worker
+      if (self.registration && self.registration.active === self) {
+        console.log("Service Worker: Claiming clients...");
+        return self.clients.claim();
+      } else {
+        console.log("Service Worker: Not the active worker, skipping client claim");
+      }
+    }).catch((error) => {
+      console.error("Service Worker: Error during activation:", error);
+    })
   );
-  self.clients.claim(); // Take control of all pages
 });
 
 // Fetch event
