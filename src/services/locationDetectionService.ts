@@ -119,6 +119,15 @@ export class LocationDetectionService {
       }
 
       const result = await response.json();
+
+      // Also check locally as a secondary validation
+      if (result.is_available) {
+        const localCheck = this.checkAvailabilityLocal(city, pincode);
+        if (!localCheck.is_available) {
+          return localCheck; // Use stricter local check
+        }
+      }
+
       return result;
     } catch (error) {
       console.error("❌ Failed to check availability:", error);
@@ -128,20 +137,58 @@ export class LocationDetectionService {
   }
 
   /**
-   * Local fallback for availability check - Service available everywhere
+   * Local fallback for availability check - Service only in Sector 69 Gurugram
    */
   private checkAvailabilityLocal(
     city: string,
     pincode?: string,
   ): LocationAvailabilityResponse {
-    // Service is now available everywhere - no location restrictions
     console.log("📍 Location availability check:", { city, pincode });
+
+    // Check if location is in Sector 69, Gurugram
+    const isAvailable = this.isLocationInServiceArea(city, pincode);
 
     return {
       success: true,
-      is_available: true,
-      message: "Service available in your area",
+      is_available: isAvailable,
+      message: isAvailable
+        ? "Service available in your area"
+        : "Service currently only available in Sector 69, Gurugram",
     };
+  }
+
+  /**
+   * Check if location is in our service area (Sector 69, Gurugram)
+   */
+  private isLocationInServiceArea(city: string, pincode?: string): boolean {
+    const normalizedCity = city.toLowerCase().trim();
+    const normalizedPincode = pincode?.trim();
+
+    // Check for Sector 69 mentions
+    const isSector69 = normalizedCity.includes('sector 69') ||
+                      normalizedCity.includes('sector-69') ||
+                      normalizedCity.includes('sec 69');
+
+    // Check for Gurugram/Gurgaon mentions
+    const isGurugram = normalizedCity.includes('gurugram') ||
+                      normalizedCity.includes('gurgaon');
+
+    // Check pincode for Sector 69 Gurugram (122505)
+    const isCorrectPincode = normalizedPincode === '122505';
+
+    // Must have both Sector 69 and Gurugram/Gurgaon mentions, or correct pincode
+    const isInServiceArea = (isSector69 && isGurugram) || isCorrectPincode;
+
+    console.log('🏠 Service area check:', {
+      city: normalizedCity,
+      pincode: normalizedPincode,
+      isSector69,
+      isGurugram,
+      isCorrectPincode,
+      isInServiceArea
+    });
+
+    return isInServiceArea;
   }
 
   /**

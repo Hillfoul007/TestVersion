@@ -125,13 +125,20 @@ export const useLocation = (
     }
   }, []);
 
-  // Get current position
-  const getCurrentPosition = useCallback((): Promise<Coordinates> => {
+  // Get current position with enhanced error handling and fallback strategy
+  const getCurrentPosition = useCallback((customOptions?: GeolocationOptions): Promise<Coordinates> => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
         reject(new Error("Geolocation is not supported by this browser"));
         return;
       }
+
+      // Use custom options if provided, otherwise use hook defaults
+      const geoOptions = customOptions || {
+        enableHighAccuracy: opts.enableHighAccuracy,
+        timeout: opts.timeout,
+        maximumAge: opts.maximumAge,
+      };
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -140,6 +147,14 @@ export const useLocation = (
             lng: position.coords.longitude,
             accuracy: position.coords.accuracy,
           };
+
+          console.log('📍 Location obtained:', {
+            lat: coordinates.lat,
+            lng: coordinates.lng,
+            accuracy: coordinates.accuracy,
+            timestamp: position.timestamp
+          });
+
           resolve(coordinates);
         },
         (error) => {
@@ -155,13 +170,10 @@ export const useLocation = (
               errorMessage = "Location request timed out";
               break;
           }
+          console.error('❌ Location error:', { code: error.code, message: errorMessage });
           reject(new Error(errorMessage));
         },
-        {
-          enableHighAccuracy: opts.enableHighAccuracy,
-          timeout: opts.timeout,
-          maximumAge: opts.maximumAge,
-        },
+        geoOptions,
       );
     });
   }, [opts.enableHighAccuracy, opts.timeout, opts.maximumAge]);

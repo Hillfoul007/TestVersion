@@ -44,6 +44,11 @@ if (productionConfig.isProduction()) {
   app.use(morgan("dev"));
 }
 
+// Trust proxy for rate limiting
+if (productionConfig.isProduction()) {
+  app.set('trust proxy', 1); // Trust first proxy for production
+}
+
 // Rate limiting
 const generalLimiter = rateLimit({
   windowMs: productionConfig.RATE_LIMIT.WINDOW_MS,
@@ -354,9 +359,6 @@ if (productionConfig.isDevelopment()) {
         "/api/addresses",
         "/api/location",
         "/api/whatsapp",
-        "/api/sheets/order",
-        "/api/sheets/test",
-        "/api/sheets/sync",
       ],
     });
   });
@@ -384,9 +386,6 @@ if (productionConfig.isProduction()) {
         "/api/addresses",
         "/api/location",
         "/api/whatsapp",
-        "/api/sheets/order",
-        "/api/sheets/test",
-        "/api/sheets/sync",
       ],
     });
   });
@@ -456,10 +455,7 @@ const gracefulShutdown = async (signal) => {
 
     console.log("✅ HTTP server closed");
 
-    // Cleanup Google Sheets service
-    if (sheetsService) {
-      await sheetsService.cleanup();
-    }
+    // Google Sheets cleanup removed
 
     // Close database connection
     mongoose.connection.close(false, (err) => {

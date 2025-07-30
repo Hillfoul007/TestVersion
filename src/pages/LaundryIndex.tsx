@@ -16,6 +16,8 @@ import {
   createSuccessNotification,
   createErrorNotification,
 } from "@/utils/notificationUtils";
+import { loginLocationChecker } from "@/services/loginLocationChecker";
+import LocationUnavailableModal from "@/components/LocationUnavailableModal";
 
 // Helper function for coordinate-based location detection (fallback)
 const getCoordinateBasedLocation = (
@@ -219,6 +221,8 @@ const LaundryIndex = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<string>("");
   const [showFirst30Notification, setShowFirst30Notification] = useState(false);
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [detectedLocationText, setDetectedLocationText] = useState("");
 
   // Single iOS detection for the entire component
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -604,6 +608,9 @@ const LaundryIndex = () => {
               }, 2000);
             }
 
+            // Check location availability after successful login
+            checkLocationAfterLogin(storedUser);
+
             return; // Exit early - user is authenticated
           }
         } catch (parseError) {
@@ -753,6 +760,33 @@ const LaundryIndex = () => {
         `Hello ${user.name || user.phone}, you're now logged in.`,
       ),
     );
+
+    // Check location availability after login
+    checkLocationAfterLogin(user);
+  };
+
+  // Check location availability after user logs in
+  const checkLocationAfterLogin = async (user: any) => {
+    try {
+      console.log('📍 Checking location availability after login for user:', user.phone || user.id);
+
+      // Only check if user is authenticated and hasn't been checked this session
+      if (!user || loginLocationChecker.hasCheckedLocation()) {
+        return;
+      }
+
+      const locationResult = await loginLocationChecker.checkLocationAfterLogin();
+
+      if (locationResult && !locationResult.isInServiceArea) {
+        console.log('🚫 User location not in service area, showing popup');
+        setDetectedLocationText(locationResult.detectedLocation);
+        setShowLocationUnavailable(true);
+      } else if (locationResult && locationResult.isInServiceArea) {
+        console.log('✅ User location is in service area');
+      }
+    } catch (error) {
+      console.error('❌ Error checking location after login:', error);
+    }
   };
 
   const handleLogout = () => {
@@ -1194,6 +1228,22 @@ const LaundryIndex = () => {
           onViewBookings={() => setCurrentView("bookings")}
         />
       )}
+
+      {/* Service Area Unavailable Modal */}
+      <LocationUnavailableModal
+        isOpen={showLocationUnavailable}
+        onClose={() => setShowLocationUnavailable(false)}
+        detectedLocation={detectedLocationText}
+        onExplore={() => {
+          console.log('🔍 User chose to explore available services');
+          setShowLocationUnavailable(false);
+          // User can continue using the app normally
+        }}
+        onNavigateHome={() => {
+          console.log('🏠 User navigating to home from location unavailable modal');
+          setCurrentView('home');
+        }}
+      />
     </div>
   );
 };

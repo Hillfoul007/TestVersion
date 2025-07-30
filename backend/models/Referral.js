@@ -76,8 +76,7 @@ const referralSchema = new mongoose.Schema(
   },
 );
 
-// Index for efficient queries
-referralSchema.index({ referral_code: 1 });
+// Index for efficient queries (referral_code index auto-created by unique constraint)
 referralSchema.index({ referrer_id: 1 });
 referralSchema.index({ referee_id: 1 });
 referralSchema.index({ status: 1 });
