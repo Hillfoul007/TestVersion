@@ -294,6 +294,37 @@ class AutocompleteSuggestionService {
       error: this.isInitialized ? undefined : "Service not initialized",
     };
   }
+
+  /**
+   * Helper methods to extract address components
+   */
+  private extractCityFromAddressComponents(components: any[]): string {
+    const cityComponent = components.find(c =>
+      c.types.includes("locality") || c.types.includes("administrative_area_level_2")
+    );
+    return cityComponent?.long_name || "Unknown";
+  }
+
+  private extractStateFromAddressComponents(components: any[]): string {
+    const stateComponent = components.find(c =>
+      c.types.includes("administrative_area_level_1")
+    );
+    return stateComponent?.long_name || "";
+  }
+
+  private extractCountryFromAddressComponents(components: any[]): string {
+    const countryComponent = components.find(c =>
+      c.types.includes("country")
+    );
+    return countryComponent?.long_name || "India";
+  }
+
+  private extractPincodeFromAddressComponents(components: any[]): string {
+    const pincodeComponent = components.find(c =>
+      c.types.includes("postal_code")
+    );
+    return pincodeComponent?.long_name || "";
+  }
 }
 
 // Export singleton instance
