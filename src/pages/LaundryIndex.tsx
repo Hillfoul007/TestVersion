@@ -8,6 +8,7 @@ import ReferralCodeHandler from "@/components/ReferralCodeHandler";
 import ReferralDiscountBanner from "@/components/ReferralDiscountBanner";
 import First30OfferNotification from "@/components/First30OfferNotification";
 import LaundrifySplashLoader from "@/components/LaundrifySplashLoader";
+import AddressSyncNotification from "@/components/AddressSyncNotification";
 import { DVHostingSmsService } from "../services/dvhostingSmsService";
 import PushNotificationService from "../services/pushNotificationService";
 import { ReferralService } from "@/services/referralService";
@@ -223,6 +224,9 @@ const LaundryIndex = () => {
   const [showFirst30Notification, setShowFirst30Notification] = useState(false);
   const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
   const [detectedLocationText, setDetectedLocationText] = useState("");
+  const [showAddressSyncNotification, setShowAddressSyncNotification] = useState(false);
+  const [addressSyncStatus, setAddressSyncStatus] = useState<'syncing' | 'success' | 'error'>('syncing');
+  const [syncedAddressCount, setSyncedAddressCount] = useState(0);
 
   // Single iOS detection for the entire component
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -744,6 +748,9 @@ const LaundryIndex = () => {
     console.log("✅ User logged in successfully:", user.name || user.phone);
     console.log("📍 Redirecting to:", targetView);
 
+    // Sync addresses across devices
+    syncAddressesAfterLogin();
+
     // Check if this is a first-time user for FIRST30 notification
     const isFirstTime = referralService.isFirstTimeUser(user);
     if (isFirstTime && targetView === "home") {
@@ -763,6 +770,44 @@ const LaundryIndex = () => {
 
     // Check location availability after login
     checkLocationAfterLogin(user);
+  };
+
+  // Sync addresses across devices after login
+  const syncAddressesAfterLogin = async () => {
+    try {
+      // Show syncing notification
+      setShowAddressSyncNotification(true);
+      setAddressSyncStatus('syncing');
+
+      const { AddressService } = await import("@/services/addressService");
+      const addressService = AddressService.getInstance();
+
+      // Get addresses before and after sync to compare
+      const beforeSync = await addressService.getUserAddresses();
+      const beforeCount = Array.isArray(beforeSync.data) ? beforeSync.data.length : 0;
+
+      await addressService.syncAddressesAfterLogin();
+
+      const afterSync = await addressService.getUserAddresses();
+      const afterCount = Array.isArray(afterSync.data) ? afterSync.data.length : 0;
+
+      const newAddressCount = Math.max(0, afterCount - beforeCount);
+
+      setSyncedAddressCount(afterCount);
+      setAddressSyncStatus('success');
+
+      console.log(`✅ Address synchronization completed. ${afterCount} total addresses available.`);
+
+      // If no addresses were synced, hide notification after short delay
+      if (afterCount === 0) {
+        setTimeout(() => {
+          setShowAddressSyncNotification(false);
+        }, 2000);
+      }
+    } catch (error) {
+      console.warn("⚠️ Address synchronization failed after login:", error);
+      setAddressSyncStatus('error');
+    }
   };
 
   // Check location availability after user logs in
@@ -1243,6 +1288,14 @@ const LaundryIndex = () => {
           console.log('🏠 User navigating to home from location unavailable modal');
           setCurrentView('home');
         }}
+      />
+
+      {/* Address Sync Notification */}
+      <AddressSyncNotification
+        isVisible={showAddressSyncNotification}
+        onClose={() => setShowAddressSyncNotification(false)}
+        addressCount={syncedAddressCount}
+        syncStatus={addressSyncStatus}
       />
     </div>
   );
