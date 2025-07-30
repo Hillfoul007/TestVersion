@@ -1571,6 +1571,12 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
   const handleSave = async () => {
     if (!selectedLocation) return;
 
+    // 🧪 TEMPORARY TEST - Always show modal first to verify it works
+    console.log("🧪 Testing modal before validation...");
+    setUnavailableAddressText("TEST: Service not available in this area (this is a test)");
+    setShowLocationUnavailable(true);
+    return; // Exit early for testing
+
     // Build complete address from split fields
     const fullAddressParts = [
       flatNo && (floor || building)
