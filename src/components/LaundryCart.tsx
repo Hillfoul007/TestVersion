@@ -798,7 +798,7 @@ Confirm this booking?`;
 
       const locationService = LocationDetectionService.getInstance();
       if (!locationService) {
-        console.error('❌ LocationDetectionService not available');
+        console.error('�� LocationDetectionService not available');
         throw new Error('Location service not available');
       }
 
@@ -1073,7 +1073,7 @@ Confirm this booking?`;
                   <h4 className="font-medium text-xs break-words leading-tight">
                     {service!.name}
                   </h4>
-                  <p className="text-xs text-laundrify-red">₹{service!.price}</p>
+                  <p className="text-xs text-laundrify-red currency-symbol">₹{service!.price}</p>
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -1100,7 +1100,7 @@ Confirm this booking?`;
 
                 <div className="flex items-center gap-1">
                   <span className="font-semibold text-xs text-laundrify-red">
-                    ��{service!.price * quantity}
+                    ���{service!.price * quantity}
                   </span>
                   <Button
                     variant="ghost"
