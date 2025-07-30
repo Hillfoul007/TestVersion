@@ -1,18 +1,6 @@
 const getApiBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_BASE_URL;
-  if (envUrl && envUrl !== "") {
-    return envUrl;
-  }
-
-  const hostname = window.location.hostname;
-  const isProduction =
-    !hostname.includes("localhost") && !hostname.includes("127.0.0.1");
-
-  if (isProduction) {
-    return "https://cleancare-pro-api-production-129e.up.railway.app/api";
-  }
-
-  return "http://localhost:3001/api";
+  const { config } = await import("../config/env");
+  return config.API_BASE_URL;
 };
 
 const apiBaseUrl = getApiBaseUrl();
@@ -773,7 +761,8 @@ export class DVHostingSmsService {
       return ""; // Return empty string to indicate no backend available
     }
 
-    return import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+    const { config } = await import("../config/env");
+    return config.API_BASE_URL;
   }
 
   /**
@@ -794,18 +783,8 @@ export class DVHostingSmsService {
       }
 
       // Use the same URL detection as booking helpers
-      let apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
-      if (!apiBaseUrl || apiBaseUrl === "") {
-        if (
-          window.location.hostname.includes("vercel.app") ||
-          window.location.hostname.includes("builder.codes")
-        ) {
-          apiBaseUrl = "https://cleancare-pro-api-production-129e.up.railway.app/api";
-        } else {
-          apiBaseUrl = "http://localhost:3001/api";
-        }
-      }
+      const { config } = await import("../config/env");
+      const apiBaseUrl = config.API_BASE_URL;
 
       // Clean the phone number
       const cleanedPhone = this.cleanPhone(user.phone);
@@ -882,15 +861,8 @@ export class DVHostingSmsService {
       }
 
       // Use the same URL detection as other services
-      let apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
-      if (!apiBaseUrl || apiBaseUrl === "") {
-        if (window.location.hostname.includes("vercel.app")) {
-          apiBaseUrl = "https://cleancare-pro-api-production-129e.up.railway.app/api";
-        } else {
-          apiBaseUrl = "http://localhost:3001/api";
-        }
-      }
+      const { config } = await import("../config/env");
+      const apiBaseUrl = config.API_BASE_URL;
 
       this.log("🔄 Restoring user from backend:", phone);
 
