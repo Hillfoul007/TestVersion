@@ -531,6 +531,56 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     [mapInstance, marker],
   );
 
+  // Immediate validation function for location availability
+  const validateLocationAvailability = async (address: string) => {
+    try {
+      console.log("🔍 Immediate validation for address:", address);
+
+      // Extract city and area from address
+      const parts = address.split(',').map(part => part.trim());
+      let area = '';
+      let city = '';
+      let pincode = '';
+
+      // Try to find city/area and pincode from address parts
+      for (const part of parts) {
+        if (/^\d{6}$/.test(part)) {
+          pincode = part;
+        } else if (part.toLowerCase().includes('sector') || part.toLowerCase().includes('gurugram') || part.toLowerCase().includes('gurgaon')) {
+          if (!area) area = part;
+          if (part.toLowerCase().includes('gurugram') || part.toLowerCase().includes('gurgaon')) {
+            city = part;
+          }
+        }
+      }
+
+      // Use the last non-pincode part as city if not found
+      if (!city) {
+        city = parts.find(part => !(/^\d{6}$/.test(part))) || '';
+      }
+
+      console.log("🔍 Parsed address for validation:", { area, city, pincode, fullAddress: address });
+
+      const locationService = LocationDetectionService.getInstance();
+      const availability = await locationService.checkLocationAvailability(
+        city || area, // city
+        pincode,
+        address, // full address
+      );
+
+      console.log("🏠 Immediate validation result:", availability);
+
+      if (!availability.is_available) {
+        console.log("🚨 Location not available - showing immediate popup");
+        setUnavailableAddressText(address);
+        setShowLocationUnavailable(true);
+      }
+    } catch (error) {
+      console.error("❌ Immediate validation failed:", error);
+      // Don't show popup on validation error during immediate check
+    }
+  };
+
   const handleMapClick = async (latLng: google.maps.LatLng) => {
     const coordinates = {
       lat: latLng.lat(),
