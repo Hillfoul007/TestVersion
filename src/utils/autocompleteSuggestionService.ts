@@ -77,10 +77,30 @@ class AutocompleteSuggestionService {
     }
 
     try {
-      // Search suggestions disabled to prevent errors
+      console.log("🔍 Fetching autocomplete suggestions for:", request.input);
+
+      const result = await this.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+        input: request.input,
+        sessionToken: request.sessionToken,
+        includedRegionCodes: request.includedRegionCodes || ["IN"], // Focus on India
+        types: request.types || ["address", "establishment", "geocode"],
+      });
+
+      if (result?.suggestions) {
+        console.log(`✅ Found ${result.suggestions.length} suggestions`);
+        return result.suggestions.map((suggestion: any) => ({
+          description: suggestion.placePrediction?.text?.text || "",
+          place_id: suggestion.placePrediction?.placeId || "",
+          structured_formatting: {
+            main_text: suggestion.placePrediction?.structuredFormat?.mainText?.text || "",
+            secondary_text: suggestion.placePrediction?.structuredFormat?.secondaryText?.text || "",
+          },
+        }));
+      }
+
       return [];
     } catch (error) {
-      console.error("Error fetching autocomplete suggestions (disabled):", error);
+      console.error("❌ Error fetching autocomplete suggestions:", error);
       return [];
     }
   }
