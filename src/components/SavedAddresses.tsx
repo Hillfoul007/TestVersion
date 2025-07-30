@@ -10,7 +10,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Home, Briefcase, MapPin, Trash2, Plus, Star } from "lucide-react";
+import { Home, Briefcase, MapPin, Trash2, Plus, Star, MoreVertical, Edit } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { AddressService, AddressData } from "@/services/addressService";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,6 +25,7 @@ interface SavedAddressesProps {
   showSelectAction?: boolean;
   showAddButton?: boolean;
   onAddNew?: () => void;
+  onEditAddress?: (address: AddressData) => void;
 }
 
 const SavedAddresses: React.FC<SavedAddressesProps> = ({
