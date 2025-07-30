@@ -119,29 +119,33 @@ const GoogleMapsNavigation: React.FC<GoogleMapsNavigationProps> = ({
             "Failed to create Advanced Marker, falling back to regular marker:",
             error,
           );
-          // Fallback to regular marker if Advanced Marker fails
-          new window.google.maps.Marker({
+          // Try simplified AdvancedMarkerElement
+          try {
+            new window.google.maps.marker.AdvancedMarkerElement({
+              position: destination,
+              map: map,
+              title: destination.address,
+            });
+          } catch (fallbackError) {
+            console.warn("AdvancedMarkerElement completely unavailable", fallbackError);
+            // Don't create marker if AdvancedMarkerElement is not available
+          }
+        }
+      } else {
+        // Use AdvancedMarkerElement even without Map ID
+        try {
+          new window.google.maps.marker.AdvancedMarkerElement({
             position: destination,
             map: map,
             title: destination.address,
-            icon: {
-              url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-            },
           });
+          console.log(
+            "📍 Using Advanced Marker for destination (no Map ID configured)",
+          );
+        } catch (error) {
+          console.warn("AdvancedMarkerElement not available", error);
+          // Don't create marker if AdvancedMarkerElement is not available
         }
-      } else {
-        // Use regular marker when Map ID is not configured
-        new window.google.maps.Marker({
-          position: destination,
-          map: map,
-          title: destination.address,
-          icon: {
-            url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-          },
-        });
-        console.log(
-          "📍 Using regular Marker for destination (no Map ID configured)",
-        );
       }
     }
   }, [directionsService, directionsRenderer, origin, destination]);

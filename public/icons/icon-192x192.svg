@@ -1,0 +1,7 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="32" fill="#C46DD8"/>
+  <path d="M96 48C80.5 48 68 60.5 68 76V92C68 100.8 75.2 108 84 108H108C116.8 108 124 100.8 124 92V76C124 60.5 111.5 48 96 48Z" fill="white"/>
+  <path d="M56 92C56 100.8 63.2 108 72 108H120C128.8 108 136 100.8 136 92C136 83.2 128.8 76 120 76H72C63.2 76 56 83.2 56 92Z" fill="#F36BAF"/>
+  <circle cx="96" cy="128" r="8" fill="#B9F9D3"/>
+  <text x="96" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">L</text>
+</svg>
