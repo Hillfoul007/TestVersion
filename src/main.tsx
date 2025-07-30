@@ -73,6 +73,62 @@ const initializeiOSFixes = () => {
     // Don't let unhandled rejections crash the app on iOS
     event.preventDefault();
   });
+
+  // Enhanced iOS session monitoring and restoration
+  if (isIOS) {
+    // Listen for iOS app lifecycle events
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        // App became visible - check and restore auth if needed
+        setTimeout(() => {
+          const hasAuth = localStorage.getItem('current_user') || localStorage.getItem('cleancare_user');
+          if (!hasAuth) {
+            console.log('🍎 App visible - no auth detected, attempting restoration');
+            import('./utils/iosAuthFix').then(({ restoreIosAuth }) => {
+              restoreIosAuth();
+            });
+          }
+        }, 1000);
+      }
+    });
+
+    // Listen for page show events (iOS Safari cache restoration)
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        console.log('🍎 Page restored from cache - checking auth state');
+        setTimeout(() => {
+          const hasAuth = localStorage.getItem('current_user') || localStorage.getItem('cleancare_user');
+          if (!hasAuth) {
+            console.log('🍎 Cache restore - no auth detected, attempting restoration');
+            import('./utils/iosAuthFix').then(({ restoreIosAuth }) => {
+              restoreIosAuth();
+            });
+          }
+        }, 500);
+      }
+    });
+
+    // Enhanced iOS PWA detection and handling
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+                  (window.navigator as any).standalone === true;
+
+    if (isPWA) {
+      console.log('🍎📱 iOS PWA mode detected - enhanced auth monitoring');
+
+      // PWA focus/blur events for session restoration
+      window.addEventListener('focus', () => {
+        setTimeout(() => {
+          const hasAuth = localStorage.getItem('current_user') || localStorage.getItem('cleancare_user');
+          if (!hasAuth) {
+            console.log('🍎 PWA focus - no auth detected, attempting restoration');
+            import('./utils/iosAuthFix').then(({ restoreIosAuth }) => {
+              restoreIosAuth();
+            });
+          }
+        }, 1000);
+      });
+    }
+  }
 };
 
 // Initialize iOS fixes
