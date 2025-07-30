@@ -22,7 +22,8 @@ const ConnectionStatusInner: React.FC<ConnectionStatusProps> = ({
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [backendStatus, setBackendStatus] = useState<
     "checking" | "online" | "offline"
-  >("checking");
+  >("offline"); // Start as offline to prevent immediate fetch
+  const [isMounted, setIsMounted] = useState(true);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -49,6 +50,7 @@ const ConnectionStatusInner: React.FC<ConnectionStatusProps> = ({
     }
 
     return () => {
+      setIsMounted(false);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
@@ -56,6 +58,11 @@ const ConnectionStatusInner: React.FC<ConnectionStatusProps> = ({
 
   const checkBackendStatus = async () => {
     try {
+      // Safety check - don't run if component is unmounted
+      if (!isMounted) {
+        return;
+      }
+
       setBackendStatus("checking");
 
       // Check if API base URL is configured
