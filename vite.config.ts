@@ -88,8 +88,8 @@ export default defineConfig(({ mode }) => {
               },
               workbox: {
                 cleanupOutdatedCaches: true, // 🚨 Remove old caches
-                clientsClaim: true, // 🚨 Take control immediately
-                skipWaiting: true, // 🚨 Activate new SW immediately
+                clientsClaim: false, // ❌ Avoid conflicts - let page reload naturally
+                skipWaiting: false, // ❌ Avoid conflicts - wait for page reload
                 runtimeCaching: [
                   {
                     urlPattern: /^https:\/\/cdn\.builder\.io\/.*/i,
