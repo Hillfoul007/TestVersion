@@ -169,20 +169,31 @@ export class LocationDetectionService {
       // Try to get address from coordinates using reverse geocoding
       const addressData = await this.reverseGeocode(latitude, longitude);
 
+      let detectedLocation: DetectedLocationData;
       if (addressData) {
-        return {
+        detectedLocation = {
           ...addressData,
+          coordinates: { lat: latitude, lng: longitude },
+          detection_method: "gps",
+        };
+      } else {
+        detectedLocation = {
+          full_address: `Coordinates: ${latitude}, ${longitude}`,
+          city: "Unknown",
           coordinates: { lat: latitude, lng: longitude },
           detection_method: "gps",
         };
       }
 
-      return {
-        full_address: `Coordinates: ${latitude}, ${longitude}`,
-        city: "Unknown",
-        coordinates: { lat: latitude, lng: longitude },
-        detection_method: "gps",
-      };
+      // Auto-save detected location to database
+      try {
+        await this.saveDetectedLocation(detectedLocation);
+        console.log("✅ GPS location saved to database");
+      } catch (error) {
+        console.warn("⚠️ Failed to save GPS location to database:", error);
+      }
+
+      return detectedLocation;
     } catch (error) {
       console.error("❌ GPS detection failed:", error);
       return null;
