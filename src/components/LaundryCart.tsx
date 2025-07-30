@@ -1379,7 +1379,7 @@ Confirm this booking?`;
 
             <div className="flex justify-between font-semibold">
               <span>Total</span>
-              <span className="text-laundrify-red">₹{getTotal()}</span>
+              <span className="text-laundrify-red currency-symbol">₹{getTotal()}</span>
             </div>
           </CardContent>
         </Card>
