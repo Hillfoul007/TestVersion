@@ -693,10 +693,7 @@ export class DVHostingSmsService {
         );
 
         // Save to IndexedDB on iPhone for extra persistence
-        if (
-          /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
-        ) {
+        if (this.isIosDevice()) {
           import("../utils/iosAuthFix").then(({ saveIosAuthToIndexedDB, clearIosLogoutFlag }) => {
             // Clear logout flag since user is logging in successfully
             clearIosLogoutFlag();
