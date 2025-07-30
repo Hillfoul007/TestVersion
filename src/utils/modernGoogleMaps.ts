@@ -309,8 +309,8 @@ class ModernGoogleMapsService {
 
     // Ensure minimum zoom level
     google.maps.event.addListenerOnce(this.map, "bounds_changed", () => {
-      if (this.map && this.map.getZoom() && this.map.getZoom()! > 15) {
-        this.map.setZoom(15);
+      if (this.map && this.map.getZoom() && this.map.getZoom()! > 13) {
+        this.map.setZoom(13); // Reduced max zoom to prevent resource issues
       }
     });
   }
