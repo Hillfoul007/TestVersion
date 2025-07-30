@@ -102,6 +102,7 @@ const AddressSelection: React.FC<AddressSelectionProps> = ({
                 showSelectAction={true}
                 showAddButton={true}
                 onAddNew={handleAddNewAddress}
+                onEditAddress={handleEditAddress}
               />
             </TabsContent>
 
