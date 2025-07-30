@@ -1371,7 +1371,7 @@ Confirm this booking?`;
             {appliedCoupon && (
               <div className="flex justify-between text-laundrify-blue text-sm">
                 <span>Discount</span>
-                <span>-₹{getCouponDiscount()}</span>
+                <span className="currency-symbol">-₹{getCouponDiscount()}</span>
               </div>
             )}
 
