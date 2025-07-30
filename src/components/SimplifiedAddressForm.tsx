@@ -296,8 +296,38 @@ const SimplifiedAddressForm: React.FC<SimplifiedAddressFormProps> = ({
     return () => clearTimeout(timeoutId);
   };
 
+  // Validate address service area
+  const validateAddressServiceArea = async (addressData: AddressData): Promise<boolean> => {
+    try {
+      const city = addressData.city || addressData.village || "";
+      const pincode = addressData.pincode || "";
+      const fullAddress = addressData.fullAddress || "";
+
+      console.log("🔍 Validating address service area:", { city, pincode, fullAddress });
+
+      const availability = await locationDetectionService.checkLocationAvailability(
+        city,
+        pincode,
+        fullAddress
+      );
+
+      console.log("🏠 Address availability result:", availability);
+
+      if (!availability.is_available) {
+        setDetectedLocationText(fullAddress || `${city}${pincode ? `, ${pincode}` : ''}`);
+        setShowLocationUnavailable(true);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("❌ Address validation error:", error);
+      return true; // Allow on error to not block user
+    }
+  };
+
   // Select search result
-  const selectSearchResult = (result: any) => {
+  const selectSearchResult = async (result: any) => {
     const addressData = {
       street: result.locality || result.city || "",
       village: result.city || result.locality || "",
@@ -309,14 +339,19 @@ const SimplifiedAddressForm: React.FC<SimplifiedAddressFormProps> = ({
       },
     };
 
-    setAddress((prev) => ({
-      ...prev,
+    const newAddress = {
+      ...address,
       ...addressData,
       fullAddress:
         `${addressData.street}, ${addressData.village}, ${addressData.city}, ${addressData.pincode}`
           .replace(/^, |, $|, , /g, ", ")
           .replace(/^, |, $/g, ""),
-    }));
+    };
+
+    setAddress(newAddress);
+
+    // Validate service area
+    await validateAddressServiceArea(newAddress);
 
     setSearchValue(
       result.formattedAddress || `${addressData.city}, ${addressData.pincode}`,
