@@ -659,7 +659,13 @@ const SimplifiedAddressForm: React.FC<SimplifiedAddressFormProps> = ({
         {/* Save Button */}
         {onAddressUpdate && (
           <Button
-            onClick={() => onAddressUpdate(address)}
+            onClick={async () => {
+              // Validate address before saving
+              const isValid = await validateAddressServiceArea(address);
+              if (isValid) {
+                onAddressUpdate(address);
+              }
+            }}
             className="w-full bg-green-600 hover:bg-green-700"
             disabled={!address.street || !address.city || !address.pincode}
           >
@@ -667,6 +673,16 @@ const SimplifiedAddressForm: React.FC<SimplifiedAddressFormProps> = ({
           </Button>
         )}
       </CardContent>
+
+      {/* Location Unavailable Modal */}
+      <LocationUnavailableModal
+        isOpen={showLocationUnavailable}
+        onClose={() => setShowLocationUnavailable(false)}
+        detectedLocation={detectedLocationText}
+        onExplore={() => {
+          console.log("🔍 User chose to explore available services from SimplifiedAddressForm");
+        }}
+      />
     </Card>
   );
 };
