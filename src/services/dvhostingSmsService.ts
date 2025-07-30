@@ -692,7 +692,7 @@ export class DVHostingSmsService {
           "✅ User authentication saved to localStorage (persistent session)",
         );
 
-        // Save to IndexedDB on iPhone for extra persistence
+        // Enhanced iOS session persistence
         if (this.isIosDevice()) {
           import("../utils/iosAuthFix").then(({ saveIosAuthToIndexedDB, clearIosLogoutFlag }) => {
             // Clear logout flag since user is logging in successfully
@@ -705,6 +705,8 @@ export class DVHostingSmsService {
               saveIosAuthToIndexedDB(user, currentToken).catch((error) => {
                 console.warn("📱⚠️ Failed to save to IndexedDB:", error);
               });
+              // Create comprehensive iOS persistent session
+              this.createIosPersistentSession(user, currentToken);
             }
           });
         }
