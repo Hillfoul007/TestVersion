@@ -54,6 +54,7 @@ import AddressSelection from "./AddressSelection";
 import { AddressService, AddressData } from "@/services/addressService";
 import { SessionManager } from "@/utils/sessionManager";
 import { CouponService } from "@/services/couponService";
+import { LocationDetectionService } from "@/services/locationDetectionService";
 
 interface LaundryCartProps {
   onBack: () => void;
@@ -765,7 +766,13 @@ Confirm this booking?`;
     console.log("✅ Address selected:", address.label || address.type);
   };
 
-  const handleAddressSelectionSelect = (address: AddressData) => {
+  const handleAddressSelectionSelect = async (address: AddressData) => {
+    // Check if address is in service area before selecting
+    const isValid = await validateAddressServiceArea(address);
+    if (!isValid) {
+      return; // Validation failed, popup shown
+    }
+
     setSelectedSavedAddress(address);
     setAddressData(address);
     setShowAddressSelection(false);
@@ -779,9 +786,55 @@ Confirm this booking?`;
     );
   };
 
+  /**
+   * Validate if address is in service area (Sector 69 Gurugram)
+   */
+  const validateAddressServiceArea = async (address: AddressData): Promise<boolean> => {
+    try {
+      const locationService = LocationDetectionService.getInstance();
+      const city = address.city || address.village || '';
+      const pincode = address.pincode || '';
+      const fullAddress = address.fullAddress || '';
+
+      console.log('🏠 Validating address service area:', { city, pincode, fullAddress });
+
+      const availability = await locationService.checkLocationAvailability(
+        city,
+        pincode,
+        fullAddress
+      );
+
+      if (!availability.is_available) {
+        console.log('🚫 Address not in service area, showing popup');
+        setUnavailableLocationText(fullAddress || `${city}, ${pincode}`);
+        setShowLocationUnavailable(true);
+        return false;
+      }
+
+      console.log('✅ Address is in service area');
+      return true;
+    } catch (error) {
+      console.error('❌ Error validating address service area:', error);
+      // On error, allow the address but warn user
+      addNotification(
+        createWarningNotification(
+          "Location Check Failed",
+          "Could not verify service availability for this location",
+        ),
+      );
+      return true;
+    }
+  };
+
   // Handle new address creation
   const handleNewAddressSave = async (newAddress: any) => {
     if (!currentUser) return;
+
+    // Validate service area before saving
+    const isValid = await validateAddressServiceArea(newAddress);
+    if (!isValid) {
+      return; // Validation failed, popup shown
+    }
 
     try {
       const addressService = AddressService.getInstance();
@@ -1380,8 +1433,9 @@ Confirm this booking?`;
             "🔍 User chose to explore available services instead of booking",
           );
           // Clear the problematic address to allow user to select a different one
-          setAddressData(null);
-          setValidationErrors([]);
+        setAddressData(null);
+        setSelectedSavedAddress(null);
+        setValidationErrors([]);
         }}
       />
     </div>
