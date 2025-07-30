@@ -231,7 +231,7 @@ export class LocationDetectionService {
       }
 
       // Fallback to a free geocoding service (example with Nominatim)
-      const { config } = await import("../config/env");
+      const { config } = require("../config/env");
       const response = await fetch(
         `${config.NOMINATIM_API_URL}/reverse?lat=${lat}&lon=${lng}&format=json`,
       );
