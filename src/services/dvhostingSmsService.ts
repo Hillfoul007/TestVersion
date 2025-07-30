@@ -1,4 +1,4 @@
-const getApiBaseUrl = () => {
+const getApiBaseUrl = async () => {
   const { config } = await import("../config/env");
   return config.API_BASE_URL;
 };
@@ -777,7 +777,7 @@ export class DVHostingSmsService {
 
       if (isHostedEnv) {
         this.log(
-          "🌐 No backend available in hosted environment, using localStorage only",
+          "��� No backend available in hosted environment, using localStorage only",
         );
         return false; // Return false instead of throwing error
       }
