@@ -206,6 +206,30 @@ export const preventIosAutoLogout = (): void => {
     }
   });
 
+  // Enhanced iOS session persistence on app lifecycle events
+  // Handle app termination/backgrounding
+  window.addEventListener("beforeunload", () => {
+    const user = localStorage.getItem("current_user") || localStorage.getItem("cleancare_user");
+    const token = localStorage.getItem("auth_token") || localStorage.getItem("cleancare_auth_token");
+
+    if (user && token) {
+      // Save to all possible storage locations before app termination
+      sessionStorage.setItem("ios_emergency_user", user);
+      sessionStorage.setItem("ios_emergency_token", token);
+      sessionStorage.setItem("ios_emergency_timestamp", Date.now().toString());
+
+      // Immediate IndexedDB save
+      try {
+        const userObj = JSON.parse(user);
+        saveIosAuthToIndexedDB(userObj, token);
+      } catch (e) {
+        console.warn("🍎⚠️ Emergency IndexedDB save failed:", e);
+      }
+
+      console.log("🍎💾 Emergency auth backup created before app termination");
+    }
+  });
+
   // Handle iOS app resume/focus
   window.addEventListener("pageshow", async (event) => {
     if (event.persisted) {
@@ -293,7 +317,7 @@ export const preventIosAutoLogout = (): void => {
 
       // Use a more persistent storage method
       try {
-        document.cookie = `ios_auth_backup=${encodeURIComponent(user)}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Strict`;
+        document.cookie = `ios_auth_backup=${encodeURIComponent(user)}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Strict; Secure`;
       } catch (e) {
         // Cookie storage failed, continue
       }
@@ -405,6 +429,7 @@ export const restoreIosAuth = async (): Promise<boolean> => {
     };
 
     // Use MONTH (30 days) to prevent automatic logout - extended UX for laundry app
+    // This ensures users stay logged in for 30 days unless they explicitly logout
     const logoutDuration = LOGOUT_DURATION_OPTIONS.MONTH;
 
     if (logoutAge < logoutDuration) {
@@ -436,13 +461,15 @@ export const restoreIosAuth = async (): Promise<boolean> => {
     return true;
   }
 
-  // Try to restore from backups
+  // Try to restore from backups (including emergency backups)
   const backupUser =
     localStorage.getItem("ios_backup_user") ||
-    sessionStorage.getItem("ios_session_user");
+    sessionStorage.getItem("ios_session_user") ||
+    sessionStorage.getItem("ios_emergency_user");
   const backupToken =
     localStorage.getItem("ios_backup_token") ||
-    sessionStorage.getItem("ios_session_token");
+    sessionStorage.getItem("ios_session_token") ||
+    sessionStorage.getItem("ios_emergency_token");
 
   if (backupUser && backupToken) {
     localStorage.setItem("current_user", backupUser);
@@ -571,10 +598,9 @@ export const restoreIosAuthFromIndexedDB = async (): Promise<boolean> => {
       request.onsuccess = () => {
         const result = request.result;
         if (result && result.user && result.token) {
-          // Check if data is not too old (30 days for PWA, 7 days for Safari)
-          const maxAge = isPWAMode()
-            ? 30 * 24 * 60 * 60 * 1000
-            : 7 * 24 * 60 * 60 * 1000;
+          // Check if data is not too old (30 days for all iOS devices)
+          // Extended to 30 days for both PWA and Safari to maintain user sessions
+          const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days for both PWA and Safari
           const age = Date.now() - result.timestamp;
           if (age < maxAge) {
             localStorage.setItem("current_user", result.user);

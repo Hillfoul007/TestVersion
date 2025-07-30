@@ -692,11 +692,8 @@ export class DVHostingSmsService {
           "✅ User authentication saved to localStorage (persistent session)",
         );
 
-        // Save to IndexedDB on iPhone for extra persistence
-        if (
-          /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
-        ) {
+        // Enhanced iOS session persistence
+        if (this.isIosDevice()) {
           import("../utils/iosAuthFix").then(({ saveIosAuthToIndexedDB, clearIosLogoutFlag }) => {
             // Clear logout flag since user is logging in successfully
             clearIosLogoutFlag();
@@ -708,12 +705,48 @@ export class DVHostingSmsService {
               saveIosAuthToIndexedDB(user, currentToken).catch((error) => {
                 console.warn("📱⚠️ Failed to save to IndexedDB:", error);
               });
+              // Create comprehensive iOS persistent session
+              this.createIosPersistentSession(user, currentToken);
             }
           });
         }
       }
     } catch (error) {
       console.error("Error setting current user:", error);
+    }
+  }
+
+  private isIosDevice(): boolean {
+    return (
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+    );
+  }
+
+  private async createIosPersistentSession(user: any, token: string): Promise<void> {
+    try {
+      // Import iOS session manager and create emergency backup
+      const { default: IosSessionManager } = await import("../utils/iosSessionManager");
+      const sessionManager = IosSessionManager.getInstance();
+      await sessionManager.forceEmergencyBackup();
+
+      // Also save to traditional iOS backup locations
+      sessionStorage.setItem("ios_session_user", JSON.stringify(user));
+      sessionStorage.setItem("ios_session_token", token);
+      localStorage.setItem("ios_backup_user", JSON.stringify(user));
+      localStorage.setItem("ios_backup_token", token);
+      localStorage.setItem("ios_auth_timestamp", Date.now().toString());
+
+      // Set cookie with 30-day expiration
+      try {
+        document.cookie = `ios_auth_backup=${encodeURIComponent(JSON.stringify(user))}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Strict; Secure`;
+      } catch (e) {
+        // Cookie save failed, continue
+      }
+
+      console.log("🍎 Enhanced iOS 30-day session persistence created");
+    } catch (error) {
+      console.warn("🍎⚠️ Failed to create iOS persistent session:", error);
     }
   }
 

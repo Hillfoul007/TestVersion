@@ -10,6 +10,7 @@ import {
   restoreIosAuth,
   isIosDevice,
 } from "@/utils/iosAuthFix";
+import IosSessionManager from "@/utils/iosSessionManager";
 
 let authCheckInitialized = false;
 
@@ -95,7 +96,8 @@ export const initializeAuthPersistence = () => {
 
   window.addEventListener("pagehide", handlePageHide);
 
-  // Add session heartbeat to keep auth alive
+  // Add session heartbeat to keep auth alive - more frequent for iOS devices
+  const heartbeatInterval = isIosDevice() ? 2 * 60 * 1000 : 5 * 60 * 1000; // iOS: 2 min, Others: 5 min
   const sessionHeartbeat = setInterval(
     () => {
       const user = authService.getCurrentUser();
@@ -103,22 +105,33 @@ export const initializeAuthPersistence = () => {
         // Update localStorage timestamp to show session is active
         localStorage.setItem("auth_last_active", Date.now().toString());
 
+        // For iOS, also save to emergency storage
+        if (isIosDevice()) {
+          const token = localStorage.getItem("auth_token") || localStorage.getItem("cleancare_auth_token");
+          if (token) {
+            sessionStorage.setItem("ios_heartbeat_user", JSON.stringify(user));
+            sessionStorage.setItem("ios_heartbeat_token", token);
+            sessionStorage.setItem("ios_heartbeat_timestamp", Date.now().toString());
+          }
+        }
+
         // Sync auth storage to ensure consistency
         syncAuthStorage();
       }
     },
-    5 * 60 * 1000,
-  ); // Every 5 minutes
+    heartbeatInterval,
+  );
 
   // Clear heartbeat on page unload
   window.addEventListener("beforeunload", () => {
     clearInterval(sessionHeartbeat);
   });
 
-  // Initialize iPhone-specific auth persistence
+  // Initialize iPhone-specific auth persistence with enhanced session management
   if (isIosDevice()) {
     preventIosAutoLogout();
-    console.log("🍎 iPhone-specific auth persistence enabled");
+    // iOS Session Manager is auto-initialized on import
+    console.log("🍎 iPhone-specific auth persistence enabled with 30-day session manager");
   }
 
   console.log(
@@ -135,9 +148,16 @@ export const restoreAuthState = async (): Promise<boolean> => {
 
     // First try iPhone-specific restoration if on iOS
     if (isIosDevice()) {
-      const iosRestored = await restoreIosAuth();
-      if (iosRestored) {
-        console.log("🍎 iPhone auth restored from backup");
+      // Try iOS Session Manager first for comprehensive restoration
+      const sessionManager = IosSessionManager.getInstance();
+      const sessionRestored = await sessionManager.forceSessionRestore();
+
+      if (!sessionRestored) {
+        // Fallback to standard iOS auth restoration
+        const iosRestored = await restoreIosAuth();
+        if (iosRestored) {
+          console.log("🍎 iPhone auth restored from standard backup");
+        }
       }
     }
 
