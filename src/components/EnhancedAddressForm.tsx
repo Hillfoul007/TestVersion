@@ -304,6 +304,36 @@ const EnhancedAddressForm: React.FC<EnhancedAddressFormProps> = ({
     }
   };
 
+  // Validate address service area
+  const validateAddressServiceArea = async (addressData: AddressData): Promise<boolean> => {
+    try {
+      const city = addressData.city || addressData.village || "";
+      const pincode = addressData.pincode || "";
+      const fullAddress = addressData.fullAddress || "";
+
+      console.log("🔍 Validating address service area:", { city, pincode, fullAddress });
+
+      const availability = await locationDetectionService.checkLocationAvailability(
+        city,
+        pincode,
+        fullAddress
+      );
+
+      console.log("🏠 Address availability result:", availability);
+
+      if (!availability.is_available) {
+        setDetectedLocationText(fullAddress || `${city}${pincode ? `, ${pincode}` : ''}`);
+        setShowLocationUnavailable(true);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("❌ Address validation error:", error);
+      return true; // Allow on error to not block user
+    }
+  };
+
   const detectCurrentLocation = async () => {
     setIsDetectingLocation(true);
     setLocationDenied(false);
