@@ -53,9 +53,13 @@ const AddressSelection: React.FC<AddressSelectionProps> = ({
     return (
       <ZomatoAddAddressPage
         isOpen={true}
-        onClose={() => setShowAddAddressForm(false)}
+        onClose={() => {
+          setShowAddAddressForm(false);
+          setEditingAddress(null);
+        }}
         onSave={handleAddressSave}
         currentUser={currentUser}
+        editingAddress={editingAddress}
       />
     );
   }
