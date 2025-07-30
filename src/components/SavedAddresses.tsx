@@ -114,6 +114,18 @@ const SavedAddresses: React.FC<SavedAddressesProps> = ({
     }
   };
 
+  const handleEditAddress = (address: AddressData) => {
+    if (onEditAddress) {
+      onEditAddress(address);
+    } else {
+      toast({
+        title: "Edit not available",
+        description: "Edit functionality not configured",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getAddressTypeIcon = (type: string) => {
     switch (type) {
       case "home":
