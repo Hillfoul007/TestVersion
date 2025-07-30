@@ -798,7 +798,7 @@ Confirm this booking?`;
 
       const locationService = LocationDetectionService.getInstance();
       if (!locationService) {
-        console.error('�� LocationDetectionService not available');
+        console.error('❌ LocationDetectionService not available');
         throw new Error('Location service not available');
       }
 
@@ -1100,7 +1100,7 @@ Confirm this booking?`;
 
                 <div className="flex items-center gap-1">
                   <span className="font-semibold text-xs text-laundrify-red">
-                    ���{service!.price * quantity}
+                    ��{service!.price * quantity}
                   </span>
                   <Button
                     variant="ghost"
@@ -1277,7 +1277,7 @@ Confirm this booking?`;
           <CardContent className="space-y-1.5 px-3 pb-2 pt-0">
             <div className="flex justify-between text-sm">
               <span>Subtotal ({cartItems.length} items)</span>
-              <span>₹{getSubtotal()}</span>
+              <span className="currency-symbol">₹{getSubtotal()}</span>
             </div>
 
             <div className="flex justify-between text-sm text-laundrify-blue">
