@@ -231,8 +231,9 @@ export class LocationDetectionService {
       }
 
       // Fallback to a free geocoding service (example with Nominatim)
+      const { config } = await import("../config/env");
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+        `${config.NOMINATIM_API_URL}/reverse?lat=${lat}&lon=${lng}&format=json`,
       );
 
       if (!response.ok) throw new Error("Nominatim request failed");
