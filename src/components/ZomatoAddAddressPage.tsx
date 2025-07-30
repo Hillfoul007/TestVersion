@@ -1511,7 +1511,16 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         area,
         pincode,
         completeAddress,
+        selectedLocation,
       });
+
+      // Validate that we have some address data
+      if (!area && !pincode && !completeAddress) {
+        console.warn("⚠️ No address data available for validation, showing popup as precaution");
+        setUnavailableAddressText(selectedLocation?.address || "Unknown location");
+        setShowLocationUnavailable(true);
+        return;
+      }
 
       const locationService = LocationDetectionService.getInstance();
       const availability = await locationService.checkLocationAvailability(
@@ -1528,12 +1537,17 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         setShowLocationUnavailable(true);
         return; // Don't save the address
       }
+
+      console.log("✅ Address validation passed, proceeding with save");
     } catch (error) {
       console.error("❌ Error checking address availability:", error);
-      // Continue with saving if location check fails
-      console.warn(
-        "⚠️ Location check failed, allowing address save to proceed",
-      );
+      console.error("❌ Validation error details:", error);
+
+      // Show popup on validation error to be safe - don't silently continue
+      console.warn("⚠️ Location check failed, showing unavailable popup as precaution");
+      setUnavailableAddressText(completeAddress || selectedLocation?.address || "Unknown location");
+      setShowLocationUnavailable(true);
+      return; // Don't save if validation fails
     }
 
     const addressData: AddressData = {
