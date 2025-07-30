@@ -2080,19 +2080,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       </div>
 
       {/* Save Button - Fixed at bottom */}
-      <div className="p-4 border-t border-gray-200 bg-white sticky bottom-0 space-y-2">
-        {/* Test Button for Modal */}
-        <Button
-          onClick={() => {
-            console.log("🧪 Test button clicked - showing modal");
-            setUnavailableAddressText("Test Address - Service Not Available");
-            setShowLocationUnavailable(true);
-          }}
-          className="w-full bg-red-600 hover:bg-red-700 text-white py-2 text-sm"
-        >
-          🧪 Test Modal (DEBUG)
-        </Button>
-
+      <div className="p-4 border-t border-gray-200 bg-white sticky bottom-0">
         <Button
           onClick={handleSave}
           disabled={!isFormValid()}
