@@ -148,6 +148,15 @@
     @apply bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200;
   }
 
+  /* Ensure proper currency symbol rendering */
+  .currency-symbol {
+    font-family: "Segoe UI", "Roboto", "Noto Sans", system-ui, sans-serif;
+    font-feature-settings: "tnum" 1; /* Tabular numbers for better alignment */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   /* PWA safe area utilities */
   .safe-top {
     padding-top: env(safe-area-inset-top, 0);
