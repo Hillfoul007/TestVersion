@@ -10,6 +10,7 @@ import {
   restoreIosAuth,
   isIosDevice,
 } from "@/utils/iosAuthFix";
+import IosSessionManager from "@/utils/iosSessionManager";
 
 let authCheckInitialized = false;
 
@@ -126,10 +127,11 @@ export const initializeAuthPersistence = () => {
     clearInterval(sessionHeartbeat);
   });
 
-  // Initialize iPhone-specific auth persistence
+  // Initialize iPhone-specific auth persistence with enhanced session management
   if (isIosDevice()) {
     preventIosAutoLogout();
-    console.log("🍎 iPhone-specific auth persistence enabled");
+    // iOS Session Manager is auto-initialized on import
+    console.log("🍎 iPhone-specific auth persistence enabled with 30-day session manager");
   }
 
   console.log(
@@ -146,9 +148,16 @@ export const restoreAuthState = async (): Promise<boolean> => {
 
     // First try iPhone-specific restoration if on iOS
     if (isIosDevice()) {
-      const iosRestored = await restoreIosAuth();
-      if (iosRestored) {
-        console.log("🍎 iPhone auth restored from backup");
+      // Try iOS Session Manager first for comprehensive restoration
+      const sessionManager = IosSessionManager.getInstance();
+      const sessionRestored = await sessionManager.forceSessionRestore();
+
+      if (!sessionRestored) {
+        // Fallback to standard iOS auth restoration
+        const iosRestored = await restoreIosAuth();
+        if (iosRestored) {
+          console.log("🍎 iPhone auth restored from standard backup");
+        }
       }
     }
 
