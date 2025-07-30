@@ -1,22 +1,21 @@
 // Production configuration settings
 // This file contains all production-specific configurations
+import { config } from "./env";
 
 export const PRODUCTION_CONFIG = {
   // Environment
-  NODE_ENV: import.meta.env.VITE_NODE_ENV || "production",
-  IS_PRODUCTION: import.meta.env.VITE_NODE_ENV === "production",
+  NODE_ENV: config.NODE_ENV,
+  IS_PRODUCTION: config.IS_PRODUCTION,
 
-  // API Configuration
-  API_BASE_URL:
-    import.meta.env.VITE_API_BASE_URL ||
-    "https://cleancare-pro-api-production-129e.up.railway.app/api",
+  // API Configuration - Must be set in environment variables
+  API_BASE_URL: config.API_BASE_URL,
 
   // Authentication
   AUTH_TOKEN_KEY: "laundrify_token",
   USER_DATA_KEY: "laundrify_user",
 
   // Google Services
-  GOOGLE_MAPS_API_KEY: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+  GOOGLE_MAPS_API_KEY: config.GOOGLE_MAPS_API_KEY,
 
   // SMS Service - API key handled by backend only
 
