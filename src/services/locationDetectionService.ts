@@ -128,35 +128,19 @@ export class LocationDetectionService {
   }
 
   /**
-   * Local fallback for availability check
+   * Local fallback for availability check - Service available everywhere
    */
   private checkAvailabilityLocal(
     city: string,
     pincode?: string,
   ): LocationAvailabilityResponse {
-    const normalizedCity = city?.toLowerCase().trim();
-
-    // Available locations - you can edit this list to add more areas
-    const availableLocations = [
-      { city: "gurgaon", area: "sector 69" },
-      { city: "gurugram", area: "sector 69" },
-      { city: "gurgaon", area: "sector-69" },
-      { city: "gurugram", area: "sector-69" },
-    ];
-
-    const isAvailable = availableLocations.some(
-      (location) =>
-        normalizedCity?.includes(location.city) &&
-        (normalizedCity?.includes("sector 69") ||
-          normalizedCity?.includes("sector-69")),
-    );
+    // Service is now available everywhere - no location restrictions
+    console.log("📍 Location availability check:", { city, pincode });
 
     return {
       success: true,
-      is_available: isAvailable,
-      message: isAvailable
-        ? "Service available in your area"
-        : "Service not available in your area",
+      is_available: true,
+      message: "Service available in your area",
     };
   }
 
