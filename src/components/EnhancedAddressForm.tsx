@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Loader2, Navigation, X } from "lucide-react";
 import { locationService, Coordinates } from "@/services/locationService";
+import LocationUnavailableModal from "./LocationUnavailableModal";
+import { LocationDetectionService } from "@/services/locationDetectionService";
 
 interface AddressData {
   flatNo: string;
@@ -64,6 +66,10 @@ const EnhancedAddressForm: React.FC<EnhancedAddressFormProps> = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
+  const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
+  const [detectedLocationText, setDetectedLocationText] = useState("");
+
+  const locationDetectionService = LocationDetectionService.getInstance();
 
   const autocompleteRef = useRef<any>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
