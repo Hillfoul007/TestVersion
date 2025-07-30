@@ -44,39 +44,52 @@ export class AddressService {
   }
 
   /**
-   * Get user ID for API calls with better fallback
+   * Get user ID for API calls with mobile number preference for cross-device sync
    */
   private getCurrentUserId(): string | null {
-    const userId = getUserId();
+    const currentUser = getCurrentUser();
 
-    if (!userId) {
-      // Try to get from current user object
-      const currentUser = getCurrentUser();
-      if (currentUser) {
-        const id = currentUser.id || currentUser._id || currentUser.phone;
-        if (id) {
-          console.log(`🔑 Using user ID from current user object: ${id}`);
-          return id;
-        }
-      }
-
-      console.log(`🔑 No user ID found, using guest mode`);
-      return null;
+    // Prioritize mobile number for cross-device sync
+    if (currentUser && currentUser.phone) {
+      console.log(`📱 Using mobile number as user ID: ${currentUser.phone}`);
+      return currentUser.phone;
     }
 
-    console.log(`🔑 Using user ID from auth utils: ${userId}`);
-    return userId;
+    // Fallback to other user identifiers
+    const userId = getUserId();
+    if (userId) {
+      console.log(`🔑 Using auth user ID: ${userId}`);
+      return userId;
+    }
+
+    // Try to get from current user object
+    if (currentUser) {
+      const id = currentUser.id || currentUser._id;
+      if (id) {
+        console.log(`🔑 Using user ID from current user object: ${id}`);
+        return id;
+      }
+    }
+
+    console.log(`🔑 No user ID found, using guest mode`);
+    return null;
   }
 
   /**
-   * Get addresses from localStorage with better error handling
+   * Get addresses from localStorage with mobile number sync support
    */
   private getAddressesFromLocalStorage(userId: string): AddressData[] {
     try {
       const storageKey = `addresses_${userId}`;
-      const savedAddresses = localStorage.getItem(storageKey);
+      let savedAddresses = localStorage.getItem(storageKey);
 
       console.log(`💾 Checking localStorage for addresses with key: ${storageKey}`);
+
+      // If no addresses found and userId looks like phone number, try to migrate from old format
+      if (!savedAddresses && userId.match(/^\+?\d{10,15}$/)) {
+        this.migrateAddressesToMobileNumber(userId);
+        savedAddresses = localStorage.getItem(storageKey);
+      }
 
       if (savedAddresses) {
         const addresses = JSON.parse(savedAddresses);
@@ -90,6 +103,55 @@ export class AddressService {
     } catch (error) {
       console.error(`❌ Error reading addresses from localStorage:`, error);
       return [];
+    }
+  }
+
+  /**
+   * Migrate addresses from old user ID format to mobile number format
+   */
+  private migrateAddressesToMobileNumber(phoneNumber: string): void {
+    try {
+      console.log(`🔄 Attempting to migrate addresses to mobile number: ${phoneNumber}`);
+
+      const currentUser = getCurrentUser();
+      if (!currentUser) return;
+
+      // Try to find addresses under old user ID formats
+      const possibleOldKeys = [
+        `addresses_${currentUser.id}`,
+        `addresses_${currentUser._id}`,
+        `addresses_guest`
+      ].filter(Boolean);
+
+      let migratedAddresses: AddressData[] = [];
+
+      for (const oldKey of possibleOldKeys) {
+        const oldAddresses = localStorage.getItem(oldKey);
+        if (oldAddresses) {
+          try {
+            const addresses = JSON.parse(oldAddresses);
+            if (Array.isArray(addresses)) {
+              migratedAddresses = [...migratedAddresses, ...addresses];
+              console.log(`🔄 Found ${addresses.length} addresses under ${oldKey}`);
+            }
+          } catch (parseError) {
+            console.warn(`Failed to parse addresses from ${oldKey}:`, parseError);
+          }
+        }
+      }
+
+      if (migratedAddresses.length > 0) {
+        const newKey = `addresses_${phoneNumber}`;
+        localStorage.setItem(newKey, JSON.stringify(migratedAddresses));
+        console.log(`✅ Migrated ${migratedAddresses.length} addresses to ${newKey}`);
+
+        // Optionally clean up old storage keys
+        for (const oldKey of possibleOldKeys) {
+          localStorage.removeItem(oldKey);
+        }
+      }
+    } catch (error) {
+      console.error("Address migration failed:", error);
     }
   }
 
@@ -326,7 +388,8 @@ export class AddressService {
         console.warn("⚠️ Failed to save manual address as detected location:", error);
       }
 
-      // Prepare data for backend
+      // Prepare data for backend with mobile number linking
+      const currentUser = getCurrentUser();
       const backendData = {
         title: addressData.label || addressData.type,
         full_address: addressData.fullAddress,
@@ -338,6 +401,7 @@ export class AddressService {
         coordinates: addressData.coordinates,
         address_type: addressData.type,
         contact_phone: addressData.phone,
+        user_phone: currentUser?.phone, // Add user's mobile number for linking
         is_default: false, // You can modify this logic
         status: "active",
       };
