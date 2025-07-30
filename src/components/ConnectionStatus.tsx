@@ -2,11 +2,21 @@ import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Wifi, WifiOff, Cloud, CloudOff } from "lucide-react";
 
+// Safe wrapper to prevent crashes
+const SafeConnectionStatus: React.FC<ConnectionStatusProps> = (props) => {
+  try {
+    return <ConnectionStatusInner {...props} />;
+  } catch (error) {
+    console.error("ConnectionStatus error:", error);
+    return null; // Fail silently
+  }
+};
+
 interface ConnectionStatusProps {
   className?: string;
 }
 
-const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
+const ConnectionStatusInner: React.FC<ConnectionStatusProps> = ({
   className = "",
 }) => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -155,4 +165,4 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
   );
 };
 
-export default ConnectionStatus;
+export default SafeConnectionStatus;
