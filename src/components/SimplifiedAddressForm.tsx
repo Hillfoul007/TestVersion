@@ -319,8 +319,15 @@ const SimplifiedAddressForm: React.FC<SimplifiedAddressFormProps> = ({
       console.log("🏠 Address availability result:", availability);
 
       if (!availability.is_available) {
-        setDetectedLocationText(fullAddress || `${city}${pincode ? `, ${pincode}` : ''}`);
+        console.log("🚫 SimplifiedAddressForm: Service not available, showing popup");
+        const locationText = fullAddress || `${city}${pincode ? `, ${pincode}` : ''}`;
+        console.log("🔍 SimplifiedAddressForm Modal state:", {
+          showLocationUnavailable,
+          locationText
+        });
+        setDetectedLocationText(locationText);
         setShowLocationUnavailable(true);
+        console.log("🔍 SimplifiedAddressForm: Modal should now be showing");
         return false;
       }
 

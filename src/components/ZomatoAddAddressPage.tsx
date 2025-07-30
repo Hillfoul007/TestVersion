@@ -1571,6 +1571,12 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
   const handleSave = async () => {
     if (!selectedLocation) return;
 
+    // 🧪 TEMPORARY TEST - Always show modal first to verify it works
+    console.log("🧪 Testing modal before validation...");
+    setUnavailableAddressText("TEST: Service not available in this area (this is a test)");
+    setShowLocationUnavailable(true);
+    return; // Exit early for testing
+
     // Build complete address from split fields
     const fullAddressParts = [
       flatNo && (floor || building)
@@ -1612,8 +1618,15 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
       if (!availability.is_available) {
         console.log("🚫 Address not available for service, showing popup");
+        console.log("🔍 Modal state before showing:", {
+          showLocationUnavailable,
+          unavailableAddressText,
+          completeAddress,
+          selectedLocationAddress: selectedLocation.address
+        });
         setUnavailableAddressText(completeAddress || selectedLocation.address);
         setShowLocationUnavailable(true);
+        console.log("🔍 Modal should now be showing - state updated");
         return; // Don't save the address
       }
 

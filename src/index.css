@@ -191,3 +191,12 @@
     }
   }
 }
+
+/* Ensure LocationUnavailableModal appears above all other content */
+.location-unavailable-modal [data-radix-dialog-overlay] {
+  z-index: 9999 !important;
+}
+
+.location-unavailable-modal [data-radix-dialog-content] {
+  z-index: 10000 !important;
+}
