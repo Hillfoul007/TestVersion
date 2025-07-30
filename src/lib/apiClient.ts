@@ -71,6 +71,14 @@ class EnhancedApiClient {
     endpoint: string,
     options: RequestOptions = {},
   ): Promise<ApiResponse<T>> {
+    // Return error if no API URL is configured
+    if (!this.baseURL && !endpoint.startsWith("http")) {
+      return {
+        error: "API_BASE_URL not configured. Please set VITE_API_BASE_URL environment variable.",
+        status: 0,
+      };
+    }
+
     const {
       body,
       timeout = 30000,
