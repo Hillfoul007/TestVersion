@@ -751,7 +751,7 @@ export class DVHostingSmsService {
     }
   }
 
-  private getApiBaseUrl(): string {
+  private async getApiBaseUrl(): Promise<string> {
     // Check if we're in a hosted environment without backend
     const isHostedEnv =
       window.location.hostname.includes("fly.dev") ||
