@@ -96,7 +96,7 @@ export class LocationDetectionService {
     try {
       if (!this.apiBaseUrl) {
         // Fallback local check
-        return this.checkAvailabilityLocal(city, pincode);
+        return this.checkAvailabilityLocal(city, pincode, fullAddress);
       }
 
       const response = await fetch(
@@ -120,10 +120,11 @@ export class LocationDetectionService {
 
       const result = await response.json();
 
-      // Also check locally as a secondary validation
+      // Also check locally as a secondary validation with full address
       if (result.is_available) {
-        const localCheck = this.checkAvailabilityLocal(city, pincode);
+        const localCheck = this.checkAvailabilityLocal(city, pincode, fullAddress);
         if (!localCheck.is_available) {
+          console.log('🔍 Backend said available but local check failed, using local result');
           return localCheck; // Use stricter local check
         }
       }
@@ -131,8 +132,8 @@ export class LocationDetectionService {
       return result;
     } catch (error) {
       console.error("❌ Failed to check availability:", error);
-      // Fallback to local check
-      return this.checkAvailabilityLocal(city, pincode);
+      // Fallback to local check with full address
+      return this.checkAvailabilityLocal(city, pincode, fullAddress);
     }
   }
 
@@ -142,36 +143,44 @@ export class LocationDetectionService {
   private checkAvailabilityLocal(
     city: string,
     pincode?: string,
+    fullAddress?: string,
   ): LocationAvailabilityResponse {
-    console.log("📍 Location availability check:", { city, pincode });
+    console.log("📍 Location availability check:", { city, pincode, fullAddress });
 
-    // Check if location is in Sector 69, Gurugram
-    const isAvailable = this.isLocationInServiceArea(city, pincode);
+    // Check if location is in Sector 69, Gurugram with full address context
+    const isAvailable = this.isLocationInServiceArea(city, pincode, fullAddress);
 
     return {
       success: true,
       is_available: isAvailable,
       message: isAvailable
         ? "Service available in your area"
-        : "Service currently only available in Sector 69, Gurugram",
+        : "Service currently only available in Sector 69, Gurugram (Pincode: 122505)",
     };
   }
 
   /**
    * Check if location is in our service area (Sector 69, Gurugram)
    */
-  private isLocationInServiceArea(city: string, pincode?: string): boolean {
+  private isLocationInServiceArea(city: string, pincode?: string, fullAddress?: string): boolean {
     const normalizedCity = city.toLowerCase().trim();
     const normalizedPincode = pincode?.trim();
+    const normalizedFullAddress = fullAddress?.toLowerCase().trim() || '';
 
-    // Check for Sector 69 mentions
-    const isSector69 = normalizedCity.includes('sector 69') ||
-                      normalizedCity.includes('sector-69') ||
-                      normalizedCity.includes('sec 69');
+    // Combine city and full address for comprehensive checking
+    const searchText = `${normalizedCity} ${normalizedFullAddress}`.toLowerCase();
+
+    // Check for Sector 69 mentions in various formats
+    const isSector69 = searchText.includes('sector 69') ||
+                      searchText.includes('sector-69') ||
+                      searchText.includes('sec 69') ||
+                      searchText.includes('sec-69') ||
+                      searchText.includes('sector69');
 
     // Check for Gurugram/Gurgaon mentions
-    const isGurugram = normalizedCity.includes('gurugram') ||
-                      normalizedCity.includes('gurgaon');
+    const isGurugram = searchText.includes('gurugram') ||
+                      searchText.includes('gurgaon') ||
+                      searchText.includes('gurgram'); // Common misspelling
 
     // Check pincode for Sector 69 Gurugram (122505)
     const isCorrectPincode = normalizedPincode === '122505';
@@ -180,7 +189,7 @@ export class LocationDetectionService {
     const isInServiceArea = (isSector69 && isGurugram) || isCorrectPincode;
 
     console.log('🏠 Service area check:', {
-      city: normalizedCity,
+      searchText: searchText.substring(0, 100) + (searchText.length > 100 ? '...' : ''),
       pincode: normalizedPincode,
       isSector69,
       isGurugram,

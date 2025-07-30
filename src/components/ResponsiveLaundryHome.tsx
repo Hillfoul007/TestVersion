@@ -130,9 +130,12 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
         if (!availability.is_available) {
           // Show unavailable popup instead of reloading
+          console.log("🚨 Manual location check - service not available, showing popup");
           setShowLocationUnavailable(true);
           setIsRequestingLocation(false);
           return;
+        } else {
+          console.log("✅ Manual location check - service is available");
         }
       }
 
@@ -198,7 +201,10 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
 
               if (!availability.is_available) {
                 // Show unavailable popup for auto-detected location
+                console.log("🚨 Service not available - showing popup");
                 setShowLocationUnavailable(true);
+              } else {
+                console.log("✅ Service is available - no popup needed");
               }
 
               // Mark that we've detected location for this device
@@ -220,6 +226,31 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
     return () => clearTimeout(timer);
   }, [userLocation, locationDetectionService]);
 
+  // Test function to simulate location outside service area
+  const testLocationUnavailable = async () => {
+    console.log("🧪 Testing location unavailable popup");
+    setDetectedLocationText("Test Location: Outside Service Area");
+    setShowLocationUnavailable(true);
+  };
+
+  // Add debugging function to window for console testing
+  useEffect(() => {
+    (window as any).testLocationPopup = testLocationUnavailable;
+    (window as any).checkLocationAvailability = async (city: string, pincode?: string, fullAddress?: string) => {
+      const result = await locationDetectionService.checkLocationAvailability(city, pincode, fullAddress);
+      console.log('Manual availability check result:', result);
+      if (!result.is_available) {
+        setDetectedLocationText(fullAddress || `${city}${pincode ? `, ${pincode}` : ''}`);
+        setShowLocationUnavailable(true);
+      }
+      return result;
+    };
+    return () => {
+      delete (window as any).testLocationPopup;
+      delete (window as any).checkLocationAvailability;
+    };
+  }, [locationDetectionService]);
+
   // Add keyboard shortcut for booking debug panel
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -237,6 +268,11 @@ const ResponsiveLaundryHome: React.FC<ResponsiveLaundryHomeProps> = ({
       if (event.ctrlKey && event.shiftKey && event.key === "A") {
         event.preventDefault();
         setShowAdminServices(true);
+      }
+      // Ctrl+Shift+L to test location popup
+      if (event.ctrlKey && event.shiftKey && event.key === "L") {
+        event.preventDefault();
+        testLocationUnavailable();
       }
     };
 

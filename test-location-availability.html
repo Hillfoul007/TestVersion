@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Location Availability Logic</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-case { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .available { background-color: #d4edda; }
+        .unavailable { background-color: #f8d7da; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Location Availability Test</h1>
+    <p>This page tests the improved location availability logic.</p>
+    
+    <div id="test-results"></div>
+    
+    <button onclick="runTests()">Run Tests</button>
+    <button onclick="testDeviceLocation()">Test Current Device Location</button>
+    
+    <script>
+        // Simulate the improved location checking logic
+        function isLocationInServiceArea(city, pincode, fullAddress) {
+            const normalizedCity = city?.toLowerCase().trim() || '';
+            const normalizedPincode = pincode?.trim();
+            const normalizedFullAddress = fullAddress?.toLowerCase().trim() || '';
+            
+            // Combine city and full address for comprehensive checking
+            const searchText = `${normalizedCity} ${normalizedFullAddress}`.toLowerCase();
+
+            // Check for Sector 69 mentions in various formats
+            const isSector69 = searchText.includes('sector 69') ||
+                              searchText.includes('sector-69') ||
+                              searchText.includes('sec 69') ||
+                              searchText.includes('sec-69') ||
+                              searchText.includes('sector69');
+
+            // Check for Gurugram/Gurgaon mentions
+            const isGurugram = searchText.includes('gurugram') ||
+                              searchText.includes('gurgaon') ||
+                              searchText.includes('gurgram'); // Common misspelling
+
+            // Check pincode for Sector 69 Gurugram (122505)
+            const isCorrectPincode = normalizedPincode === '122505';
+
+            // Must have both Sector 69 and Gurugram/Gurgaon mentions, or correct pincode
+            const isInServiceArea = (isSector69 && isGurugram) || isCorrectPincode;
+
+            return {
+                isInServiceArea,
+                isSector69,
+                isGurugram,
+                isCorrectPincode,
+                searchText: searchText.substring(0, 100)
+            };
+        }
+
+        function runTests() {
+            const testCases = [
+                {
+                    name: "Sector 69 Gurugram (Should be available)",
+                    city: "Gurugram",
+                    pincode: "122505",
+                    fullAddress: "Sector 69, Gurugram, Haryana 122505, India"
+                },
+                {
+                    name: "Sector 69 Gurgaon (Should be available)",
+                    city: "Gurgaon",
+                    pincode: "122505", 
+                    fullAddress: "Sector 69, Gurgaon, Haryana 122505, India"
+                },
+                {
+                    name: "Different sector in Gurugram (Should NOT be available)",
+                    city: "Gurugram",
+                    pincode: "122001",
+                    fullAddress: "Sector 45, Gurugram, Haryana 122001, India"
+                },
+                {
+                    name: "Delhi location (Should NOT be available)",
+                    city: "Delhi",
+                    pincode: "110001",
+                    fullAddress: "Connaught Place, New Delhi, Delhi 110001, India"
+                },
+                {
+                    name: "Only pincode 122505 (Should be available)",
+                    city: "Unknown",
+                    pincode: "122505",
+                    fullAddress: "Some address with pincode 122505"
+                },
+                {
+                    name: "Sector 69 without city context (Should NOT be available)",
+                    city: "Unknown",
+                    pincode: "110001",
+                    fullAddress: "Sector 69, Some other place"
+                },
+                {
+                    name: "Formatted address - Sector 69 Gurugram (Should be available)",
+                    city: "Gurugram", 
+                    pincode: "",
+                    fullAddress: "123, Block A, Sector 69, Gurugram, Haryana, India"
+                }
+            ];
+
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<h2>Test Results:</h2>';
+
+            testCases.forEach(testCase => {
+                const result = isLocationInServiceArea(testCase.city, testCase.pincode, testCase.fullAddress);
+                
+                const testDiv = document.createElement('div');
+                testDiv.className = `test-case ${result.isInServiceArea ? 'available' : 'unavailable'}`;
+                testDiv.innerHTML = `
+                    <h3>${testCase.name}</h3>
+                    <p><strong>Result:</strong> ${result.isInServiceArea ? '✅ AVAILABLE' : '❌ NOT AVAILABLE'}</p>
+                    <p><strong>Input:</strong> City: "${testCase.city}", Pincode: "${testCase.pincode}"</p>
+                    <p><strong>Full Address:</strong> "${testCase.fullAddress}"</p>
+                    <p><strong>Analysis:</strong> Sector69: ${result.isSector69}, Gurugram: ${result.isGurugram}, Correct Pincode: ${result.isCorrectPincode}</p>
+                    <p><strong>Search Text:</strong> "${result.searchText}"</p>
+                `;
+                resultsDiv.appendChild(testDiv);
+            });
+        }
+
+        function testDeviceLocation() {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by this browser.');
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const { latitude, longitude } = position.coords;
+                console.log('Device coordinates:', { latitude, longitude });
+                
+                // Use a public geocoding service for testing
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+                    const data = await response.json();
+                    
+                    const city = data.address?.city || data.address?.town || data.address?.village || 'Unknown';
+                    const pincode = data.address?.postcode || '';
+                    const fullAddress = data.display_name || 'Unknown address';
+                    
+                    const result = isLocationInServiceArea(city, pincode, fullAddress);
+                    
+                    const resultsDiv = document.getElementById('test-results');
+                    const deviceTestDiv = document.createElement('div');
+                    deviceTestDiv.className = `test-case ${result.isInServiceArea ? 'available' : 'unavailable'}`;
+                    deviceTestDiv.innerHTML = `
+                        <h3>🌍 Your Current Location Test</h3>
+                        <p><strong>Result:</strong> ${result.isInServiceArea ? '✅ AVAILABLE' : '❌ NOT AVAILABLE'}</p>
+                        <p><strong>Coordinates:</strong> ${latitude}, ${longitude}</p>
+                        <p><strong>Detected City:</strong> "${city}"</p>
+                        <p><strong>Detected Pincode:</strong> "${pincode}"</p>
+                        <p><strong>Full Address:</strong> "${fullAddress.substring(0, 100)}..."</p>
+                        <p><strong>Analysis:</strong> Sector69: ${result.isSector69}, Gurugram: ${result.isGurugram}, Correct Pincode: ${result.isCorrectPincode}</p>
+                    `;
+                    resultsDiv.appendChild(deviceTestDiv);
+                    
+                } catch (error) {
+                    console.error('Geocoding failed:', error);
+                    alert('Failed to get address information for your location.');
+                }
+            }, (error) => {
+                console.error('Geolocation error:', error);
+                alert('Error getting your location: ' + error.message);
+            });
+        }
+
+        // Auto-run tests on page load
+        window.onload = runTests;
+    </script>
+</body>
+</html>

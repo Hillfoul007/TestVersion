@@ -84,20 +84,47 @@ detectedLocationSchema.index({ is_available: 1 });
 detectedLocationSchema.index({ ip_address: 1 });
 
 // Static method to check if location is available
-detectedLocationSchema.statics.checkAvailability = function (city, pincode) {
-  // For now, only Sector 69, Gurgaon is available
-  const availableLocations = [
-    { city: "Gurgaon", area: "Sector 69" },
-    { city: "Gurugram", area: "Sector 69" },
-  ];
+detectedLocationSchema.statics.checkAvailability = function (city, pincode, fullAddress) {
+  const normalizedCity = city?.toLowerCase().trim() || '';
+  const normalizedPincode = pincode?.trim();
+  const normalizedFullAddress = fullAddress?.toLowerCase().trim() || '';
 
-  const normalizedCity = city?.toLowerCase().trim();
-  return availableLocations.some(
-    (location) =>
-      normalizedCity?.includes(location.city.toLowerCase()) &&
-      (city?.toLowerCase().includes("sector 69") ||
-        city?.toLowerCase().includes("sector-69")),
-  );
+  // Combine city and full address for comprehensive checking
+  const searchText = `${normalizedCity} ${normalizedFullAddress}`.toLowerCase();
+
+  console.log('🏠 Backend availability check:', {
+    city,
+    pincode,
+    fullAddress: fullAddress?.substring(0, 100) + (fullAddress?.length > 100 ? '...' : ''),
+    searchText: searchText.substring(0, 100) + (searchText.length > 100 ? '...' : '')
+  });
+
+  // Check for Sector 69 mentions in various formats
+  const isSector69 = searchText.includes('sector 69') ||
+                    searchText.includes('sector-69') ||
+                    searchText.includes('sec 69') ||
+                    searchText.includes('sec-69') ||
+                    searchText.includes('sector69');
+
+  // Check for Gurugram/Gurgaon mentions
+  const isGurugram = searchText.includes('gurugram') ||
+                    searchText.includes('gurgaon') ||
+                    searchText.includes('gurgram'); // Common misspelling
+
+  // Check pincode for Sector 69 Gurugram (122505)
+  const isCorrectPincode = normalizedPincode === '122505';
+
+  // Must have both Sector 69 and Gurugram/Gurgaon mentions, or correct pincode
+  const isAvailable = (isSector69 && isGurugram) || isCorrectPincode;
+
+  console.log('🏠 Backend availability result:', {
+    isSector69,
+    isGurugram,
+    isCorrectPincode,
+    isAvailable
+  });
+
+  return isAvailable;
 };
 
 // Static method to save detected location
@@ -120,10 +147,11 @@ detectedLocationSchema.statics.saveDetectedLocation = async function (
       return recentDetection; // Don't create duplicate
     }
 
-    // Check if location is available
+    // Check if location is available with full address context
     const isAvailable = this.checkAvailability(
       locationData.city,
       locationData.pincode,
+      locationData.full_address,
     );
 
     const detectedLocation = new this({
