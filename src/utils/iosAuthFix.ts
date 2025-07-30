@@ -577,6 +577,48 @@ export const clearIosAuthFromIndexedDB = async (): Promise<void> => {
   }
 };
 
+/**
+ * Manually trigger iOS auth preservation - useful for critical auth operations
+ */
+export const manualIosAuthPreservation = async (): Promise<void> => {
+  if (!isIosDevice()) return;
+
+  const user = localStorage.getItem('current_user') || localStorage.getItem('cleancare_user');
+  const token = localStorage.getItem('auth_token') || localStorage.getItem('cleancare_auth_token');
+
+  if (user && token) {
+    console.log('🍎💾 Manual iOS auth preservation triggered');
+
+    // Save to all backup locations immediately
+    localStorage.setItem('ios_backup_user', user);
+    localStorage.setItem('ios_backup_token', token);
+    localStorage.setItem('ios_auth_timestamp', Date.now().toString());
+
+    sessionStorage.setItem('ios_session_user', user);
+    sessionStorage.setItem('ios_session_token', token);
+    sessionStorage.setItem('ios_emergency_user', user);
+    sessionStorage.setItem('ios_emergency_token', token);
+    sessionStorage.setItem('ios_emergency_timestamp', Date.now().toString());
+
+    // Save to IndexedDB
+    try {
+      const userObj = JSON.parse(user);
+      await saveIosAuthToIndexedDB(userObj, token);
+    } catch (e) {
+      console.warn('🍎⚠️ Manual IndexedDB save failed:', e);
+    }
+
+    // Save to cookie
+    try {
+      document.cookie = `ios_auth_backup=${encodeURIComponent(user)}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Strict; Secure`;
+    } catch (e) {
+      // Cookie save failed, continue
+    }
+
+    console.log('🍎✨ Manual iOS auth preservation completed');
+  }
+};
+
 export const restoreIosAuthFromIndexedDB = async (): Promise<boolean> => {
   if (!isIosDevice()) return false;
 
