@@ -25,6 +25,7 @@ const LocationUnavailableModal: React.FC<LocationUnavailableModalProps> = ({
   onExplore,
   onNavigateHome,
 }) => {
+  console.log("🔍 LocationUnavailableModal render:", { isOpen, detectedLocation });
   const handleExploreServices = () => {
     console.log("🔍 User clicked Explore Available Services");
 
