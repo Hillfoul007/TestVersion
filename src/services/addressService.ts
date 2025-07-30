@@ -305,6 +305,27 @@ export class AddressService {
 
       console.log("💾 Saving address:", addressData);
 
+      // Save as detected location for analytics
+      try {
+        const { LocationDetectionService } = await import("./locationDetectionService");
+        const locationService = LocationDetectionService.getInstance();
+
+        const detectedLocation = {
+          full_address: addressData.fullAddress,
+          city: addressData.city || addressData.village || "Unknown",
+          state: "India", // Default state
+          country: "India",
+          pincode: addressData.pincode || "",
+          coordinates: addressData.coordinates,
+          detection_method: "manual" as const,
+        };
+
+        await locationService.saveDetectedLocation(detectedLocation);
+        console.log("✅ Manual address saved as detected location");
+      } catch (error) {
+        console.warn("⚠️ Failed to save manual address as detected location:", error);
+      }
+
       // Prepare data for backend
       const backendData = {
         title: addressData.label || addressData.type,
