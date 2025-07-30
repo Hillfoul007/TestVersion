@@ -3,7 +3,7 @@ const getApiBaseUrl = async () => {
   return config.API_BASE_URL;
 };
 
-const apiBaseUrl = getApiBaseUrl();
+let apiBaseUrl: string;
 export class DVHostingSmsService {
   private static instance: DVHostingSmsService;
   private currentPhone: string = "";
@@ -732,7 +732,7 @@ export class DVHostingSmsService {
       this.otpStorage.clear();
 
       // Call backend logout for session clearing (only if backend is available)
-      const apiBaseUrl = this.getApiBaseUrl();
+      const apiBaseUrl = await this.getApiBaseUrl();
       if (apiBaseUrl) {
         fetch(`${apiBaseUrl}/auth/logout`, {
           method: "POST",
