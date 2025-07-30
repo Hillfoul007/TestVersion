@@ -43,6 +43,21 @@ const detailedLogger = require('./middleware/detailedLogger');
 // Use detailed custom logger
 app.use(detailedLogger);
 
+// Debug middleware to track request processing
+app.use((req, res, next) => {
+  const requestId = Math.random().toString(36).substr(2, 9);
+  req.requestId = requestId;
+
+  console.log(`🎯 REQUEST_START [${requestId}] ${req.method} ${req.originalUrl}`);
+
+  // Track when response finishes
+  res.on('finish', () => {
+    console.log(`🏁 REQUEST_END [${requestId}] ${req.method} ${req.originalUrl} - ${res.statusCode}`);
+  });
+
+  next();
+});
+
 // Morgan middleware with custom format
 if (productionConfig.isProduction()) {
   // Custom production format with more details
