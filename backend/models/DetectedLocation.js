@@ -111,12 +111,8 @@ detectedLocationSchema.statics.checkAvailability = function (city, pincode, full
                     searchText.includes('gurgaon') ||
                     searchText.includes('gurgram'); // Common misspelling
 
-  // Check pincode for Sector 69 Gurugram (multiple valid pincodes)
-  const validPincodes = ['122001', '122101', '122505', '110088'];
-  const isCorrectPincode = normalizedPincode && validPincodes.includes(normalizedPincode);
-
-  // Must have both Sector 69 and Gurugram/Gurgaon mentions, or correct pincode
-  const isAvailable = (isSector69 && isGurugram) || isCorrectPincode;
+  // Must have both Sector 69 and Gurugram/Gurgaon mentions in the address
+  const isAvailable = isSector69 && isGurugram;
 
   console.log('🏠 Backend availability result:', {
     isSector69,
