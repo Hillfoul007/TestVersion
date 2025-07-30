@@ -332,9 +332,9 @@ export const preventIosAutoLogout = (): void => {
     }
   };
 
-  // Different intervals for PWA vs Safari
-  const preservationInterval = isPWAMode() ? 15000 : 30000; // PWA: every 15s, Safari: every 30s
-  const monitoringInterval = isPWAMode() ? 5000 : 10000; // PWA: every 5s, Safari: every 10s
+  // More aggressive intervals for better iOS persistence
+  const preservationInterval = isPWAMode() ? 10000 : 20000; // PWA: every 10s, Safari: every 20s
+  const monitoringInterval = isPWAMode() ? 3000 : 5000; // PWA: every 3s, Safari: every 5s
 
   console.log(
     `🍎 ${isPWAMode() ? "PWA" : "Safari"} mode detected - using ${preservationInterval / 1000}s preservation interval`,
