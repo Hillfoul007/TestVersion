@@ -612,7 +612,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-4">
               <CreditCard className="h-4 w-4 text-gray-600" />
-              <span className="font-medium">Total Bill ��{getSubtotal()}</span>
+              <span className="font-medium currency-symbol">Total Bill ₹{getSubtotal()}</span>
               <span className="text-sm text-laundrify-red font-medium">
                 ₹{getTotal()}
               </span>
