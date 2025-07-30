@@ -173,7 +173,7 @@ const LocationDetector: React.FC<LocationDetectorProps> = ({
           }
 
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=16&addressdetails=1`,
           );
 
           if (response.ok) {
