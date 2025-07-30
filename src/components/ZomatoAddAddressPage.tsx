@@ -137,6 +137,11 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
   const [showLocationUnavailable, setShowLocationUnavailable] = useState(false);
   const [unavailableAddressText, setUnavailableAddressText] = useState("");
 
+  // Debug: Force modal to show for testing
+  React.useEffect(() => {
+    console.log("🔍 ZomatoAddAddressPage: Modal state changed:", showLocationUnavailable);
+  }, [showLocationUnavailable]);
+
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
