@@ -52,8 +52,10 @@ const LocationUnavailableModal: React.FC<LocationUnavailableModalProps> = ({
     // Just close the modal, allow user to edit address
     onClose();
   };
-  return (
-    <div className="location-unavailable-modal fixed inset-0 z-[100]">
+  if (!isOpen) return null;
+
+  return ReactDOM.createPortal(
+    <div className="location-unavailable-modal fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
       <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md w-[90vw] mx-auto border-0 shadow-2xl rounded-3xl overflow-hidden bg-white z-[100]">
         {/* Close Button */}
