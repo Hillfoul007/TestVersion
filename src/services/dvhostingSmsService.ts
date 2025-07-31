@@ -76,16 +76,22 @@ export class DVHostingSmsService {
       this.currentPhone = "";
 
       // Call backend API for local development
+      console.log("🌐 Making CORS request to:", `${apiBaseUrl}/auth/send-otp`);
+      console.log("🌐 From origin:", window.location.origin);
+
       const response = await fetch(
         `${apiBaseUrl}/auth/send-otp?t=${Date.now()}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Accept": "application/json",
             "Cache-Control": "no-cache, no-store, must-revalidate",
             Pragma: "no-cache",
             Expires: "0",
           },
+          mode: "cors",
+          credentials: "include",
           body: JSON.stringify({
             phone: cleanPhone,
           }),
