@@ -90,8 +90,6 @@ function App() {
       const restored = await restoreAuthState();
 
       // For iOS devices, ensure auth state is properly broadcasted after restoration
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
       if (isIOS && restored) {
         console.log("🍎 iOS auth restored in App - broadcasting auth event");
