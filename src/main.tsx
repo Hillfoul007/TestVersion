@@ -156,5 +156,53 @@ if (rootElement) {
   console.error('Root element not found');
 }
 
-// Service worker registration is handled by Vite PWA plugin
-// Manual registration removed to avoid conflicts
+// Enhanced service worker handling for Safari
+if ('serviceWorker' in navigator) {
+  // Listen for service worker messages
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'CACHE_UPDATED') {
+      console.log('🔄 Service worker cache updated:', event.data.version);
+
+      // For Safari: Force reload on cache update to prevent blank screens
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      if (isSafari) {
+        console.log('🍎 Safari detected - forcing reload after cache update');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    }
+  });
+
+  // Register our custom service worker (fallback if PWA plugin fails)
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then((registration) => {
+      console.log('✅ Service worker registered successfully');
+
+      // Handle service worker updates
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'activated') {
+              console.log('🔄 New service worker activated');
+              // Force reload for Safari to prevent cache conflicts
+              const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+              if (isSafari) {
+                console.log('🍎 Safari - reloading for new service worker');
+                setTimeout(() => {
+                  window.location.reload();
+                }, 500);
+              }
+            }
+          });
+        }
+      });
+    }).catch((error) => {
+      console.warn('⚠️ Service worker registration failed:', error);
+    });
+  });
+}
+
+// Service worker registration is also handled by Vite PWA plugin
+// Manual registration provides fallback and enhanced Safari handling
