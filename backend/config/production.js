@@ -25,6 +25,7 @@ const config = {
     : [
         "https://testversion-ro8s.onrender.com",
         "https://laundrify-up.up.railway.app",
+        "https://testversion-ro8s.onrender.com",
         "http://localhost:5173",
         "http://localhost:3000",
       ],
