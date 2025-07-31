@@ -102,7 +102,35 @@ if (productionConfig.isProduction()) {
 }
 app.use("/api/auth", authLimiter);
 
-// Middleware to add cache control headers for iOS
+// Middleware to add cache control headers for iOS and explicit CORS headers
+app.use("/api", (req, res, next) => {
+  // Add explicit CORS headers for API routes
+  const origin = req.headers.origin;
+  if (origin && (
+    origin.includes('railway.app') ||
+    origin.includes('laundrify-up.up.railway.app') ||
+    origin.includes('localhost') ||
+    productionConfig.ALLOWED_ORIGINS.includes(origin)
+  )) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else if (!origin) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, user-id, Cache-Control, Pragma, Expires, X-Requested-With, Origin, X-iOS-Compatible');
+  res.setHeader('Access-Control-Expose-Headers', 'Clear-Site-Data, X-iOS-Compatible');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Max-Age', '86400');
+    return res.status(200).end();
+  }
+
+  next();
+});
+
 app.use("/api/auth", (req, res, next) => {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   res.setHeader("Pragma", "no-cache");
@@ -304,7 +332,7 @@ try {
 try {
   const adminRoutes = require("./routes/admin");
   app.use("/api/admin", adminRoutes);
-  console.log("�� Admin routes registered at /api/admin");
+  console.log("🔗 Admin routes registered at /api/admin");
 } catch (error) {
   console.error("❌ Failed to load Admin routes:", error.message);
 }
