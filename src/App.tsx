@@ -37,6 +37,12 @@ function App() {
       // Initialize PWA updates and service worker cleanup
       initializePWAUpdates();
 
+      // Initialize Safari cache management if needed
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      if (isSafari) {
+        SafariCacheManager.getInstance().initialize();
+      }
+
       // Check iOS mobile data connectivity before auth restoration
       if (isIOSSafari() && isProbablyMobileData()) {
         console.log('🍎 iOS Safari on mobile data detected - performing connectivity check...');
