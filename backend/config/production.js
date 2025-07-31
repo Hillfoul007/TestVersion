@@ -27,6 +27,7 @@ const config = {
         "https://laundrify-up.up.railway.app",
         "https://cleancare-pro-frontend-testversion-pr-81.up.railway.app",
         "https://cleancare-pro-api-production-129e.up.railway.app",
+        "https://cleancare-pro-api-testversion-pr-81.up.railway.app",
         "http://localhost:5173",
         "http://localhost:3000",
         "http://localhost:10000",
