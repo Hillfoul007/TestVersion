@@ -114,22 +114,34 @@ app.use("/api/auth", (req, res, next) => {
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
+      console.log(`🔍 CORS origin check: ${origin}`);
 
-      if (productionConfig.ALLOWED_ORIGINS.indexOf(origin) !== -1) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) {
+        console.log('✅ CORS: Allowing request with no origin');
         return callback(null, true);
       }
 
-      // Special handling for iOS Safari on mobile data - Railway subdomain variations
+      // Check against allowed origins from config
+      if (productionConfig.ALLOWED_ORIGINS.indexOf(origin) !== -1) {
+        console.log('✅ CORS: Origin found in allowed origins list');
+        return callback(null, true);
+      }
+
+      // Special handling for Railway domains - more permissive for deployment
       if (origin && (
         origin.includes('railway.app') ||
+        origin.includes('railway.com') ||
         origin.includes('laundrify-up.up.railway.app') ||
-        origin.includes('localhost')
+        origin.includes('cleancare-pro-api-production-129e.up.railway.app') ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1')
       )) {
+        console.log('✅ CORS: Allowing Railway/localhost domain');
         return callback(null, true);
       }
 
+      console.log(`❌ CORS: Origin ${origin} not allowed`);
       return callback(new Error('Not allowed by CORS'));
     },
     credentials: true, // Enable credentials for iOS
@@ -144,7 +156,8 @@ app.use(
       "Expires",
       "X-Requested-With",
       "Origin",
-      "X-iOS-Compatible"
+      "X-iOS-Compatible",
+      "Access-Control-Allow-Origin"
     ],
     exposedHeaders: ["Clear-Site-Data", "X-iOS-Compatible"],
     optionsSuccessStatus: 200, // Support legacy browsers and iOS
@@ -291,7 +304,7 @@ try {
 try {
   const adminRoutes = require("./routes/admin");
   app.use("/api/admin", adminRoutes);
-  console.log("🔗 Admin routes registered at /api/admin");
+  console.log("�� Admin routes registered at /api/admin");
 } catch (error) {
   console.error("❌ Failed to load Admin routes:", error.message);
 }
