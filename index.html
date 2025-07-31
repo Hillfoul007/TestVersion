@@ -105,6 +105,21 @@
     <meta property="og:image" content="/icons/icon-512x512.png" />
 
     <title>Laundrify - Quick clean & convenient</title>
+
+    <!-- iOS Emergency Recovery Script - Must be early -->
+    <script>
+      // Only load emergency script on iOS devices
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                   (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+      if (isIOS) {
+        // Create script tag for emergency recovery
+        const emergencyScript = document.createElement('script');
+        emergencyScript.src = '/ios-emergency-recovery.js';
+        emergencyScript.async = false; // Load synchronously for immediate protection
+        document.head.appendChild(emergencyScript);
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
