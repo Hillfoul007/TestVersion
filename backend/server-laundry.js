@@ -494,6 +494,14 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   // Google Sheets integration removed
 });
 
+// Configure server timeouts for iOS mobile data networks
+server.keepAliveTimeout = 65000; // 65 seconds (AWS ALB timeout is 60s)
+server.headersTimeout = 66000; // Slightly higher than keepAliveTimeout
+server.requestTimeout = 30000; // 30 seconds for individual requests
+server.timeout = 30000; // Overall socket timeout
+
+console.log('🍎 iOS mobile data compatibility: Enhanced timeouts and IPv4 preference enabled');
+
 // Graceful shutdown handling
 const gracefulShutdown = async (signal) => {
   console.log(`\n�� Received ${signal}. Starting graceful shutdown...`);
