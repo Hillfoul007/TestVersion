@@ -10,11 +10,15 @@ const urlsToCache = [
 
 // Install service worker
 self.addEventListener("install", (event) => {
-  console.log("Service Worker: Installing v4...");
+  console.log("Service Worker: Installing v5 (Safari Fix)...");
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log("Service Worker: Caching app shell");
-      return cache.addAll(urlsToCache);
+      return cache.addAll(urlsToCache).catch((error) => {
+        console.warn("Service Worker: Failed to cache some resources:", error);
+        // Continue anyway to avoid breaking the installation
+        return Promise.resolve();
+      });
     }),
   );
   self.skipWaiting(); // Force the waiting service worker to become active
@@ -22,8 +26,9 @@ self.addEventListener("install", (event) => {
 
 // Activate service worker
 self.addEventListener("activate", (event) => {
-  console.log("Service Worker: Activating v4...");
+  console.log("Service Worker: Activating v5 (Safari Fix)...");
   event.waitUntil(
+    // Clear all old caches to prevent conflicts
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
@@ -34,13 +39,21 @@ self.addEventListener("activate", (event) => {
         }),
       );
     }).then(() => {
-      // Only claim clients after cleanup is complete and if this is the active worker
+      // Safari-specific: Clear all cached data if it's a new version
       if (self.registration && self.registration.active === self) {
         console.log("Service Worker: Claiming clients...");
         return self.clients.claim();
-      } else {
-        console.log("Service Worker: Not the active worker, skipping client claim");
       }
+    }).then(() => {
+      // Notify all clients about the cache update
+      return self.clients.matchAll().then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({
+            type: 'CACHE_UPDATED',
+            version: 'v5-safari-fix'
+          });
+        });
+      });
     }).catch((error) => {
       console.error("Service Worker: Error during activation:", error);
     })
