@@ -9,6 +9,7 @@ import InstallPrompt from "@/components/InstallPrompt";
 import PWAUpdateNotification from "@/components/PWAUpdateNotification";
 import AddressSearchDemo from "@/components/AddressSearchDemo";
 import ReferralLoginPage from "@/pages/ReferralLoginPage";
+import IosBlankPageRecovery from "@/components/IosBlankPageRecovery";
 import {
   initializeAuthPersistence,
   restoreAuthState,
