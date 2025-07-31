@@ -125,6 +125,7 @@ app.use(
       if (origin && (
         origin.includes('railway.app') ||
         origin.includes('laundrify-up.up.railway.app') ||
+        origin.includes('onrender.com') ||
         origin.includes('localhost')
       )) {
         return callback(null, true);
