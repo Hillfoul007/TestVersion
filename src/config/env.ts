@@ -117,4 +117,8 @@ console.log('🔧 Environment Configuration Loaded:', {
   NODE_ENV: config.NODE_ENV,
 });
 
+// Helper functions for backward compatibility and convenience
+export const getApiBaseUrl = (): string => config.API_BASE_URL;
+export const isBackendAvailable = (): boolean => !!config.API_BASE_URL;
+
 export default config;
