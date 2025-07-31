@@ -9,12 +9,14 @@ import InstallPrompt from "@/components/InstallPrompt";
 import PWAUpdateNotification from "@/components/PWAUpdateNotification";
 import AddressSearchDemo from "@/components/AddressSearchDemo";
 import ReferralLoginPage from "@/pages/ReferralLoginPage";
+import SafariTestPanel from "@/components/SafariTestPanel";
 import {
   initializeAuthPersistence,
   restoreAuthState,
 } from "@/utils/authPersistence";
 import { initializePWAUpdates } from "@/utils/swCleanup";
 import { isIOSSafari, isProbablyMobileData, preloadForIOS, checkIOSConnectivity } from "@/utils/iosNetworkUtils";
+import SafariCacheManager from "@/utils/safariCacheManager";
 import "./App.css";
 import "./styles/mobile-fixes.css";
 import "./styles/mobile-touch-fixes.css";
@@ -35,6 +37,12 @@ function App() {
 
       // Initialize PWA updates and service worker cleanup
       initializePWAUpdates();
+
+      // Initialize Safari cache management if needed
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      if (isSafari) {
+        SafariCacheManager.getInstance().initialize();
+      }
 
       // Check iOS mobile data connectivity before auth restoration
       if (isIOSSafari() && isProbablyMobileData()) {
@@ -119,6 +127,7 @@ function App() {
               <Route path="/login" element={<ReferralLoginPage />} />
               <Route path="/refer" element={<ReferralLoginPage />} />
               <Route path="/address-demo" element={<AddressSearchDemo />} />
+              <Route path="/safari-test" element={<SafariTestPanel />} />
               <Route
                 path="/admin/location-config"
                 element={<LocationConfigPage />}

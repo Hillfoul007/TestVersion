@@ -102,7 +102,35 @@ if (productionConfig.isProduction()) {
 }
 app.use("/api/auth", authLimiter);
 
-// Middleware to add cache control headers for iOS
+// Middleware to add cache control headers for iOS and explicit CORS headers
+app.use("/api", (req, res, next) => {
+  // Add explicit CORS headers for API routes
+  const origin = req.headers.origin;
+  if (origin && (
+    origin.includes('railway.app') ||
+    origin.includes('laundrify-up.up.railway.app') ||
+    origin.includes('localhost') ||
+    productionConfig.ALLOWED_ORIGINS.includes(origin)
+  )) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else if (!origin) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, user-id, Cache-Control, Pragma, Expires, X-Requested-With, Origin, X-iOS-Compatible');
+  res.setHeader('Access-Control-Expose-Headers', 'Clear-Site-Data, X-iOS-Compatible');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Max-Age', '86400');
+    return res.status(200).end();
+  }
+
+  next();
+});
+
 app.use("/api/auth", (req, res, next) => {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   res.setHeader("Pragma", "no-cache");
@@ -114,22 +142,34 @@ app.use("/api/auth", (req, res, next) => {
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
+      console.log(`🔍 CORS origin check: ${origin}`);
 
-      if (productionConfig.ALLOWED_ORIGINS.indexOf(origin) !== -1) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) {
+        console.log('✅ CORS: Allowing request with no origin');
         return callback(null, true);
       }
 
-      // Special handling for iOS Safari on mobile data - Railway subdomain variations
+      // Check against allowed origins from config
+      if (productionConfig.ALLOWED_ORIGINS.indexOf(origin) !== -1) {
+        console.log('✅ CORS: Origin found in allowed origins list');
+        return callback(null, true);
+      }
+
+      // Special handling for Railway domains - more permissive for deployment
       if (origin && (
         origin.includes('railway.app') ||
+        origin.includes('railway.com') ||
         origin.includes('laundrify-up.up.railway.app') ||
-        origin.includes('localhost')
+        origin.includes('cleancare-pro-api-production-129e.up.railway.app') ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1')
       )) {
+        console.log('✅ CORS: Allowing Railway/localhost domain');
         return callback(null, true);
       }
 
+      console.log(`❌ CORS: Origin ${origin} not allowed`);
       return callback(new Error('Not allowed by CORS'));
     },
     credentials: true, // Enable credentials for iOS
@@ -144,7 +184,8 @@ app.use(
       "Expires",
       "X-Requested-With",
       "Origin",
-      "X-iOS-Compatible"
+      "X-iOS-Compatible",
+      "Access-Control-Allow-Origin"
     ],
     exposedHeaders: ["Clear-Site-Data", "X-iOS-Compatible"],
     optionsSuccessStatus: 200, // Support legacy browsers and iOS
