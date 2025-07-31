@@ -103,10 +103,10 @@ export const checkIOSConnectivity = async (): Promise<boolean> => {
     const response = await iosFetch('/api/health', {
       method: 'GET',
     }, {
-      timeout: 10000, // 10 second timeout for connectivity check
+      timeout: 20000, // 20 second timeout for connectivity check (increased from 10s)
       retries: 1, // Single retry for quick check
     });
-    
+
     return response.ok;
   } catch (error) {
     console.error('🍎 iOS connectivity check failed:', error);
