@@ -55,6 +55,46 @@
         overflow-x: hidden;
         position: relative;
       }
+
+      /* iOS Blank Page Prevention - Critical Styles */
+      @supports (-webkit-touch-callout: none) {
+        /* iOS Safari specific blank page prevention */
+        #root {
+          -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+          -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+          will-change: transform;
+        }
+
+        /* Ensure critical content never disappears */
+        .App,
+        nav,
+        header,
+        main {
+          -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+          position: relative;
+          z-index: 1;
+        }
+
+        /* Emergency fallback when page goes blank */
+        body.ios-blank-emergency::before {
+          content: "🔄 Loading Laundrify...";
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          z-index: 999999;
+          font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+          font-size: 16px;
+          color: #333;
+        }
+      }
     </style>
 
     <!-- PWA Meta Tags -->
