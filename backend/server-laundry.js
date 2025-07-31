@@ -495,9 +495,10 @@ if (productionConfig.isProduction()) {
 // Keep-alive mechanism for Render deployment with iOS mobile data compatibility
 const setupKeepAlive = () => {
   if (productionConfig.isProduction()) {
-    const keepAliveInterval = 5 * 60 * 1000; // 5 minutes in milliseconds
+    const keepAliveInterval = 4 * 60 * 1000; // 4 minutes (more frequent)
     let consecutiveFailures = 0;
-    const maxFailures = 3;
+    const maxFailures = 5; // Allow more failures before warning
+    let lastSuccessfulPing = Date.now();
 
     setInterval(async () => {
       try {
@@ -505,9 +506,9 @@ const setupKeepAlive = () => {
                    process.env.RAILWAY_STATIC_URL ||
                    `http://localhost:${PORT}`;
 
-        // Use longer timeout for keep-alive pings for iOS mobile data compatibility
+        // Use shorter timeout for keep-alive pings (more aggressive)
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout for mobile data
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
         const response = await fetch(`${url}/api/health`, {
           signal: controller.signal,
@@ -515,7 +516,9 @@ const setupKeepAlive = () => {
             'User-Agent': 'KeepAlive/1.0',
             'X-Keep-Alive': 'true',
             'X-iOS-Compatible': 'true',
-            'Connection': 'close' // Don't keep connection open for keep-alive pings
+            'Connection': 'close', // Don't keep connection open for keep-alive pings
+            'Cache-Control': 'no-cache',
+            'Accept': 'application/json'
           }
         });
 
@@ -524,6 +527,7 @@ const setupKeepAlive = () => {
         if (response.ok) {
           console.log("🔄 Keep-alive ping successful");
           consecutiveFailures = 0; // Reset failure counter
+          lastSuccessfulPing = Date.now();
         } else {
           consecutiveFailures++;
           console.log(
@@ -532,6 +536,8 @@ const setupKeepAlive = () => {
         }
       } catch (error) {
         consecutiveFailures++;
+        const timeSinceLastSuccess = Date.now() - lastSuccessfulPing;
+
         if (error.name === 'AbortError') {
           console.log(`⚠️ Keep-alive ping timeout (failures: ${consecutiveFailures}/${maxFailures}) - likely iOS mobile data issue`);
         } else {
@@ -540,13 +546,13 @@ const setupKeepAlive = () => {
 
         // If too many consecutive failures, log warning but don't crash
         if (consecutiveFailures >= maxFailures) {
-          console.log(`🚨 Keep-alive: ${maxFailures} consecutive failures detected. This may indicate iOS mobile data connectivity issues.`);
+          console.log(`🚨 Keep-alive: ${maxFailures} consecutive failures detected over ${Math.round(timeSinceLastSuccess/1000)}s. This may indicate iOS mobile data connectivity issues.`);
           consecutiveFailures = 0; // Reset to avoid spam
         }
       }
     }, keepAliveInterval);
 
-    console.log("🔄 Keep-alive mechanism started (5 min intervals) with iOS mobile data compatibility");
+    console.log("🔄 Keep-alive mechanism started (4 min intervals) with enhanced iOS mobile data compatibility");
   }
 };
 
