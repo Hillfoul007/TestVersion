@@ -138,40 +138,10 @@ app.use("/api/auth", (req, res, next) => {
   next();
 });
 
-// CORS configuration - Enhanced for iOS Safari compatibility on mobile data
+// CORS configuration - Allow all origins for development
 app.use(
   cors({
-    origin: function (origin, callback) {
-      console.log(`🔍 CORS origin check: ${origin}`);
-
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) {
-        console.log('✅ CORS: Allowing request with no origin');
-        return callback(null, true);
-      }
-
-      // Check against allowed origins from config
-      if (productionConfig.ALLOWED_ORIGINS.indexOf(origin) !== -1) {
-        console.log('✅ CORS: Origin found in allowed origins list');
-        return callback(null, true);
-      }
-
-      // Special handling for Railway domains - more permissive for deployment
-      if (origin && (
-        origin.includes('railway.app') ||
-        origin.includes('railway.com') ||
-        origin.includes('laundrify-up.up.railway.app') ||
-        origin.includes('cleancare-pro-api-production-129e.up.railway.app') ||
-        origin.includes('localhost') ||
-        origin.includes('127.0.0.1')
-      )) {
-        console.log('✅ CORS: Allowing Railway/localhost domain');
-        return callback(null, true);
-      }
-
-      console.log(`❌ CORS: Origin ${origin} not allowed`);
-      return callback(new Error('Not allowed by CORS'));
-    },
+    origin: true, // Allow all origins
     credentials: true, // Enable credentials for iOS
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
     allowedHeaders: [
