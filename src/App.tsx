@@ -15,6 +15,7 @@ import {
 } from "@/utils/authPersistence";
 import { initializePWAUpdates } from "@/utils/swCleanup";
 import { isIOSSafari, isProbablyMobileData, preloadForIOS, checkIOSConnectivity } from "@/utils/iosNetworkUtils";
+import SafariCacheManager from "@/utils/safariCacheManager";
 import "./App.css";
 import "./styles/mobile-fixes.css";
 import "./styles/mobile-touch-fixes.css";
