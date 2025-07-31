@@ -9,18 +9,15 @@ import InstallPrompt from "@/components/InstallPrompt";
 import PWAUpdateNotification from "@/components/PWAUpdateNotification";
 import AddressSearchDemo from "@/components/AddressSearchDemo";
 import ReferralLoginPage from "@/pages/ReferralLoginPage";
-import IosBlankPageRecovery from "@/components/IosBlankPageRecovery";
 import {
   initializeAuthPersistence,
   restoreAuthState,
 } from "@/utils/authPersistence";
 import { initializePWAUpdates } from "@/utils/swCleanup";
 import { isIOSSafari, isProbablyMobileData, preloadForIOS, checkIOSConnectivity } from "@/utils/iosNetworkUtils";
-import { IosBlankPageManager } from "@/utils/iosBlankPageFix";
 import "./App.css";
 import "./styles/mobile-fixes.css";
 import "./styles/mobile-touch-fixes.css";
-import "./styles/ios-blank-page-fix.css";
 
 function App() {
   // Initialize authentication persistence and restore user session
@@ -38,26 +35,6 @@ function App() {
 
       // Initialize PWA updates and service worker cleanup
       initializePWAUpdates();
-
-      // Initialize iOS blank page prevention (must be early)
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                   (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-      if (isIOS) {
-        console.log('🍎 Initializing iOS blank page prevention...');
-        IosBlankPageManager.getInstance();
-
-        // Handle recovery from previous blank page
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('ios_recovery') === 'blank_page') {
-          console.log('🍎✅ Recovered from blank page, removing recovery parameters');
-          const cleanUrl = window.location.pathname;
-          window.history.replaceState({}, document.title, cleanUrl);
-
-          // Reset recovery attempt counter on successful recovery
-          localStorage.removeItem('ios_recovery_attempt');
-        }
-      }
 
       // Check iOS mobile data connectivity before auth restoration
       if (isIOSSafari() && isProbablyMobileData()) {
@@ -90,6 +67,8 @@ function App() {
       const restored = await restoreAuthState();
 
       // For iOS devices, ensure auth state is properly broadcasted after restoration
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
       if (isIOS && restored) {
         console.log("🍎 iOS auth restored in App - broadcasting auth event");
@@ -149,7 +128,6 @@ function App() {
             <Toaster />
             <InstallPrompt />
             <PWAUpdateNotification />
-            <IosBlankPageRecovery />
           </div>
         </Router>
       </NotificationProvider>
