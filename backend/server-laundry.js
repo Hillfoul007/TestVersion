@@ -206,10 +206,60 @@ try {
   console.error("❌ Failed to load Location routes:", error.message);
 }
 
+// Special handling for manifest.json with iOS mobile data optimizations
+app.get('/manifest.json', (req, res) => {
+  const userAgent = req.headers['user-agent'] || '';
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+
+  if (isIOS) {
+    console.log('🍎 iOS device requesting manifest.json - applying mobile data optimizations');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('X-iOS-Compatible', 'true');
+  } else {
+    res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hour for non-iOS
+  }
+
+  res.setHeader('Content-Type', 'application/manifest+json');
+  res.sendFile(path.join(__dirname, '../dist/manifest.json'));
+});
+
+// Special handling for icon files with iOS mobile data optimizations
+app.get('/icons/*', (req, res) => {
+  const userAgent = req.headers['user-agent'] || '';
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+
+  if (isIOS) {
+    console.log(`🍎 iOS device requesting ${req.path} - applying mobile data optimizations`);
+    res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 hours but allow revalidation
+    res.setHeader('X-iOS-Compatible', 'true');
+  } else {
+    res.setHeader('Cache-Control', 'public, max-age=604800'); // 1 week for non-iOS
+  }
+
+  const iconPath = path.join(__dirname, '../dist', req.path);
+  res.sendFile(iconPath, (err) => {
+    if (err) {
+      console.log(`⚠️ Icon not found: ${req.path}`);
+      res.status(404).send('Icon not found');
+    }
+  });
+});
+
 // Serve static frontend files in production
 if (productionConfig.isProduction()) {
   const frontendPath = path.join(__dirname, "../dist");
-  app.use(express.static(frontendPath));
+  app.use(express.static(frontendPath, {
+    // Add iOS-specific headers for static files
+    setHeaders: (res, path, stat) => {
+      if (path.includes('manifest.json') || path.includes('/icons/')) {
+        // These are handled by specific routes above
+        return;
+      }
+      res.setHeader('X-iOS-Compatible', 'true');
+    }
+  }));
   console.log("📁 Serving frontend static files from:", frontendPath);
 }
 
