@@ -7,6 +7,14 @@ import SafariCacheManager, { setupSafariErrorHandling } from "./utils/safariCach
 
 // iOS Safari compatibility fixes with enhanced authentication
 const initializeiOSFixes = () => {
+  // Initialize Safari cache management first
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  if (isSafari) {
+    console.log("🍎 Initializing Safari cache management...");
+    SafariCacheManager.getInstance().initialize();
+    setupSafariErrorHandling();
+  }
+
   // Immediate iOS authentication initialization
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                 (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
