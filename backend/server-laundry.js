@@ -228,6 +228,17 @@ try {
   console.error("❌ Failed to load Location routes:", error.message);
 }
 
+// Handle preflight requests explicitly
+app.options('*', (req, res) => {
+  console.log('🔍 CORS Preflight request for:', req.path, 'from:', req.get('Origin'));
+  res.header('Access-Control-Allow-Origin', req.get('Origin') || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, user-id, Cache-Control, Pragma, Expires, X-Requested-With, Origin, X-iOS-Compatible');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Max-Age', '86400');
+  res.sendStatus(200);
+});
+
 // Serve static frontend files in production
 if (productionConfig.isProduction()) {
   const frontendPath = path.join(__dirname, "../dist");
@@ -243,7 +254,7 @@ if (otpAuthRoutes) {
 
 if (bookingRoutes) {
   app.use("/api/bookings", bookingRoutes);
-  console.log("🔗 Booking routes registered at /api/bookings");
+  console.log("��� Booking routes registered at /api/bookings");
 }
 
 if (locationRoutes) {
