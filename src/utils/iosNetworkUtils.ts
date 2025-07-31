@@ -7,9 +7,9 @@ interface IOSNetworkConfig {
 }
 
 const defaultConfig: IOSNetworkConfig = {
-  timeout: 30000, // 30 seconds for iOS mobile networks
-  retries: 3,
-  retryDelay: 2000, // 2 seconds between retries
+  timeout: 60000, // 60 seconds for iOS mobile networks (increased from 30s)
+  retries: 2, // Reduced retries to avoid long waits
+  retryDelay: 3000, // 3 seconds between retries (increased)
 };
 
 // Detect iOS Safari
