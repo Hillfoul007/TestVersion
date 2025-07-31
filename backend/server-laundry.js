@@ -445,7 +445,7 @@ const setupKeepAlive = () => {
 };
 
 // Start server with error handling
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 CleanCare Pro server running on port ${PORT}`);
   console.log(`📱 Environment: ${productionConfig.NODE_ENV}`);
   if (productionConfig.isProduction()) {

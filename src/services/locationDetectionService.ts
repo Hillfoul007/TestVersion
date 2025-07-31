@@ -190,7 +190,6 @@ export class LocationDetectionService {
       pincode: normalizedPincode,
       isSector69,
       isGurugram,
-      isCorrectPincode,
       isInServiceArea
     });
 
