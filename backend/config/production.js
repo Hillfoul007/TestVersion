@@ -23,6 +23,7 @@ const config = {
   ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(",")
     : [
+        "https://testversion-ro8s.onrender.com",
         "https://laundrify-up.up.railway.app",
         "http://localhost:5173",
         "http://localhost:3000",
