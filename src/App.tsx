@@ -14,6 +14,7 @@ import {
   restoreAuthState,
 } from "@/utils/authPersistence";
 import { initializePWAUpdates } from "@/utils/swCleanup";
+import { isIOSSafari, isProbablyMobileData, preloadForIOS, checkIOSConnectivity } from "@/utils/iosNetworkUtils";
 import "./App.css";
 import "./styles/mobile-fixes.css";
 import "./styles/mobile-touch-fixes.css";
@@ -34,6 +35,33 @@ function App() {
 
       // Initialize PWA updates and service worker cleanup
       initializePWAUpdates();
+
+      // Check iOS mobile data connectivity before auth restoration
+      if (isIOSSafari() && isProbablyMobileData()) {
+        console.log('🍎 iOS Safari on mobile data detected - performing connectivity check...');
+
+        try {
+          // Preload critical resources for iOS
+          await preloadForIOS();
+
+          // Check connectivity with health endpoint
+          const isConnected = await checkIOSConnectivity();
+          if (!isConnected) {
+            console.warn('⚠️ iOS connectivity issue detected - showing connection warning');
+            // You could show a toast notification here
+            window.dispatchEvent(new CustomEvent('ios-connectivity-issue', {
+              detail: { type: 'mobile-data-connection-failed' }
+            }));
+          } else {
+            console.log('✅ iOS connectivity check passed');
+          }
+        } catch (error) {
+          console.error('🍎 iOS connectivity check failed:', error);
+          window.dispatchEvent(new CustomEvent('ios-connectivity-issue', {
+            detail: { type: 'connectivity-check-error', error: error.message }
+          }));
+        }
+      }
 
       // Restore authentication state from localStorage
       const restored = await restoreAuthState();

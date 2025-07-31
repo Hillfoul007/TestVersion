@@ -1,5 +1,6 @@
 // Enhanced API client with better error handling and CORS support
 import { config } from "@/config/env";
+import { iosFetch, isIOSSafari, isProbablyMobileData } from "@/utils/iosNetworkUtils";
 
 const API_BASE_URL = config.API_BASE_URL;
 
@@ -48,6 +49,17 @@ class EnhancedApiClient {
   ): Promise<Response> {
     const { timeout = 30000, ...fetchOptions } = options;
 
+    // Use iOS-specific fetch for iOS Safari on mobile data
+    if (isIOSSafari() && isProbablyMobileData()) {
+      console.log('🍎 Using iOS-optimized fetch for mobile data network');
+      return iosFetch(url, fetchOptions, {
+        timeout,
+        retries: 1, // Single retry within fetchWithTimeout
+        retryDelay: 1000
+      });
+    }
+
+    // Standard fetch for other browsers/networks
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
 
@@ -102,6 +114,12 @@ class EnhancedApiClient {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       Accept: "application/json",
+      // Add iOS compatibility headers
+      ...(isIOSSafari() ? {
+        "X-iOS-Compatible": "true",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache"
+      } : {}),
       ...((requestOptions.headers as Record<string, string>) || {}),
     };
 

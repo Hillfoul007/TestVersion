@@ -1,0 +1,25 @@
+[phases.setup]
+nixPkgs = ['nodejs_18', 'npm-9_x']
+
+[phases.install]
+cmds = ['npm ci --production=false']
+
+[phases.build]
+cmds = ['npm run render:build']
+
+[start]
+cmd = 'npm run render:start'
+
+[variables]
+NODE_ENV = 'production'
+NPM_CONFIG_PRODUCTION = 'false'
+
+# Network optimization for iOS Safari on mobile data
+[env]
+# Force IPv4 for better iOS mobile data compatibility
+NODE_OPTIONS = '--max-old-space-size=300 --dns-result-order=ipv4first'
+# Ensure proper network binding
+HOST = '0.0.0.0'
+# Optimize for mobile networks
+HTTP_TIMEOUT = '30000'
+KEEP_ALIVE_TIMEOUT = '65000'
