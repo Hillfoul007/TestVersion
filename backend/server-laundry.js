@@ -116,7 +116,7 @@ app.use("/api", (req, res, next) => {
     origin.includes('127.0.0.1') ||
     productionConfig.ALLOWED_ORIGINS.includes(origin)
   )) {
-    console.log(`��� API CORS: Allowing origin ${origin}`);
+    console.log(`✅ API CORS: Allowing origin ${origin}`);
     res.setHeader('Access-Control-Allow-Origin', origin);
   } else if (!origin) {
     console.log('✅ API CORS: Allowing request with no origin');
@@ -174,6 +174,7 @@ app.use(
         origin.includes('laundrify-up.up.railway.app') ||
         origin.includes('cleancare-pro-frontend-testversion-pr-81.up.railway.app') ||
         origin.includes('cleancare-pro-api-production-129e.up.railway.app') ||
+        origin.includes('cleancare-pro-api-testversion-pr-81.up.railway.app') ||
         origin.includes('localhost') ||
         origin.includes('127.0.0.1')
       )) {
