@@ -206,10 +206,60 @@ try {
   console.error("❌ Failed to load Location routes:", error.message);
 }
 
+// Special handling for manifest.json with iOS mobile data optimizations
+app.get('/manifest.json', (req, res) => {
+  const userAgent = req.headers['user-agent'] || '';
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+
+  if (isIOS) {
+    console.log('🍎 iOS device requesting manifest.json - applying mobile data optimizations');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('X-iOS-Compatible', 'true');
+  } else {
+    res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hour for non-iOS
+  }
+
+  res.setHeader('Content-Type', 'application/manifest+json');
+  res.sendFile(path.join(__dirname, '../dist/manifest.json'));
+});
+
+// Special handling for icon files with iOS mobile data optimizations
+app.get('/icons/*', (req, res) => {
+  const userAgent = req.headers['user-agent'] || '';
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+
+  if (isIOS) {
+    console.log(`🍎 iOS device requesting ${req.path} - applying mobile data optimizations`);
+    res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 hours but allow revalidation
+    res.setHeader('X-iOS-Compatible', 'true');
+  } else {
+    res.setHeader('Cache-Control', 'public, max-age=604800'); // 1 week for non-iOS
+  }
+
+  const iconPath = path.join(__dirname, '../dist', req.path);
+  res.sendFile(iconPath, (err) => {
+    if (err) {
+      console.log(`⚠️ Icon not found: ${req.path}`);
+      res.status(404).send('Icon not found');
+    }
+  });
+});
+
 // Serve static frontend files in production
 if (productionConfig.isProduction()) {
   const frontendPath = path.join(__dirname, "../dist");
-  app.use(express.static(frontendPath));
+  app.use(express.static(frontendPath, {
+    // Add iOS-specific headers for static files
+    setHeaders: (res, path, stat) => {
+      if (path.includes('manifest.json') || path.includes('/icons/')) {
+        // These are handled by specific routes above
+        return;
+      }
+      res.setHeader('X-iOS-Compatible', 'true');
+    }
+  }));
   console.log("📁 Serving frontend static files from:", frontendPath);
 }
 
@@ -442,31 +492,61 @@ if (productionConfig.isProduction()) {
   });
 }
 
-// Keep-alive mechanism for Render deployment
+// Keep-alive mechanism for Render deployment with iOS mobile data compatibility
 const setupKeepAlive = () => {
   if (productionConfig.isProduction()) {
     const keepAliveInterval = 5 * 60 * 1000; // 5 minutes in milliseconds
+    let consecutiveFailures = 0;
+    const maxFailures = 3;
 
     setInterval(async () => {
       try {
-        const url =
-          process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
-        const response = await fetch(`${url}/api/health`);
+        const url = process.env.RENDER_EXTERNAL_URL ||
+                   process.env.RAILWAY_STATIC_URL ||
+                   `http://localhost:${PORT}`;
+
+        // Use shorter timeout for keep-alive pings to avoid iOS mobile data issues
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+        const response = await fetch(`${url}/api/health`, {
+          signal: controller.signal,
+          headers: {
+            'User-Agent': 'KeepAlive/1.0',
+            'X-Keep-Alive': 'true',
+            'X-iOS-Compatible': 'true',
+            'Connection': 'close' // Don't keep connection open for keep-alive pings
+          }
+        });
+
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           console.log("🔄 Keep-alive ping successful");
+          consecutiveFailures = 0; // Reset failure counter
         } else {
+          consecutiveFailures++;
           console.log(
-            "⚠️ Keep-alive ping failed with status:",
-            response.status,
+            `⚠️ Keep-alive ping failed with status: ${response.status} (failures: ${consecutiveFailures}/${maxFailures})`
           );
         }
       } catch (error) {
-        console.log("⚠️ Keep-alive ping error:", error.message);
+        consecutiveFailures++;
+        if (error.name === 'AbortError') {
+          console.log(`⚠️ Keep-alive ping timeout (failures: ${consecutiveFailures}/${maxFailures}) - likely iOS mobile data issue`);
+        } else {
+          console.log(`⚠️ Keep-alive ping error: ${error.message} (failures: ${consecutiveFailures}/${maxFailures})`);
+        }
+
+        // If too many consecutive failures, log warning but don't crash
+        if (consecutiveFailures >= maxFailures) {
+          console.log(`🚨 Keep-alive: ${maxFailures} consecutive failures detected. This may indicate iOS mobile data connectivity issues.`);
+          consecutiveFailures = 0; // Reset to avoid spam
+        }
       }
     }, keepAliveInterval);
 
-    console.log("🔄 Keep-alive mechanism started (5 min intervals)");
+    console.log("🔄 Keep-alive mechanism started (5 min intervals) with iOS mobile data compatibility");
   }
 };
 
@@ -495,9 +575,33 @@ const server = app.listen(PORT, '0.0.0.0', () => {
 });
 
 // Configure server timeouts for iOS mobile data networks
-server.keepAliveTimeout = 65000; // 65 seconds (AWS ALB timeout is 60s)
-server.headersTimeout = 66000; // Slightly higher than keepAliveTimeout
-server.requestTimeout = 30000; // 30 seconds for individual requests
+server.keepAliveTimeout = parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 65000; // 65 seconds (AWS ALB timeout is 60s)
+server.headersTimeout = (parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 65000) + 1000; // Slightly higher than keepAliveTimeout
+server.requestTimeout = parseInt(process.env.HTTP_TIMEOUT) || 30000; // 30 seconds for individual requests
+server.timeout = parseInt(process.env.HTTP_TIMEOUT) || 30000; // Overall socket timeout
+
+// Log timeout configuration for debugging iOS mobile data issues
+console.log(`⚙️ Server timeouts configured:
+  keepAliveTimeout: ${server.keepAliveTimeout}ms
+  headersTimeout: ${server.headersTimeout}ms
+  requestTimeout: ${server.requestTimeout}ms
+  timeout: ${server.timeout}ms
+  iOS Compatibility Mode: ${process.env.IOS_COMPATIBILITY_MODE || 'false'}`);
+
+// Handle server timeout events
+server.on('timeout', (socket) => {
+  console.log('⚠️ Server timeout event triggered for iOS mobile data request');
+  socket.destroy();
+});
+
+server.on('clientError', (err, socket) => {
+  if (err.code === 'ECONNRESET' || err.code === 'HPE_HEADER_OVERFLOW') {
+    console.log('⚠️ Client error (likely iOS mobile data):', err.code);
+  }
+  if (socket.writable) {
+    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+  }
+});
 server.timeout = 30000; // Overall socket timeout
 
 console.log('🍎 iOS mobile data compatibility: Enhanced timeouts and IPv4 preference enabled');
