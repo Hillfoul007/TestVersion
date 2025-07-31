@@ -127,6 +127,7 @@ function App() {
               <Route path="/login" element={<ReferralLoginPage />} />
               <Route path="/refer" element={<ReferralLoginPage />} />
               <Route path="/address-demo" element={<AddressSearchDemo />} />
+              <Route path="/safari-test" element={<SafariTestPanel />} />
               <Route
                 path="/admin/location-config"
                 element={<LocationConfigPage />}
