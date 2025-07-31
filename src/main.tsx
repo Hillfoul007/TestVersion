@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import PerformanceMonitor from "./utils/performanceMonitor";
+import SafariCacheManager, { setupSafariErrorHandling } from "./utils/safariCacheManager";
 
 // iOS Safari compatibility fixes with enhanced authentication
 const initializeiOSFixes = () => {
