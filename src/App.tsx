@@ -20,6 +20,7 @@ import { IosBlankPageManager } from "@/utils/iosBlankPageFix";
 import "./App.css";
 import "./styles/mobile-fixes.css";
 import "./styles/mobile-touch-fixes.css";
+import "./styles/ios-blank-page-fix.css";
 
 function App() {
   // Initialize authentication persistence and restore user session
