@@ -24,6 +24,7 @@ const config = {
     ? process.env.ALLOWED_ORIGINS.split(",")
     : [
         "https://laundrify-up.up.railway.app",
+        "https://testversion-ro8s.onrender.com",
         "http://localhost:5173",
         "http://localhost:3000",
       ],
