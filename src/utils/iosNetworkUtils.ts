@@ -7,9 +7,9 @@ interface IOSNetworkConfig {
 }
 
 const defaultConfig: IOSNetworkConfig = {
-  timeout: 60000, // 60 seconds for iOS mobile networks (increased from 30s)
-  retries: 2, // Reduced retries to avoid long waits
-  retryDelay: 3000, // 3 seconds between retries (increased)
+  timeout: 30000, // 30 seconds for iOS mobile networks
+  retries: 3,
+  retryDelay: 2000, // 2 seconds between retries
 };
 
 // Detect iOS Safari
@@ -103,10 +103,10 @@ export const checkIOSConnectivity = async (): Promise<boolean> => {
     const response = await iosFetch('/api/health', {
       method: 'GET',
     }, {
-      timeout: 20000, // 20 second timeout for connectivity check (increased from 10s)
+      timeout: 10000, // 10 second timeout for connectivity check
       retries: 1, // Single retry for quick check
     });
-
+    
     return response.ok;
   } catch (error) {
     console.error('🍎 iOS connectivity check failed:', error);
