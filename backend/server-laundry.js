@@ -442,31 +442,61 @@ if (productionConfig.isProduction()) {
   });
 }
 
-// Keep-alive mechanism for Render deployment
+// Keep-alive mechanism for Render deployment with iOS mobile data compatibility
 const setupKeepAlive = () => {
   if (productionConfig.isProduction()) {
     const keepAliveInterval = 5 * 60 * 1000; // 5 minutes in milliseconds
+    let consecutiveFailures = 0;
+    const maxFailures = 3;
 
     setInterval(async () => {
       try {
-        const url =
-          process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
-        const response = await fetch(`${url}/api/health`);
+        const url = process.env.RENDER_EXTERNAL_URL ||
+                   process.env.RAILWAY_STATIC_URL ||
+                   `http://localhost:${PORT}`;
+
+        // Use shorter timeout for keep-alive pings to avoid iOS mobile data issues
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+        const response = await fetch(`${url}/api/health`, {
+          signal: controller.signal,
+          headers: {
+            'User-Agent': 'KeepAlive/1.0',
+            'X-Keep-Alive': 'true',
+            'X-iOS-Compatible': 'true',
+            'Connection': 'close' // Don't keep connection open for keep-alive pings
+          }
+        });
+
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           console.log("🔄 Keep-alive ping successful");
+          consecutiveFailures = 0; // Reset failure counter
         } else {
+          consecutiveFailures++;
           console.log(
-            "⚠️ Keep-alive ping failed with status:",
-            response.status,
+            `⚠️ Keep-alive ping failed with status: ${response.status} (failures: ${consecutiveFailures}/${maxFailures})`
           );
         }
       } catch (error) {
-        console.log("⚠️ Keep-alive ping error:", error.message);
+        consecutiveFailures++;
+        if (error.name === 'AbortError') {
+          console.log(`⚠️ Keep-alive ping timeout (failures: ${consecutiveFailures}/${maxFailures}) - likely iOS mobile data issue`);
+        } else {
+          console.log(`⚠️ Keep-alive ping error: ${error.message} (failures: ${consecutiveFailures}/${maxFailures})`);
+        }
+
+        // If too many consecutive failures, log warning but don't crash
+        if (consecutiveFailures >= maxFailures) {
+          console.log(`🚨 Keep-alive: ${maxFailures} consecutive failures detected. This may indicate iOS mobile data connectivity issues.`);
+          consecutiveFailures = 0; // Reset to avoid spam
+        }
       }
     }, keepAliveInterval);
 
-    console.log("🔄 Keep-alive mechanism started (5 min intervals)");
+    console.log("🔄 Keep-alive mechanism started (5 min intervals) with iOS mobile data compatibility");
   }
 };
 
