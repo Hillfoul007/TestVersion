@@ -150,6 +150,7 @@ function App() {
             <Toaster />
             <InstallPrompt />
             <PWAUpdateNotification />
+            <IosBlankPageRecovery />
           </div>
         </Router>
       </NotificationProvider>
