@@ -9,6 +9,7 @@ import InstallPrompt from "@/components/InstallPrompt";
 import PWAUpdateNotification from "@/components/PWAUpdateNotification";
 import AddressSearchDemo from "@/components/AddressSearchDemo";
 import ReferralLoginPage from "@/pages/ReferralLoginPage";
+import SafariTestPanel from "@/components/SafariTestPanel";
 import {
   initializeAuthPersistence,
   restoreAuthState,
