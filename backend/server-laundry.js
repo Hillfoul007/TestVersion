@@ -575,10 +575,10 @@ const server = app.listen(PORT, '0.0.0.0', () => {
 });
 
 // Configure server timeouts for iOS mobile data networks
-server.keepAliveTimeout = parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 120000; // 120 seconds for mobile data
-server.headersTimeout = (parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 120000) + 5000; // Slightly higher than keepAliveTimeout
-server.requestTimeout = parseInt(process.env.HTTP_TIMEOUT) || 60000; // 60 seconds for individual requests (mobile data friendly)
-server.timeout = parseInt(process.env.HTTP_TIMEOUT) || 60000; // Overall socket timeout
+server.keepAliveTimeout = parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 90000; // 90 seconds for mobile data (reduced)
+server.headersTimeout = (parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 90000) + 5000; // Slightly higher than keepAliveTimeout
+server.requestTimeout = parseInt(process.env.HTTP_TIMEOUT) || 45000; // 45 seconds for individual requests (more aggressive)
+server.timeout = parseInt(process.env.HTTP_TIMEOUT) || 45000; // Overall socket timeout (more aggressive)
 
 // Log timeout configuration for debugging iOS mobile data issues
 console.log(`⚙️ Server timeouts configured:
