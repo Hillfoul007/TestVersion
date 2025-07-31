@@ -495,10 +495,9 @@ if (productionConfig.isProduction()) {
 // Keep-alive mechanism for Render deployment with iOS mobile data compatibility
 const setupKeepAlive = () => {
   if (productionConfig.isProduction()) {
-    const keepAliveInterval = 4 * 60 * 1000; // 4 minutes (more frequent)
+    const keepAliveInterval = 5 * 60 * 1000; // 5 minutes in milliseconds
     let consecutiveFailures = 0;
-    const maxFailures = 5; // Allow more failures before warning
-    let lastSuccessfulPing = Date.now();
+    const maxFailures = 3;
 
     setInterval(async () => {
       try {
@@ -506,9 +505,9 @@ const setupKeepAlive = () => {
                    process.env.RAILWAY_STATIC_URL ||
                    `http://localhost:${PORT}`;
 
-        // Use shorter timeout for keep-alive pings (more aggressive)
+        // Use longer timeout for keep-alive pings for iOS mobile data compatibility
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout for mobile data
 
         const response = await fetch(`${url}/api/health`, {
           signal: controller.signal,
@@ -516,9 +515,7 @@ const setupKeepAlive = () => {
             'User-Agent': 'KeepAlive/1.0',
             'X-Keep-Alive': 'true',
             'X-iOS-Compatible': 'true',
-            'Connection': 'close', // Don't keep connection open for keep-alive pings
-            'Cache-Control': 'no-cache',
-            'Accept': 'application/json'
+            'Connection': 'close' // Don't keep connection open for keep-alive pings
           }
         });
 
@@ -527,7 +524,6 @@ const setupKeepAlive = () => {
         if (response.ok) {
           console.log("🔄 Keep-alive ping successful");
           consecutiveFailures = 0; // Reset failure counter
-          lastSuccessfulPing = Date.now();
         } else {
           consecutiveFailures++;
           console.log(
@@ -536,8 +532,6 @@ const setupKeepAlive = () => {
         }
       } catch (error) {
         consecutiveFailures++;
-        const timeSinceLastSuccess = Date.now() - lastSuccessfulPing;
-
         if (error.name === 'AbortError') {
           console.log(`⚠️ Keep-alive ping timeout (failures: ${consecutiveFailures}/${maxFailures}) - likely iOS mobile data issue`);
         } else {
@@ -546,13 +540,13 @@ const setupKeepAlive = () => {
 
         // If too many consecutive failures, log warning but don't crash
         if (consecutiveFailures >= maxFailures) {
-          console.log(`🚨 Keep-alive: ${maxFailures} consecutive failures detected over ${Math.round(timeSinceLastSuccess/1000)}s. This may indicate iOS mobile data connectivity issues.`);
+          console.log(`🚨 Keep-alive: ${maxFailures} consecutive failures detected. This may indicate iOS mobile data connectivity issues.`);
           consecutiveFailures = 0; // Reset to avoid spam
         }
       }
     }, keepAliveInterval);
 
-    console.log("🔄 Keep-alive mechanism started (4 min intervals) with enhanced iOS mobile data compatibility");
+    console.log("🔄 Keep-alive mechanism started (5 min intervals) with iOS mobile data compatibility");
   }
 };
 
@@ -581,10 +575,10 @@ const server = app.listen(PORT, '0.0.0.0', () => {
 });
 
 // Configure server timeouts for iOS mobile data networks
-server.keepAliveTimeout = parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 90000; // 90 seconds for mobile data (reduced)
-server.headersTimeout = (parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 90000) + 5000; // Slightly higher than keepAliveTimeout
-server.requestTimeout = parseInt(process.env.HTTP_TIMEOUT) || 45000; // 45 seconds for individual requests (more aggressive)
-server.timeout = parseInt(process.env.HTTP_TIMEOUT) || 45000; // Overall socket timeout (more aggressive)
+server.keepAliveTimeout = parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 120000; // 120 seconds for mobile data
+server.headersTimeout = (parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 120000) + 5000; // Slightly higher than keepAliveTimeout
+server.requestTimeout = parseInt(process.env.HTTP_TIMEOUT) || 60000; // 60 seconds for individual requests (mobile data friendly)
+server.timeout = parseInt(process.env.HTTP_TIMEOUT) || 60000; // Overall socket timeout
 
 // Log timeout configuration for debugging iOS mobile data issues
 console.log(`⚙️ Server timeouts configured:
