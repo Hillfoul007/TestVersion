@@ -33,25 +33,44 @@ app.use(iosCompatibilityMiddleware);
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, Postman, etc.)
-      if (!origin) return callback(null, true);
+      console.log('🌐 CORS Check - Origin:', origin);
 
-      // Check if origin is in allowed list or matches railway.app pattern
-      if (
-        origin.includes('railway.app') ||
-        origin.includes('laundrify-up.up.railway.app') ||
-        origin.includes('cleancare-pro-api-production-129e.up.railway.app') ||
-        origin.includes('localhost') ||
-        productionConfig.ALLOWED_ORIGINS.includes(origin)
-      ) {
+      // Allow requests with no origin (like mobile apps, Postman, etc.)
+      if (!origin) {
+        console.log('✅ CORS: No origin - allowing');
+        return callback(null, true);
+      }
+
+      // Specific Railway.app origins
+      const allowedOrigins = [
+        'https://laundrify-up.up.railway.app',
+        'https://cleancare-pro-api-production-129e.up.railway.app',
+        'http://localhost:10000',
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'https://testversion-ro8s.onrender.com',
+        ...productionConfig.ALLOWED_ORIGINS
+      ];
+
+      // Check exact match first
+      if (allowedOrigins.includes(origin)) {
+        console.log('✅ CORS: Origin allowed -', origin);
+        return callback(null, true);
+      }
+
+      // Check Railway.app pattern as fallback
+      if (origin.includes('railway.app') || origin.includes('localhost')) {
+        console.log('✅ CORS: Railway/localhost pattern allowed -', origin);
         return callback(null, true);
       }
 
       // In development, allow all origins
       if (productionConfig.isDevelopment()) {
+        console.log('✅ CORS: Development mode - allowing all');
         return callback(null, true);
       }
 
+      console.log('❌ CORS: Origin not allowed -', origin);
       return callback(new Error('Not allowed by CORS'), false);
     },
     credentials: true, // Enable credentials for iOS
