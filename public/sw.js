@@ -60,80 +60,128 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Fetch event
+// Fetch event - Enhanced for Safari cache management
 self.addEventListener("fetch", (event) => {
-  // Skip chrome-extension requests and other non-http requests
+  // Skip chrome-extension and non-HTTP requests
   if (!event.request.url.startsWith("http")) {
     return;
   }
 
-  // Don't interfere with API requests at all - let them pass through normally
+  // Safari-specific: Force fresh requests for API calls to prevent cache issues
   if (
     event.request.url.includes("/api/") ||
-    event.request.url.includes("railway.app") ||
-    event.request.url.includes("onrender.com") ||
+    event.request.url.includes("railway.app/api") ||
+    event.request.url.includes("onrender.com/api") ||
     event.request.url.includes("localhost:3001") ||
-    event.request.url.includes("laundrify") ||
     event.request.method !== "GET"
   ) {
-    // Let these requests pass through without any service worker intervention
+    // For Safari: Always bypass cache for API requests
+    event.respondWith(
+      fetch(event.request, {
+        cache: 'no-cache',
+        headers: {
+          ...event.request.headers,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      }).catch((error) => {
+        console.error('API fetch failed:', error);
+        return new Response(JSON.stringify({
+          error: 'Network request failed',
+          message: 'Please check your connection and try again'
+        }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      })
+    );
     return;
   }
 
-  // Handle static assets with caching
+  // Handle static assets with careful caching
   if (
     event.request.url.includes("/assets/") ||
     event.request.url.includes("/static/") ||
     event.request.url.match(/\.(js|css|png|jpg|jpeg|svg|ico|woff|woff2)$/)
   ) {
     event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        return fetch(event.request)
-          .then((response) => {
-            // Cache successful responses for static assets
-            if (response.status === 200) {
-              const responseClone = response.clone();
-              caches.open(STATIC_CACHE).then((cache) => {
-                cache.put(event.request, responseClone);
-              });
-            }
-            return response;
-          })
-          .catch(() => {
-            return new Response("Asset not available offline", {
-              status: 503,
-              statusText: "Service Unavailable",
+      fetch(event.request, { cache: 'default' })
+        .then((response) => {
+          // Only cache successful responses
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(STATIC_CACHE).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Fallback to cache if network fails
+          return caches.match(event.request).then((cachedResponse) => {
+            return cachedResponse || new Response("Asset not available", {
+              status: 404,
+              statusText: "Not Found",
             });
           });
-      }),
+        })
     );
     return;
   }
 
-  // Handle regular navigation requests
+  // Handle navigation requests with Safari-specific fallbacks
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Return cached version or fetch from network
-      return (
-        response ||
-        fetch(event.request).catch(() => {
-          // Return cached index.html for SPA routing
-          return caches.match("/").then((indexResponse) => {
-            return (
-              indexResponse ||
-              new Response("Page not available offline", {
-                status: 503,
-                statusText: "Service Unavailable",
-              })
-            );
+    fetch(event.request, {
+      cache: 'default',
+      credentials: 'same-origin'
+    })
+      .then((response) => {
+        // Cache successful HTML responses
+        if (response.status === 200 && response.headers.get('content-type')?.includes('text/html')) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
           });
-        })
-      );
-    }),
+        }
+        return response;
+      })
+      .catch(() => {
+        // Fallback to index.html for SPA routing
+        return caches.match("/").then((indexResponse) => {
+          if (indexResponse) {
+            return indexResponse;
+          }
+          // If no cached index, return a basic fallback
+          return new Response(`
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <title>Laundrify</title>
+              </head>
+              <body>
+                <div id="root">
+                  <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif;">
+                    <div style="text-align: center;">
+                      <h1>Laundrify</h1>
+                      <p>Loading... Please refresh if this takes too long.</p>
+                    </div>
+                  </div>
+                </div>
+                <script>
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 3000);
+                </script>
+              </body>
+            </html>
+          `, {
+            status: 200,
+            headers: { 'Content-Type': 'text/html' }
+          });
+        });
+      })
   );
 });
 
