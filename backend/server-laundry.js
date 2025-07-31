@@ -25,6 +25,10 @@ try {
 const app = express();
 const PORT = process.env.PORT || productionConfig.PORT || 3001;
 
+// iOS compatibility middleware - MUST be first for mobile data networks
+const iosCompatibilityMiddleware = require('./middleware/iosCompatibility');
+app.use(iosCompatibilityMiddleware);
+
 // Security middleware
 app.use(
   helmet({
@@ -106,24 +110,46 @@ app.use("/api/auth", (req, res, next) => {
   next();
 });
 
-// CORS configuration - Enhanced for iOS Safari compatibility
+// CORS configuration - Enhanced for iOS Safari compatibility on mobile data
 app.use(
   cors({
-    origin: productionConfig.ALLOWED_ORIGINS,
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      if (productionConfig.ALLOWED_ORIGINS.indexOf(origin) !== -1) {
+        return callback(null, true);
+      }
+
+      // Special handling for iOS Safari on mobile data - Railway subdomain variations
+      if (origin && (
+        origin.includes('railway.app') ||
+        origin.includes('laundrify-up.up.railway.app') ||
+        origin.includes('localhost')
+      )) {
+        return callback(null, true);
+      }
+
+      return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true, // Enable credentials for iOS
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",
       "Accept",
       "user-id",
-      "Cache-Control", // Add Cache-Control header support
+      "Cache-Control",
       "Pragma",
       "Expires",
+      "X-Requested-With",
+      "Origin",
+      "X-iOS-Compatible"
     ],
-    exposedHeaders: ["Clear-Site-Data"], // Expose clear site data header
-    optionsSuccessStatus: 200, // Support legacy browsers
+    exposedHeaders: ["Clear-Site-Data", "X-iOS-Compatible"],
+    optionsSuccessStatus: 200, // Support legacy browsers and iOS
     preflightContinue: false,
+    maxAge: 86400 // 24 hours cache for preflight requests
   }),
 );
 
@@ -444,7 +470,7 @@ const setupKeepAlive = () => {
   }
 };
 
-// Start server with error handling
+// Start server with error handling - explicit IPv4 binding for iOS mobile data compatibility
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 CleanCare Pro server running on port ${PORT}`);
   console.log(`📱 Environment: ${productionConfig.NODE_ENV}`);
