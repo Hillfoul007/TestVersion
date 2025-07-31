@@ -13,13 +13,29 @@ const urlsToCache = [
   "/icons/icon-512x512.png",
 ];
 
-// Install service worker
+// Install service worker with iOS mobile data considerations
 self.addEventListener("install", (event) => {
   console.log("Service Worker: Installing v4...");
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log("Service Worker: Caching app shell");
-      return cache.addAll(urlsToCache);
+      // For iOS mobile data, cache with longer timeout
+      const cachePromises = urlsToCache.map(url => {
+        const fetchOptions = {
+          signal: AbortSignal.timeout(30000) // 30 second timeout during install
+        };
+        return fetch(url, fetchOptions)
+          .then(response => {
+            if (response.ok) {
+              return cache.put(url, response);
+            }
+            console.warn('Failed to cache:', url, response.status);
+          })
+          .catch(error => {
+            console.warn('Error caching:', url, error.message);
+          });
+      });
+      return Promise.allSettled(cachePromises);
     }),
   );
   self.skipWaiting(); // Force the waiting service worker to become active
@@ -52,27 +68,40 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Fetch event
+// iOS Mobile Data Detection
+const isIOSMobileData = () => {
+  const userAgent = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const isMobileData = connection && (connection.type === 'cellular' || connection.effectiveType === '2g' || connection.effectiveType === '3g');
+  return isIOS && isMobileData;
+};
+
+// Fetch event with iOS mobile data optimizations
 self.addEventListener("fetch", (event) => {
   // Skip chrome-extension requests and other non-http requests
   if (!event.request.url.startsWith("http")) {
     return;
   }
 
-  // Don't interfere with API requests at all - let them pass through normally
+  // For iOS mobile data, let ALL API requests pass through without caching to avoid timeout issues
   if (
     event.request.url.includes("/api/") ||
     event.request.url.includes("railway.app") ||
     event.request.url.includes("onrender.com") ||
     event.request.url.includes("localhost:3001") ||
     event.request.url.includes("laundrify") ||
-    event.request.method !== "GET"
+    event.request.method !== "GET" ||
+    isIOSMobileData() // Skip service worker for iOS mobile data to prevent timeout conflicts
   ) {
     // Let these requests pass through without any service worker intervention
+    if (isIOSMobileData()) {
+      console.log('🍎 iOS mobile data detected - bypassing service worker for:', event.request.url);
+    }
     return;
   }
 
-  // Handle static assets with caching
+  // Handle static assets with caching - but with iOS mobile data timeout handling
   if (
     event.request.url.includes("/assets/") ||
     event.request.url.includes("/static/") ||
@@ -84,10 +113,15 @@ self.addEventListener("fetch", (event) => {
           return cachedResponse;
         }
 
-        return fetch(event.request)
+        // For iOS mobile data, use longer timeout and avoid aggressive caching
+        const fetchOptions = isIOSMobileData() ? {
+          signal: AbortSignal.timeout(60000) // 60 second timeout for iOS mobile data
+        } : {};
+
+        return fetch(event.request, fetchOptions)
           .then((response) => {
             // Cache successful responses for static assets
-            if (response.status === 200) {
+            if (response.status === 200 && !isIOSMobileData()) {
               const responseClone = response.clone();
               caches.open(STATIC_CACHE).then((cache) => {
                 cache.put(event.request, responseClone);
@@ -95,7 +129,10 @@ self.addEventListener("fetch", (event) => {
             }
             return response;
           })
-          .catch(() => {
+          .catch((error) => {
+            if (isIOSMobileData()) {
+              console.log('🍎 iOS mobile data asset fetch timeout:', event.request.url);
+            }
             return new Response("Asset not available offline", {
               status: 503,
               statusText: "Service Unavailable",
@@ -106,15 +143,36 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Handle regular navigation requests
+  // Handle regular navigation requests with iOS mobile data optimizations
   event.respondWith(
     caches.match(event.request).then((response) => {
       // Return cached version or fetch from network
-      return (
-        response ||
-        fetch(event.request).catch(() => {
-          // Return cached index.html for SPA routing
-          return caches.match("/").then((indexResponse) => {
+      if (response && !isIOSMobileData()) {
+        return response;
+      }
+
+      // For iOS mobile data, always try network first with longer timeout
+      const fetchOptions = isIOSMobileData() ? {
+        signal: AbortSignal.timeout(60000) // 60 second timeout for iOS mobile data
+      } : {};
+
+      return fetch(event.request, fetchOptions)
+        .then((networkResponse) => {
+          // Cache for non-iOS mobile data users
+          if (networkResponse.ok && !isIOSMobileData()) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+          }
+          return networkResponse;
+        })
+        .catch((error) => {
+          if (isIOSMobileData()) {
+            console.log('🍎 iOS mobile data navigation timeout:', event.request.url);
+          }
+          // Fallback to cached version or index.html for SPA routing
+          return response || caches.match("/").then((indexResponse) => {
             return (
               indexResponse ||
               new Response("Page not available offline", {
@@ -123,8 +181,7 @@ self.addEventListener("fetch", (event) => {
               })
             );
           });
-        })
-      );
+        });
     }),
   );
 });

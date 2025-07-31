@@ -505,9 +505,9 @@ const setupKeepAlive = () => {
                    process.env.RAILWAY_STATIC_URL ||
                    `http://localhost:${PORT}`;
 
-        // Use shorter timeout for keep-alive pings to avoid iOS mobile data issues
+        // Use longer timeout for keep-alive pings for iOS mobile data compatibility
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout for mobile data
 
         const response = await fetch(`${url}/api/health`, {
           signal: controller.signal,
@@ -575,10 +575,10 @@ const server = app.listen(PORT, '0.0.0.0', () => {
 });
 
 // Configure server timeouts for iOS mobile data networks
-server.keepAliveTimeout = parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 65000; // 65 seconds (AWS ALB timeout is 60s)
-server.headersTimeout = (parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 65000) + 1000; // Slightly higher than keepAliveTimeout
-server.requestTimeout = parseInt(process.env.HTTP_TIMEOUT) || 30000; // 30 seconds for individual requests
-server.timeout = parseInt(process.env.HTTP_TIMEOUT) || 30000; // Overall socket timeout
+server.keepAliveTimeout = parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 120000; // 120 seconds for mobile data
+server.headersTimeout = (parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 120000) + 5000; // Slightly higher than keepAliveTimeout
+server.requestTimeout = parseInt(process.env.HTTP_TIMEOUT) || 60000; // 60 seconds for individual requests (mobile data friendly)
+server.timeout = parseInt(process.env.HTTP_TIMEOUT) || 60000; // Overall socket timeout
 
 // Log timeout configuration for debugging iOS mobile data issues
 console.log(`⚙️ Server timeouts configured:
@@ -588,10 +588,28 @@ console.log(`⚙️ Server timeouts configured:
   timeout: ${server.timeout}ms
   iOS Compatibility Mode: ${process.env.IOS_COMPATIBILITY_MODE || 'false'}`);
 
-// Handle server timeout events
+// Handle server timeout events with graceful handling for iOS mobile data
 server.on('timeout', (socket) => {
   console.log('⚠️ Server timeout event triggered for iOS mobile data request');
-  socket.destroy();
+
+  // More graceful timeout handling to prevent blank screens
+  if (socket.writable && !socket.destroyed) {
+    try {
+      // Send a proper HTTP response instead of destroying socket immediately
+      socket.write('HTTP/1.1 408 Request Timeout\r\n');
+      socket.write('Connection: close\r\n');
+      socket.write('Content-Type: application/json\r\n');
+      socket.write('Access-Control-Allow-Origin: *\r\n');
+      socket.write('\r\n');
+      socket.write(JSON.stringify({ error: 'Request timeout', code: 408, message: 'Request took too long - this may be due to mobile data connectivity' }));
+      socket.end();
+    } catch (error) {
+      console.log('⚠️ Error during graceful timeout handling:', error.message);
+      socket.destroy();
+    }
+  } else {
+    socket.destroy();
+  }
 });
 
 server.on('clientError', (err, socket) => {
@@ -602,7 +620,8 @@ server.on('clientError', (err, socket) => {
     socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
   }
 });
-server.timeout = 30000; // Overall socket timeout
+// Overall socket timeout already set above - removed duplicate
+// server.timeout = 60000; // This is now set above with mobile data friendly values
 
 console.log('🍎 iOS mobile data compatibility: Enhanced timeouts and IPv4 preference enabled');
 
