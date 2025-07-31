@@ -106,15 +106,23 @@ app.use("/api/auth", authLimiter);
 app.use("/api", (req, res, next) => {
   // Add explicit CORS headers for API routes
   const origin = req.headers.origin;
+  console.log(`🔍 API CORS middleware - Origin: ${origin}`);
+
   if (origin && (
     origin.includes('railway.app') ||
     origin.includes('laundrify-up.up.railway.app') ||
     origin.includes('localhost') ||
+    origin.includes('127.0.0.1') ||
     productionConfig.ALLOWED_ORIGINS.includes(origin)
   )) {
+    console.log(`✅ API CORS: Allowing origin ${origin}`);
     res.setHeader('Access-Control-Allow-Origin', origin);
   } else if (!origin) {
+    console.log('✅ API CORS: Allowing request with no origin');
     res.setHeader('Access-Control-Allow-Origin', '*');
+  } else {
+    console.log(`⚠️ API CORS: Origin ${origin} not explicitly allowed but setting anyway`);
+    res.setHeader('Access-Control-Allow-Origin', origin);
   }
 
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -125,6 +133,7 @@ app.use("/api", (req, res, next) => {
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Max-Age', '86400');
+    console.log(`✅ API CORS: Handling OPTIONS preflight for ${origin}`);
     return res.status(200).end();
   }
 
