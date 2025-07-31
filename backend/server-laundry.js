@@ -171,6 +171,7 @@ app.use(
         origin.includes('railway.app') ||
         origin.includes('railway.com') ||
         origin.includes('laundrify-up.up.railway.app') ||
+        origin.includes('cleancare-pro-frontend-testversion-pr-81.up.railway.app') ||
         origin.includes('cleancare-pro-api-production-129e.up.railway.app') ||
         origin.includes('localhost') ||
         origin.includes('127.0.0.1')
@@ -246,7 +247,7 @@ try {
 
 try {
   bookingRoutes = require("./routes/bookings");
-  console.log("✅ Booking routes loaded");
+  console.log("�� Booking routes loaded");
 } catch (error) {
   console.error("❌ Failed to load Booking routes:", error.message);
 }
