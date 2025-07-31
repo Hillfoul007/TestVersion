@@ -29,6 +29,52 @@ const PORT = process.env.PORT || productionConfig.PORT || 3001;
 const iosCompatibilityMiddleware = require('./middleware/iosCompatibility');
 app.use(iosCompatibilityMiddleware);
 
+// CORS configuration - Must be early in middleware chain
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+
+      // Check if origin is in allowed list or matches railway.app pattern
+      if (
+        origin.includes('railway.app') ||
+        origin.includes('laundrify-up.up.railway.app') ||
+        origin.includes('cleancare-pro-api-production-129e.up.railway.app') ||
+        origin.includes('localhost') ||
+        productionConfig.ALLOWED_ORIGINS.includes(origin)
+      ) {
+        return callback(null, true);
+      }
+
+      // In development, allow all origins
+      if (productionConfig.isDevelopment()) {
+        return callback(null, true);
+      }
+
+      return callback(new Error('Not allowed by CORS'), false);
+    },
+    credentials: true, // Enable credentials for iOS
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Accept",
+      "user-id",
+      "Cache-Control",
+      "Pragma",
+      "Expires",
+      "X-Requested-With",
+      "Origin",
+      "X-iOS-Compatible"
+    ],
+    exposedHeaders: ["Clear-Site-Data", "X-iOS-Compatible"],
+    optionsSuccessStatus: 200, // Support legacy browsers and iOS
+    preflightContinue: false,
+    maxAge: 86400 // 24 hours cache for preflight requests
+  }),
+);
+
 // Security middleware
 app.use(
   helmet({
@@ -102,67 +148,13 @@ if (productionConfig.isProduction()) {
 }
 app.use("/api/auth", authLimiter);
 
-// Middleware to add cache control headers for iOS and explicit CORS headers
-app.use("/api", (req, res, next) => {
-  // Add explicit CORS headers for API routes
-  const origin = req.headers.origin;
-  if (origin && (
-    origin.includes('railway.app') ||
-    origin.includes('laundrify-up.up.railway.app') ||
-    origin.includes('localhost') ||
-    productionConfig.ALLOWED_ORIGINS.includes(origin)
-  )) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else if (!origin) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
-
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, user-id, Cache-Control, Pragma, Expires, X-Requested-With, Origin, X-iOS-Compatible');
-  res.setHeader('Access-Control-Expose-Headers', 'Clear-Site-Data, X-iOS-Compatible');
-
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Max-Age', '86400');
-    return res.status(200).end();
-  }
-
-  next();
-});
-
+// Middleware for iOS cache control headers
 app.use("/api/auth", (req, res, next) => {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
   next();
 });
-
-// CORS configuration - Allow all origins for development
-app.use(
-  cors({
-    origin: true, // Allow all origins
-    credentials: true, // Enable credentials for iOS
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "Accept",
-      "user-id",
-      "Cache-Control",
-      "Pragma",
-      "Expires",
-      "X-Requested-With",
-      "Origin",
-      "X-iOS-Compatible",
-      "Access-Control-Allow-Origin"
-    ],
-    exposedHeaders: ["Clear-Site-Data", "X-iOS-Compatible"],
-    optionsSuccessStatus: 200, // Support legacy browsers and iOS
-    preflightContinue: false,
-    maxAge: 86400 // 24 hours cache for preflight requests
-  }),
-);
 
 
 // Body parsing middleware
