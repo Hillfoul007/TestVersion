@@ -33,44 +33,25 @@ app.use(iosCompatibilityMiddleware);
 app.use(
   cors({
     origin: (origin, callback) => {
-      console.log('🌐 CORS Check - Origin:', origin);
-
       // Allow requests with no origin (like mobile apps, Postman, etc.)
-      if (!origin) {
-        console.log('✅ CORS: No origin - allowing');
-        return callback(null, true);
-      }
+      if (!origin) return callback(null, true);
 
-      // Specific Railway.app origins
-      const allowedOrigins = [
-        'https://laundrify-up.up.railway.app',
-        'https://cleancare-pro-api-production-129e.up.railway.app',
-        'http://localhost:10000',
-        'http://localhost:5173',
-        'http://localhost:3000',
-        'https://testversion-ro8s.onrender.com',
-        ...productionConfig.ALLOWED_ORIGINS
-      ];
-
-      // Check exact match first
-      if (allowedOrigins.includes(origin)) {
-        console.log('✅ CORS: Origin allowed -', origin);
-        return callback(null, true);
-      }
-
-      // Check Railway.app pattern as fallback
-      if (origin.includes('railway.app') || origin.includes('localhost')) {
-        console.log('✅ CORS: Railway/localhost pattern allowed -', origin);
+      // Check if origin is in allowed list or matches railway.app pattern
+      if (
+        origin.includes('railway.app') ||
+        origin.includes('laundrify-up.up.railway.app') ||
+        origin.includes('cleancare-pro-api-production-129e.up.railway.app') ||
+        origin.includes('localhost') ||
+        productionConfig.ALLOWED_ORIGINS.includes(origin)
+      ) {
         return callback(null, true);
       }
 
       // In development, allow all origins
       if (productionConfig.isDevelopment()) {
-        console.log('✅ CORS: Development mode - allowing all');
         return callback(null, true);
       }
 
-      console.log('❌ CORS: Origin not allowed -', origin);
       return callback(new Error('Not allowed by CORS'), false);
     },
     credentials: true, // Enable credentials for iOS
@@ -228,17 +209,6 @@ try {
   console.error("❌ Failed to load Location routes:", error.message);
 }
 
-// Handle preflight requests explicitly
-app.options('*', (req, res) => {
-  console.log('🔍 CORS Preflight request for:', req.path, 'from:', req.get('Origin'));
-  res.header('Access-Control-Allow-Origin', req.get('Origin') || '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, user-id, Cache-Control, Pragma, Expires, X-Requested-With, Origin, X-iOS-Compatible');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Max-Age', '86400');
-  res.sendStatus(200);
-});
-
 // Serve static frontend files in production
 if (productionConfig.isProduction()) {
   const frontendPath = path.join(__dirname, "../dist");
@@ -254,7 +224,7 @@ if (otpAuthRoutes) {
 
 if (bookingRoutes) {
   app.use("/api/bookings", bookingRoutes);
-  console.log("��� Booking routes registered at /api/bookings");
+  console.log("🔗 Booking routes registered at /api/bookings");
 }
 
 if (locationRoutes) {
