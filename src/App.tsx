@@ -37,6 +37,26 @@ function App() {
       // Initialize PWA updates and service worker cleanup
       initializePWAUpdates();
 
+      // Initialize iOS blank page prevention (must be early)
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                   (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+      if (isIOS) {
+        console.log('🍎 Initializing iOS blank page prevention...');
+        IosBlankPageManager.getInstance();
+
+        // Handle recovery from previous blank page
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('ios_recovery') === 'blank_page') {
+          console.log('🍎✅ Recovered from blank page, removing recovery parameters');
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+
+          // Reset recovery attempt counter on successful recovery
+          localStorage.removeItem('ios_recovery_attempt');
+        }
+      }
+
       // Check iOS mobile data connectivity before auth restoration
       if (isIOSSafari() && isProbablyMobileData()) {
         console.log('🍎 iOS Safari on mobile data detected - performing connectivity check...');
