@@ -495,9 +495,33 @@ const server = app.listen(PORT, '0.0.0.0', () => {
 });
 
 // Configure server timeouts for iOS mobile data networks
-server.keepAliveTimeout = 65000; // 65 seconds (AWS ALB timeout is 60s)
-server.headersTimeout = 66000; // Slightly higher than keepAliveTimeout
-server.requestTimeout = 30000; // 30 seconds for individual requests
+server.keepAliveTimeout = parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 65000; // 65 seconds (AWS ALB timeout is 60s)
+server.headersTimeout = (parseInt(process.env.KEEP_ALIVE_TIMEOUT) || 65000) + 1000; // Slightly higher than keepAliveTimeout
+server.requestTimeout = parseInt(process.env.HTTP_TIMEOUT) || 30000; // 30 seconds for individual requests
+server.timeout = parseInt(process.env.HTTP_TIMEOUT) || 30000; // Overall socket timeout
+
+// Log timeout configuration for debugging iOS mobile data issues
+console.log(`⚙️ Server timeouts configured:
+  keepAliveTimeout: ${server.keepAliveTimeout}ms
+  headersTimeout: ${server.headersTimeout}ms
+  requestTimeout: ${server.requestTimeout}ms
+  timeout: ${server.timeout}ms
+  iOS Compatibility Mode: ${process.env.IOS_COMPATIBILITY_MODE || 'false'}`);
+
+// Handle server timeout events
+server.on('timeout', (socket) => {
+  console.log('⚠️ Server timeout event triggered for iOS mobile data request');
+  socket.destroy();
+});
+
+server.on('clientError', (err, socket) => {
+  if (err.code === 'ECONNRESET' || err.code === 'HPE_HEADER_OVERFLOW') {
+    console.log('⚠️ Client error (likely iOS mobile data):', err.code);
+  }
+  if (socket.writable) {
+    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+  }
+});
 server.timeout = 30000; // Overall socket timeout
 
 console.log('🍎 iOS mobile data compatibility: Enhanced timeouts and IPv4 preference enabled');
