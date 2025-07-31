@@ -45,6 +45,11 @@ export const PRODUCTION_CONFIG = {
     VIRTUAL_SCROLLING: false, // For large lists
     DEBOUNCE_SEARCH: 300, // ms
     API_TIMEOUT: 30000, // 30 seconds
+    // iOS mobile data compatibility
+    IOS_NETWORK_TIMEOUT: 30000, // 30 seconds for iOS mobile networks
+    IOS_RETRY_ATTEMPTS: 3,
+    IOS_RETRY_DELAY: 2000, // 2 seconds between retries
+    CONNECTION_TIMEOUT: 15000, // 15 seconds connection timeout
   },
 
   // Security Settings
