@@ -133,20 +133,60 @@ export class CouponService {
   }
 
   /**
-   * Validate a coupon for a specific user
+   * Validate a coupon for a specific user using backend API
    */
-  validateCoupon(
-    couponCode: string, 
-    userId: string, 
+  async validateCoupon(
+    couponCode: string,
+    userId: string,
     orderAmount: number = 0
-  ): { valid: boolean; coupon?: CouponData; error?: string } {
+  ): Promise<{ valid: boolean; coupon?: CouponData; error?: string }> {
     if (!couponCode || !userId) {
       return { valid: false, error: "Invalid input" };
     }
 
+    try {
+      const response = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          couponCode,
+          userId,
+          orderAmount,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return { valid: false, error: result.message || 'Coupon validation failed' };
+      }
+
+      return {
+        valid: result.success,
+        coupon: result.coupon,
+        error: result.success ? undefined : result.message
+      };
+    } catch (error) {
+      console.error('❌ Error validating coupon:', error);
+
+      // Fallback to local validation if backend is unavailable
+      return this.validateCouponLocal(couponCode, userId, orderAmount);
+    }
+  }
+
+  /**
+   * Local fallback validation method
+   */
+  private validateCouponLocal(
+    couponCode: string,
+    userId: string,
+    orderAmount: number = 0
+  ): { valid: boolean; coupon?: CouponData; error?: string } {
     const coupons = this.getAllCoupons();
     const coupon = coupons.find(c => c.code.toLowerCase() === couponCode.toLowerCase());
-    
+
     if (!coupon) {
       return { valid: false, error: `Invalid coupon code: ${couponCode}` };
     }
@@ -168,16 +208,16 @@ export class CouponService {
       return { valid: false, error: "This coupon is valid for first orders only" };
     }
 
-    // Check exclude first order restrictions  
+    // Check exclude first order restrictions
     if (coupon.excludeFirstOrder && isFirstTime) {
       return { valid: false, error: "This coupon is not valid for first orders" };
     }
 
     // Check minimum amount if specified
     if (coupon.minimumAmount && orderAmount < coupon.minimumAmount) {
-      return { 
-        valid: false, 
-        error: `Minimum order amount of ₹${coupon.minimumAmount} required` 
+      return {
+        valid: false,
+        error: `Minimum order amount of ₹${coupon.minimumAmount} required`
       };
     }
 
