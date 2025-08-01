@@ -1333,16 +1333,12 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
     // Clear form fields first to ensure fresh autofill
     console.log("🧹 Clearing form fields before autofill");
-    setFlatNo("");
-    setStreet("");
-    setArea("");
-    setPincode("");
-
-    // Force a re-render by using functional state updates
-    setFlatNo(() => "");
-    setStreet(() => "");
-    setArea(() => "");
-    setPincode(() => "");
+    await forceStateUpdate({
+      flatNo: "",
+      street: "",
+      area: "",
+      pincode: ""
+    });
 
     // Check if this is a fallback suggestion that doesn't need Google Maps API
     if (!suggestion.place_id ||
