@@ -62,17 +62,28 @@ const GoogleMapsNavigation: React.FC<GoogleMapsNavigationProps> = ({
   // Initialize map
   useEffect(() => {
     if (isGoogleMapsLoaded && mapRef.current && !map) {
-      const mapInstance = new window.google.maps.Map(mapRef.current, {
+      // Check if Map ID is configured
+      const mapId = process.env.VITE_GOOGLE_MAPS_MAP_ID;
+      const mapConfig: any = {
         zoom: 13,
         center: destination,
-        styles: [
+      };
+
+      // Only apply custom styles when Map ID is NOT present
+      if (!mapId || mapId.trim() === "") {
+        mapConfig.styles = [
           {
             featureType: "poi",
             elementType: "labels",
             stylers: [{ visibility: "off" }],
           },
-        ],
-      });
+        ];
+      } else {
+        mapConfig.mapId = mapId;
+        console.log("🗺️ Navigation using Map ID:", mapId);
+      }
+
+      const mapInstance = new window.google.maps.Map(mapRef.current, mapConfig);
 
       const directionsServiceInstance =
         new window.google.maps.DirectionsService();
