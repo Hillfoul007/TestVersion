@@ -1552,13 +1552,11 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
         updateMapLocation(coordinates);
 
-        // Use enhanced autofill method
-        setTimeout(async () => {
-          console.log("🏠 Enhanced autofilling for Google Places result:", place.formatted_address || suggestion.description);
-          await enhancedAutoFillFields(
-            place.formatted_address || suggestion.description,
-          );
-        }, 50);
+        // Use simple autofill with small delay
+        setTimeout(() => {
+          console.log("🏠 Simple autofilling for Google Places result:", place.formatted_address || suggestion.description);
+          simpleAutoFill(place.formatted_address || suggestion.description);
+        }, 100);
       } else {
         console.log("🗺️ No place geometry found, using fallback");
         throw new Error("No place geometry found");
