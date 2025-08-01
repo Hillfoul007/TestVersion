@@ -1105,8 +1105,18 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       setArea(areaParts.join(", "));
 
       console.log("🛣️ Street name:", cleanParts[0]);
-      console.log("��️ Extended area:", areaParts.join(", "));
+      console.log("🏘️ Extended area:", areaParts.join(", "));
     }
+
+    // Log final state after autofill attempts
+    setTimeout(() => {
+      console.log("📋 Final field states after autofill:", {
+        flatNo,
+        street,
+        area,
+        pincode
+      });
+    }, 50);
   };
 
   const handleSearch = async (query: string) => {
