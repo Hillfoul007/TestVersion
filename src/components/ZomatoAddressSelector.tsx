@@ -85,7 +85,10 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
 
       // Use AddressService for better error handling
       const addressService = AddressService.getInstance();
+
+      console.log("📡 Calling getUserAddresses...");
       const result = await addressService.getUserAddresses();
+      console.log("📋 getUserAddresses result:", result);
 
       if (result.success && result.data) {
         console.log(`✅ Loaded ${result.data.length} addresses:`, result.data);
