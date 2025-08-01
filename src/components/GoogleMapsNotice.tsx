@@ -6,24 +6,32 @@ interface GoogleMapsNoticeProps {
 }
 
 const GoogleMapsNotice: React.FC<GoogleMapsNoticeProps> = ({ className = "" }) => {
-  const isGoogleMapsConfigured = Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY?.trim());
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY?.trim();
+  const isGoogleMapsConfigured = Boolean(apiKey && apiKey !== 'your-google-maps-api-key-here');
 
   if (isGoogleMapsConfigured) {
     return null; // Don't show notice if Google Maps is properly configured
   }
 
   return (
-    <div className={`bg-amber-50 border border-amber-200 rounded-lg p-3 ${className}`}>
-      <div className="flex items-start gap-2">
-        <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+    <div className={`bg-red-50 border border-red-200 rounded-lg p-4 ${className}`}>
+      <div className="flex items-start gap-3">
+        <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
-          <p className="text-sm text-amber-800">
-            <span className="font-medium">Limited search functionality:</span> Google Maps API not configured. 
-            Address search is using fallback suggestions.
+          <h3 className="text-sm font-semibold text-red-800 mb-2">
+            Google Maps API Key Required
+          </h3>
+          <p className="text-sm text-red-700 mb-3">
+            Please configure your Google Maps API key to enable full address search functionality.
           </p>
-          <div className="flex items-center gap-1 mt-1 text-xs text-amber-700">
+          <div className="bg-red-100 rounded p-2 mb-2">
+            <p className="text-xs font-mono text-red-800">
+              Set: VITE_GOOGLE_MAPS_API_KEY=your_actual_api_key
+            </p>
+          </div>
+          <div className="flex items-center gap-1 text-xs text-red-600">
             <MapPin className="h-3 w-3" />
-            <span>You can still add addresses manually</span>
+            <span>Limited to manual address entry only</span>
           </div>
         </div>
       </div>
