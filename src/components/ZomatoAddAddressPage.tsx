@@ -208,7 +208,17 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         streetViewControl: false,
         fullscreenControl: false,
         gestureHandling: "cooperative", // Better mobile performance
-        styles: [
+      };
+
+      // Only add Map ID if it's configured
+      if (mapId && mapId.trim() !== "") {
+        mapConfig.mapId = mapId;
+        console.log("🗺️ Using Map ID for Advanced Markers:", mapId);
+        console.log("🎨 Map styles will be controlled via Google Cloud Console when using Map ID");
+      } else {
+        console.log("🗺️ No Map ID configured, using regular markers with custom styles");
+        // Only apply custom styles when Map ID is NOT present
+        mapConfig.styles = [
           {
             featureType: "poi",
             elementType: "labels",
@@ -219,15 +229,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
             elementType: "labels",
             stylers: [{ visibility: "off" }], // Hide transit labels for cleaner view
           },
-        ],
-      };
-
-      // Only add Map ID if it's configured
-      if (mapId && mapId.trim() !== "") {
-        mapConfig.mapId = mapId;
-        console.log("🗺️ Using Map ID for Advanced Markers:", mapId);
-      } else {
-        console.log("🗺️ No Map ID configured, using regular markers");
+        ];
       }
 
       const map = new google.maps.Map(mapRef.current!, mapConfig);
