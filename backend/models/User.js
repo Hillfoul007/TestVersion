@@ -145,6 +145,27 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    // Coupon tracking fields
+    used_coupons: [{
+      type: String,
+      uppercase: true,
+    }],
+    coupon_usage_history: [{
+      code: {
+        type: String,
+        uppercase: true,
+      },
+      usedAt: {
+        type: Date,
+        default: Date.now,
+      },
+      bookingId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Booking",
+      },
+      orderAmount: Number,
+      discountAmount: Number,
+    }],
   },
   {
     timestamps: true,
