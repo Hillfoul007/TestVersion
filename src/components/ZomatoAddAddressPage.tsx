@@ -182,28 +182,36 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       const loader = new Loader({
         apiKey,
         version: "weekly",
-        libraries: ["places", "geometry", "marker"], // Include marker library for AdvancedMarkerElement
+        libraries: ["places", "geometry"], // Removed marker library for faster loading
+        region: "IN", // Optimize for India
+        language: "en",
       });
 
       const google = await loader.load();
 
-      // Default to India center
-      const defaultCenter = { lat: 20.5937, lng: 78.9629 };
+      // Default to Sector 69, Gurugram (pincode 122101 area) for faster loading
+      const defaultCenter = { lat: 28.3960, lng: 77.0370 };
 
       // Check if Map ID is configured for Advanced Markers
       const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
 
       const mapConfig: any = {
         center: defaultCenter,
-        zoom: 5,
+        zoom: 14, // Higher zoom for better locality view
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,
+        gestureHandling: "cooperative", // Better mobile performance
         styles: [
           {
             featureType: "poi",
             elementType: "labels",
-            stylers: [{ visibility: "off" }],
+            stylers: [{ visibility: "simplified" }], // Show some POIs for reference
+          },
+          {
+            featureType: "transit",
+            elementType: "labels",
+            stylers: [{ visibility: "off" }], // Hide transit labels for cleaner view
           },
         ],
       };
