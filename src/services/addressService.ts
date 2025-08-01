@@ -306,18 +306,22 @@ export class AddressService {
 
       console.log("💾 Saving address:", addressData);
 
+      // Get current user for contact details
+      const currentUser = getCurrentUser();
+
       // Prepare data for backend
       const backendData = {
         title: addressData.label || addressData.type,
         full_address: addressData.fullAddress,
         area: addressData.street || addressData.village,
         city: addressData.city || addressData.village,
-        state: "India", // Default state
+        state: "Haryana", // Updated state
         pincode: addressData.pincode,
         landmark: addressData.landmark,
         coordinates: addressData.coordinates,
         address_type: addressData.type,
-        contact_phone: addressData.phone,
+        contact_person: addressData.name || currentUser?.name || currentUser?.full_name || "",
+        contact_phone: addressData.phone || currentUser?.phone || "",
         is_default: false, // You can modify this logic
         status: "active",
       };
