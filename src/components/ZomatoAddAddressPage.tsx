@@ -264,7 +264,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       if (
         mapId &&
         mapId.trim() !== "" &&
-        google.maps.marker?.AdvancedMarkerElement
+        markerLibrary?.AdvancedMarkerElement
       ) {
         try {
           const markerContent = document.createElement("div");
@@ -274,7 +274,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
               <circle cx='12' cy='10' r='3' fill='white'/>
             </svg>
           `;
-          defaultMarker = new google.maps.marker.AdvancedMarkerElement({
+          defaultMarker = new markerLibrary.AdvancedMarkerElement({
             position: defaultCenter,
             map: map,
             title: "Click anywhere on the map to select location",
@@ -1583,7 +1583,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         simpleAutoFill(suggestion.description);
       }, 100);
 
-      console.log(`✅ Used fallback coordinates for: ${suggestion.description}`);
+      console.log(`�� Used fallback coordinates for: ${suggestion.description}`);
     }
   };
 
