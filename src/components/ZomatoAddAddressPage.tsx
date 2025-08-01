@@ -410,7 +410,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       if (
         mapId &&
         mapId.trim() !== "" &&
-        google.maps.marker?.AdvancedMarkerElement
+        markerLibrary?.AdvancedMarkerElement
       ) {
         try {
           const markerContent = document.createElement("div");
@@ -422,7 +422,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
           `;
           markerContent.style.cursor = "pointer";
 
-          newMarker = new google.maps.marker.AdvancedMarkerElement({
+          newMarker = new markerLibrary.AdvancedMarkerElement({
             position: coordinates,
             map: mapInstance,
             title: "Drag to adjust location or click map to move pin",
