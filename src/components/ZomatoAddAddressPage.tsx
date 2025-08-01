@@ -644,7 +644,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       if (finalComponents) {
         autoFillAddressFieldsFromComponents(finalComponents);
       } else {
-        await enhancedAutoFillFields(enhancedAddress);
+        simpleAutoFill(enhancedAddress);
       }
     } catch (error) {
       console.error("❌ All location detection attempts failed:", error);
