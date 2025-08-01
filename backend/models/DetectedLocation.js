@@ -85,19 +85,47 @@ detectedLocationSchema.index({ ip_address: 1 });
 
 // Static method to check if location is available
 detectedLocationSchema.statics.checkAvailability = function (city, pincode) {
-  // For now, only Sector 69, Gurgaon is available
+  // Check pincode 122101 first - this is the only allowed pincode
+  if (pincode && pincode.trim() === "122101") {
+    return {
+      is_available: true,
+      message: "Service available for pincode 122101",
+    };
+  }
+
+  // Legacy support for city-based checks
   const availableLocations = [
-    { city: "Gurgaon", area: "Sector 69" },
-    { city: "Gurugram", area: "Sector 69" },
+    { city: "Gurgaon", area: "Sector 69", pincode: "122101" },
+    { city: "Gurugram", area: "Sector 69", pincode: "122101" },
   ];
 
   const normalizedCity = city?.toLowerCase().trim();
-  return availableLocations.some(
+  const isAvailableByCity = availableLocations.some(
     (location) =>
       normalizedCity?.includes(location.city.toLowerCase()) &&
       (city?.toLowerCase().includes("sector 69") ||
         city?.toLowerCase().includes("sector-69")),
   );
+
+  if (isAvailableByCity) {
+    return {
+      is_available: true,
+      message: "Service available in your area",
+    };
+  }
+
+  // If pincode is provided but not 122101, service not available
+  if (pincode && pincode.trim() !== "122101") {
+    return {
+      is_available: false,
+      message: `Service currently not available for pincode ${pincode}. Available only for pincode 122101.`,
+    };
+  }
+
+  return {
+    is_available: false,
+    message: "Service not available in your area. Currently serving pincode 122101 only.",
+  };
 };
 
 // Static method to save detected location
