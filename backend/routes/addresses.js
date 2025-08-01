@@ -49,9 +49,20 @@ router.get("/default", verifyUser, async (req, res) => {
 // Create new address
 router.post("/", verifyUser, async (req, res) => {
   try {
+    // Get user details to auto-populate contact info if not provided
+    const User = require("../models/User");
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     const addressData = {
       ...req.body,
       user_id: req.userId,
+      // Auto-populate contact info with user details if not provided
+      contact_person: req.body.contact_person || user.name || user.full_name || "",
+      contact_phone: req.body.contact_phone || user.phone || "",
     };
 
     const address = new Address(addressData);
