@@ -11,8 +11,11 @@ export class ApiClient {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl =
-      import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+    // Use relative path for proxy compatibility in development
+    const isProduction = window.location.hostname !== "localhost";
+    this.baseUrl = isProduction
+      ? (import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api")
+      : "/api";
   }
 
   public static getInstance(): ApiClient {
