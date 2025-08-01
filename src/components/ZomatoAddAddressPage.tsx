@@ -1599,11 +1599,11 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       });
       updateMapLocation(coordinates);
 
-      // Use enhanced autofill method
-      setTimeout(async () => {
-        console.log("🏠 Enhanced autofilling for smart fallback:", suggestion.description);
-        await enhancedAutoFillFields(suggestion.description);
-      }, 50);
+      // Use simple autofill with small delay
+      setTimeout(() => {
+        console.log("🏠 Simple autofilling for smart fallback:", suggestion.description);
+        simpleAutoFill(suggestion.description);
+      }, 100);
 
       console.log(`✅ Used fallback coordinates for: ${suggestion.description}`);
     }
