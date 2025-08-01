@@ -454,7 +454,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
             anchor: new google.maps.Point(16, 32),
           },
         });
-        console.log("���� Created regular Marker at:", coordinates);
+        console.log("��� Created regular Marker at:", coordinates);
       }
 
       // Add event listeners that work with both marker types
@@ -1454,9 +1454,15 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       });
       updateMapLocation(coordinates);
 
-      // Use simple autofill with small delay
+      // Clear first and then autofill
+      console.log("🏠 About to autofill for fallback suggestion:", suggestion.description);
+
+      // Test immediate call
+      simpleAutoFill(suggestion.description);
+
+      // Also try with delay
       setTimeout(() => {
-        console.log("🏠 Simple autofilling for fallback suggestion:", suggestion.description);
+        console.log("🏠 Second attempt - Simple autofilling for fallback suggestion:", suggestion.description);
         simpleAutoFill(suggestion.description);
       }, 100);
 
