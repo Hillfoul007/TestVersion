@@ -1467,14 +1467,12 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     setSearchQuery(suggestion.description);
     setShowSuggestions(false);
 
-    // Clear form fields first to ensure fresh autofill
+    // Clear form fields first
     console.log("🧹 Clearing form fields before autofill");
-    await forceStateUpdate({
-      flatNo: "",
-      street: "",
-      area: "",
-      pincode: ""
-    });
+    setFlatNo("");
+    setStreet("");
+    setArea("");
+    setPincode("");
 
     // Check if this is a fallback suggestion that doesn't need Google Maps API
     if (!suggestion.place_id ||
@@ -1513,7 +1511,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
       // Use enhanced autofill method
       setTimeout(async () => {
-        console.log("�� Enhanced autofilling for fallback suggestion:", suggestion.description);
+        console.log("🏠 Enhanced autofilling for fallback suggestion:", suggestion.description);
         await enhancedAutoFillFields(suggestion.description);
       }, 50);
 
