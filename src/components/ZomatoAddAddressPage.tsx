@@ -1049,11 +1049,15 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
     // Fill flatNo (always update it when selecting from search)
     if (extractedFlatNo) {
+      console.log("🏠 Setting flat number:", extractedFlatNo);
       setFlatNo(extractedFlatNo);
-      console.log("✅ Flat number set:", extractedFlatNo);
+    } else {
+      console.log("🏠 No flat number found, clearing field");
+      setFlatNo("");
     }
 
-    // Force update other fields (don't preserve previous values)
+    // Force clear and then update other fields
+    console.log("🧹 Force clearing street and area fields");
     setStreet("");
     setArea("");
 
