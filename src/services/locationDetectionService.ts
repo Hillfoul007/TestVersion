@@ -153,7 +153,16 @@ export class LocationDetectionService {
   ): LocationAvailabilityResponse {
     const normalizedCity = city?.toLowerCase().trim();
 
-    // Check coordinates first if available
+    // Check pincode 122101 first - this is the only allowed pincode
+    if (pincode && pincode.trim() === "122101") {
+      return {
+        success: true,
+        is_available: true,
+        message: "Service available for pincode 122101",
+      };
+    }
+
+    // Check coordinates for Sector 69 if available (legacy support)
     if (coordinates && this.isInSector69(coordinates.lat, coordinates.lng)) {
       return {
         success: true,
@@ -162,27 +171,43 @@ export class LocationDetectionService {
       };
     }
 
-    // Available locations - you can edit this list to add more areas
+    // Available locations for city name checks
     const availableLocations = [
-      { city: "gurgaon", area: "sector 69" },
-      { city: "gurugram", area: "sector 69" },
-      { city: "gurgaon", area: "sector-69" },
-      { city: "gurugram", area: "sector-69" },
+      { city: "gurgaon", area: "sector 69", pincode: "122101" },
+      { city: "gurugram", area: "sector 69", pincode: "122101" },
+      { city: "gurgaon", area: "sector-69", pincode: "122101" },
+      { city: "gurugram", area: "sector-69", pincode: "122101" },
     ];
 
-    const isAvailable = availableLocations.some(
+    // Check by city name and area
+    const isAvailableByCity = availableLocations.some(
       (location) =>
         normalizedCity?.includes(location.city) &&
         (normalizedCity?.includes("sector 69") ||
           normalizedCity?.includes("sector-69")),
     );
 
+    if (isAvailableByCity) {
+      return {
+        success: true,
+        is_available: true,
+        message: "Service available in your area",
+      };
+    }
+
+    // If pincode is provided but not 122101, service not available
+    if (pincode && pincode.trim() !== "122101") {
+      return {
+        success: true,
+        is_available: false,
+        message: `Service currently not available for pincode ${pincode}. Available only for pincode 122101.`,
+      };
+    }
+
     return {
       success: true,
-      is_available: isAvailable,
-      message: isAvailable
-        ? "Service available in your area"
-        : "Service not available in your area",
+      is_available: false,
+      message: "Service not available in your area. Currently serving pincode 122101 only.",
     };
   }
 
