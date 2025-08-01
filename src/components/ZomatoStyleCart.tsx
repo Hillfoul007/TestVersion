@@ -34,6 +34,7 @@ import {
 import DynamicServicesService from "@/services/dynamicServicesService";
 import type { DynamicLaundryService } from "@/services/dynamicServicesService";
 import { ReferralService } from "@/services/referralService";
+import { CouponService } from "@/services/couponService";
 import SimplifiedAddressForm from "./SimplifiedAddressForm";
 import ProfessionalDateTimePicker from "./ProfessionalDateTimePicker";
 import { FormValidation, validateCheckoutForm } from "./FormValidation";
