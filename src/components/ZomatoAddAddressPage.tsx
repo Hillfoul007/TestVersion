@@ -1503,10 +1503,16 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
         updateMapLocation(coordinates);
 
-        // Use simple autofill with small delay
+        // Immediate autofill for Google Places
+        const addressToFill = place.formatted_address || suggestion.description;
+        console.log("🏠 About to autofill for Google Places result:", addressToFill);
+
+        simpleAutoFill(addressToFill);
+
+        // Also try with delay
         setTimeout(() => {
-          console.log("🏠 Simple autofilling for Google Places result:", place.formatted_address || suggestion.description);
-          simpleAutoFill(place.formatted_address || suggestion.description);
+          console.log("🏠 Second attempt - Simple autofilling for Google Places result:", addressToFill);
+          simpleAutoFill(addressToFill);
         }, 100);
       } else {
         console.log("🗺️ No place geometry found, using fallback");
@@ -1694,7 +1700,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
                   <div
                     key={index}
                     onClick={() => {
-                      console.log("🖱️ SUGGESTION CLICKED:", suggestion);
+                      console.log("🖱�� SUGGESTION CLICKED:", suggestion);
                       handleSuggestionSelect(suggestion);
                     }}
                     className="px-4 py-3 cursor-pointer hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
