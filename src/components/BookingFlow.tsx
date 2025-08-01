@@ -117,19 +117,39 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
     return Math.round((subtotal - couponDiscount) * 100) / 100;
   };
 
-  const applyCoupon = () => {
-    const code = couponCode.trim().toUpperCase();
+  const applyCoupon = async () => {
+    const code = couponCode.trim();
 
-    if (code === "NEW10") {
-      setAppliedCoupon({ code: "NEW10", discount: 10 });
-      setError("");
-    } else if (code === "FIRST30") {
-      setAppliedCoupon({ code: "FIRST30", discount: 30 });
-      setError("");
-    } else if (code === "") {
+    if (!code) {
       setError("Please enter a coupon code");
-    } else {
-      setError("Invalid coupon code. Valid coupons: FIRST30, NEW10");
+      return;
+    }
+
+    if (!currentUser) {
+      setError("Please sign in to apply coupons");
+      return;
+    }
+
+    try {
+      const couponService = CouponService.getInstance();
+      const validation = await couponService.validateCoupon(
+        code,
+        currentUser.id || currentUser._id,
+        calculateTotal()
+      );
+
+      if (validation.valid && validation.coupon) {
+        setAppliedCoupon({
+          code: validation.coupon.code,
+          discount: validation.coupon.discount
+        });
+        setError("");
+      } else {
+        setError(validation.error || "Invalid coupon code");
+      }
+    } catch (error) {
+      console.error('❌ Error applying coupon:', error);
+      setError("Failed to validate coupon. Please try again.");
     }
   };
 
