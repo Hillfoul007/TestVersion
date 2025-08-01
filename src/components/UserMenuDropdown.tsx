@@ -20,7 +20,6 @@ import {
   MessageCircle,
   Gift,
 } from "lucide-react";
-import ReferralShareButton from "@/components/ReferralShareButton";
 import ProfileSettingsModal from "./ProfileSettingsModal";
 import SavedAddressesModal from "./SavedAddressesModal";
 import PreferencesModal from "./PreferencesModal";
