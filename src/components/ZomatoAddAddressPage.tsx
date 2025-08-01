@@ -653,7 +653,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         simpleAutoFill(enhancedAddress);
       }
     } catch (error) {
-      console.error("❌ All location detection attempts failed:", error);
+      console.error("�� All location detection attempts failed:", error);
 
       // Enhanced fallback - try to get approximate location from IP
       try {
@@ -684,7 +684,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         fallbackLocations[Math.floor(Math.random() * fallbackLocations.length)];
       const fallbackAddress = `${randomFallback.city}, India`;
 
-      console.log(`🏙️ Using fallback location: ${fallbackAddress}`);
+      console.log(`🏙��� Using fallback location: ${fallbackAddress}`);
 
       setSelectedLocation({
         address: fallbackAddress,
@@ -1376,6 +1376,15 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     setStreet(street);
     setArea(area);
     setPincode(extractedPincode);
+
+    // Force React re-render using functional updates
+    setTimeout(() => {
+      setFlatNo(prev => extractedFlatNo);
+      setStreet(prev => street);
+      setArea(prev => area);
+      setPincode(prev => extractedPincode);
+      console.log("🔄 Forced re-render with functional updates");
+    }, 10);
 
     // Also update DOM directly as a fallback to ensure values are visible
     setTimeout(() => {
