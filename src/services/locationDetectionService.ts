@@ -128,13 +128,36 @@ export class LocationDetectionService {
   }
 
   /**
+   * Check if coordinates are in Sector 69, Gurugram using bounding box
+   */
+  private isInSector69(lat: number, lng: number): boolean {
+    // Bounding box for Sector 69, Gurugram
+    const minLat = 28.3940;
+    const maxLat = 28.3980;
+    const minLng = 77.0350;
+    const maxLng = 77.0390;
+
+    return lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
+  }
+
+  /**
    * Local fallback for availability check
    */
   private checkAvailabilityLocal(
     city: string,
     pincode?: string,
+    coordinates?: { lat: number; lng: number },
   ): LocationAvailabilityResponse {
     const normalizedCity = city?.toLowerCase().trim();
+
+    // Check coordinates first if available
+    if (coordinates && this.isInSector69(coordinates.lat, coordinates.lng)) {
+      return {
+        success: true,
+        is_available: true,
+        message: "Service available in Sector 69, Gurugram (GPS verified)",
+      };
+    }
 
     // Available locations - you can edit this list to add more areas
     const availableLocations = [
