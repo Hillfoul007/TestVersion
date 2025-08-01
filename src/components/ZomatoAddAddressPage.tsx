@@ -188,7 +188,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       const loader = new Loader({
         apiKey,
         version: "weekly",
-        libraries: ["places", "geometry"], // Removed marker library for faster loading
+        libraries: ["places", "geometry", "marker"], // Include marker library for AdvancedMarkerElement
         region: "IN", // Optimize for India
         language: "en",
       });
