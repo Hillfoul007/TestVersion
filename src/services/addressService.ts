@@ -278,7 +278,11 @@ export class AddressService {
             };
           }
         } catch (error) {
-          console.warn("Backend fetch failed, using localStorage:", error);
+          console.warn("⚠️ Backend fetch failed, using localStorage:", {
+            error: error instanceof Error ? error.message : error,
+            apiUrl: this.apiBaseUrl,
+            userId: userId
+          });
         }
       }
 
