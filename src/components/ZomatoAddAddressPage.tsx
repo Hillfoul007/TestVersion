@@ -657,7 +657,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
           setSelectedLocation(browserLocation);
           setSearchQuery(browserLocation.address);
           updateMapLocation(browserLocation.coordinates);
-          autoFillAddressFields(browserLocation.address);
+          await enhancedAutoFillFields(browserLocation.address);
           return;
         }
       } catch (locationError) {
