@@ -92,11 +92,12 @@ export class LocationDetectionService {
     city: string,
     pincode?: string,
     fullAddress?: string,
+    coordinates?: { lat: number; lng: number },
   ): Promise<LocationAvailabilityResponse> {
     try {
       if (!this.apiBaseUrl) {
         // Fallback local check
-        return this.checkAvailabilityLocal(city, pincode);
+        return this.checkAvailabilityLocal(city, pincode, coordinates);
       }
 
       const response = await fetch(
@@ -110,6 +111,7 @@ export class LocationDetectionService {
             city,
             pincode,
             full_address: fullAddress,
+            coordinates,
           }),
         },
       );
@@ -123,7 +125,7 @@ export class LocationDetectionService {
     } catch (error) {
       console.error("❌ Failed to check availability:", error);
       // Fallback to local check
-      return this.checkAvailabilityLocal(city, pincode);
+      return this.checkAvailabilityLocal(city, pincode, coordinates);
     }
   }
 
