@@ -43,11 +43,10 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
   try {
     setBackendStatus("checking");
 
-    // Get API base URL with fallback
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
-    const healthUrl = `${apiBaseUrl}/health`;
+    // Use relative path to leverage the proxy configuration
+    const healthUrl = "/api/health";
 
-    console.log("🔍 ConnectionStatus: Checking backend at:", healthUrl);
+    console.log("🔍 ConnectionStatus: Checking backend via proxy at:", healthUrl);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
