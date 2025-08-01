@@ -126,6 +126,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [autocompleteService, setAutocompleteService] = useState<any>(null);
+  const [markerLibrary, setMarkerLibrary] = useState<any>(null);
   const [marker, setMarker] = useState<
     google.maps.marker.AdvancedMarkerElement | google.maps.Marker | null
   >(null);
