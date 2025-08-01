@@ -559,8 +559,8 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
           const currentCoords = await locationService.getCurrentPosition({
             enableHighAccuracy: true,
-            timeout: attempts === 0 ? 30000 : 15000, // Much longer timeout for precision
-            maximumAge: 0, // Always get fresh location
+            timeout: attempts === 0 ? 8000 : 5000, // Faster timeouts for better UX
+            maximumAge: 30000, // Accept recent location for 122101 area
           });
 
           console.log(
