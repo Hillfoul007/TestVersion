@@ -61,7 +61,8 @@ export class BookingService {
 
   constructor() {
     this.mongoService = MongoDBService.getInstance();
-    this.apiBaseUrl = config.apiBaseUrl;
+    // Use relative path for proxy compatibility in development
+    this.apiBaseUrl = config.isProduction ? config.apiBaseUrl : "/api";
 
     console.log("📡 BookingService API URL:", this.apiBaseUrl);
   }
