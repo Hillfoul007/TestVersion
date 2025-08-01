@@ -534,7 +534,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       setSelectedLocation({ address, coordinates });
       setSearchQuery(address);
       updateMapLocation(coordinates);
-      autoFillAddressFields(address);
+      await enhancedAutoFillFields(address);
     } catch (error) {
       console.error("Reverse geocoding failed:", error);
     }
