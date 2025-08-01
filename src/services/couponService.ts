@@ -104,16 +104,63 @@ export class CouponService {
   }
 
   /**
-   * Track coupon usage
+   * Track coupon usage via backend API
    */
-  markCouponAsUsed(
-    couponCode: string, 
-    userId: string, 
-    orderAmount: number, 
+  async markCouponAsUsed(
+    couponCode: string,
+    userId: string,
+    bookingId: string,
+    orderAmount: number,
+    discountAmount: number
+  ): Promise<boolean> {
+    if (!userId) return false;
+
+    try {
+      const response = await fetch('/api/coupons/mark-used', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          couponCode,
+          userId,
+          bookingId,
+          orderAmount,
+          discountAmount,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        console.log(`✅ Marked coupon ${couponCode} as used for user ${userId} via backend`);
+
+        // Also update localStorage as backup
+        this.markCouponAsUsedLocal(couponCode, userId, orderAmount, discountAmount);
+        return true;
+      } else {
+        console.error('❌ Failed to mark coupon as used via backend:', result.message);
+        // Fallback to local storage
+        this.markCouponAsUsedLocal(couponCode, userId, orderAmount, discountAmount);
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ Error marking coupon as used:', error);
+      // Fallback to local storage
+      this.markCouponAsUsedLocal(couponCode, userId, orderAmount, discountAmount);
+      return false;
+    }
+  }
+
+  /**
+   * Local fallback for tracking coupon usage
+   */
+  private markCouponAsUsedLocal(
+    couponCode: string,
+    userId: string,
+    orderAmount: number,
     discountAmount: number
   ): void {
-    if (!userId) return;
-    
     const usage: CouponUsage = {
       code: couponCode,
       userId,
@@ -121,15 +168,15 @@ export class CouponService {
       orderAmount,
       discountAmount,
     };
-    
+
     const existingUsages = JSON.parse(
       localStorage.getItem(`used_coupons_${userId}`) || "[]",
     ) as CouponUsage[];
-    
+
     existingUsages.push(usage);
     localStorage.setItem(`used_coupons_${userId}`, JSON.stringify(existingUsages));
-    
-    console.log(`✅ Marked coupon ${couponCode} as used for user ${userId}`);
+
+    console.log(`✅ Marked coupon ${couponCode} as used locally for user ${userId}`);
   }
 
   /**
