@@ -1001,12 +1001,17 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
   const autoFillAddressFields = (fullAddress: string) => {
     console.log("🏠 Auto-filling address from:", fullAddress);
 
+    if (!fullAddress || fullAddress.trim() === "") {
+      console.warn("⚠️ Empty address provided for autofill");
+      return;
+    }
+
     const parts = fullAddress.split(",").map((part) => part.trim());
     console.log("📍 Address parts:", parts);
 
     // Extract pincode first
     const pincodeMatch = fullAddress.match(/\b\d{6}\b/);
-    if (pincodeMatch) {
+    if (pincodeMatch && pincodeMatch[0]) {
       setPincode(pincodeMatch[0]);
       console.log("📮 Pincode extracted:", pincodeMatch[0]);
     }
@@ -1036,12 +1041,13 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       }
     }
 
-    // Only fill flatNo if it's currently empty (preserve user input)
-    if (!flatNo && extractedFlatNo) {
+    // Fill flatNo (always update it when selecting from search)
+    if (extractedFlatNo) {
       setFlatNo(extractedFlatNo);
+      console.log("✅ Flat number set:", extractedFlatNo);
     }
 
-    // Clear previous values for other fields
+    // Force update other fields (don't preserve previous values)
     setStreet("");
     setArea("");
 
