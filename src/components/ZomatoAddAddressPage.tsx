@@ -1036,7 +1036,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         part.match(/^[A-Z]\d+/) // Like "A123", "B45"
       ) {
         extractedFlatNo = part;
-        console.log("���� House number extracted:", extractedFlatNo);
+        console.log("🏠 House number extracted:", extractedFlatNo);
         break;
       }
     }
@@ -1375,9 +1375,13 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         });
 
         updateMapLocation(coordinates);
-        autoFillAddressFields(
-          place.formatted_address || suggestion.description,
-        );
+
+        // Add delay to ensure state clearing is processed first
+        setTimeout(() => {
+          autoFillAddressFields(
+            place.formatted_address || suggestion.description,
+          );
+        }, 50);
       } else {
         console.log("🗺️ No place geometry found, using fallback");
         throw new Error("No place geometry found");
