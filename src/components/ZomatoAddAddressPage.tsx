@@ -1465,11 +1465,11 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       });
       updateMapLocation(coordinates);
 
-      // Add delay to ensure state clearing is processed first
-      setTimeout(() => {
-        console.log("🏠 Autofilling address fields for fallback suggestion:", suggestion.description);
-        autoFillAddressFields(suggestion.description);
-      }, 100);
+      // Use enhanced autofill method
+      setTimeout(async () => {
+        console.log("🏠 Enhanced autofilling for fallback suggestion:", suggestion.description);
+        await enhancedAutoFillFields(suggestion.description);
+      }, 50);
 
       return;
     }
