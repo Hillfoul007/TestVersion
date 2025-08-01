@@ -185,44 +185,41 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
     );
   };
 
-  const applyCoupon = () => {
+  const applyCoupon = async () => {
     setCouponError(""); // Clear any previous errors
-    const referralService = ReferralService.getInstance();
-    const validCoupons = {
-      NEW10: {
-        discount: 10,
-        description: "10% off on your order"
-      },
-      FIRST30: {
-        discount: 30,
-        description: "30% off on first order",
-        isFirstOrder: true
-      },
-    };
 
-    const coupon = validCoupons[couponCode.toUpperCase()];
-    if (coupon) {
-      // Check if coupon is restricted to first orders only
-      if (coupon.isFirstOrder && !referralService.isFirstTimeUser(currentUser)) {
-        setCouponError("This coupon is valid for first orders only.");
-        return;
-      }
+    if (!couponCode.trim()) {
+      setCouponError("Please enter a coupon code");
+      return;
+    }
 
-      // Check if coupon excludes first orders
-      if (coupon.excludeFirstOrder && referralService.isFirstTimeUser(currentUser)) {
-        setCouponError("This coupon is not valid for first orders.");
-        return;
-      }
+    if (!currentUser) {
+      setCouponError("Please sign in to apply coupons");
+      return;
+    }
 
-      setAppliedCoupon({
-        code: couponCode.toUpperCase(),
-        discount: coupon.discount,
-      });
-      addNotification(
-        createSuccessNotification("Coupon Applied", coupon.description),
+    try {
+      const couponService = CouponService.getInstance();
+      const validation = await couponService.validateCoupon(
+        couponCode.trim(),
+        currentUser.id || currentUser._id,
+        getSubtotal()
       );
-    } else {
-      setCouponError("Invalid coupon. Valid coupons: FIRST30, NEW10");
+
+      if (validation.valid && validation.coupon) {
+        setAppliedCoupon({
+          code: validation.coupon.code,
+          discount: validation.coupon.discount,
+        });
+        addNotification(
+          createSuccessNotification("Coupon Applied", validation.coupon.description),
+        );
+      } else {
+        setCouponError(validation.error || "Invalid coupon code");
+      }
+    } catch (error) {
+      console.error('❌ Error applying coupon:', error);
+      setCouponError("Failed to validate coupon. Please try again.");
     }
   };
 
@@ -337,7 +334,7 @@ const ZomatoStyleCart: React.FC<ZomatoStyleCartProps> = ({
         </div>
 
         <div className="flex flex-col items-center justify-center h-96 px-4">
-          <div className="text-6xl mb-4">🛍️</div>
+          <div className="text-6xl mb-4">���️</div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Your cart is empty
           </h2>
