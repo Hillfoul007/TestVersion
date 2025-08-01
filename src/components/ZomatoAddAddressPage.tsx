@@ -1308,6 +1308,24 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     }
   };
 
+  // Force state updates to ensure form fields are properly cleared and filled
+  const forceStateUpdate = (updates: any) => {
+    return new Promise((resolve) => {
+      Object.entries(updates).forEach(([field, value]: [string, any]) => {
+        if (field === 'flatNo') setFlatNo(value);
+        else if (field === 'street') setStreet(value);
+        else if (field === 'area') setArea(value);
+        else if (field === 'pincode') setPincode(value);
+      });
+
+      // Allow React to process the state updates
+      setTimeout(() => {
+        console.log("🔄 Force updated states:", updates);
+        resolve(true);
+      }, 10);
+    });
+  };
+
   const handleSuggestionSelect = async (suggestion: any) => {
     console.log("🔍 Address suggestion selected:", suggestion);
     setSearchQuery(suggestion.description);
