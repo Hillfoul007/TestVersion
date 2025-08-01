@@ -234,9 +234,14 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
       const map = new google.maps.Map(mapRef.current!, mapConfig);
 
-      // Initialize the new AutocompleteSuggestion service
-      const { AutocompleteSuggestion, AutocompleteSessionToken } =
-        await google.maps.importLibrary("places");
+      // Initialize the new AutocompleteSuggestion service and marker library
+      const [
+        { AutocompleteSuggestion, AutocompleteSessionToken },
+        markerLibrary
+      ] = await Promise.all([
+        google.maps.importLibrary("places"),
+        google.maps.importLibrary("marker")
+      ]);
 
       setMapInstance(map);
       setAutocompleteService({
