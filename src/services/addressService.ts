@@ -234,17 +234,23 @@ export class AddressService {
       }
 
       // Try backend first
-      if (this.apiBaseUrl) {
+      if (this.apiBaseUrl && this.apiBaseUrl !== "") {
         try {
+          console.log("📡 Fetching addresses from backend:", `${this.apiBaseUrl}/addresses`);
+
           const response = await fetch(`${this.apiBaseUrl}/addresses`, {
             headers: {
               "Content-Type": "application/json",
               "user-id": userId,
             },
+            // Add timeout to prevent hanging
+            signal: AbortSignal.timeout(10000), // 10 second timeout
           });
 
           if (response.ok) {
             const result = await response.json();
+            console.log("✅ Successfully fetched addresses from backend:", result);
+
             // Transform backend format to frontend format
             const transformedAddresses = (result.data || []).map(
               (addr: any) => ({
