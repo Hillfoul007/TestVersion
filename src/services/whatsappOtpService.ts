@@ -16,8 +16,12 @@ export interface User {
 
 export class WhatsAppOTPService {
   private static instance: WhatsAppOTPService;
-  private apiBaseUrl =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+  private apiBaseUrl = (() => {
+    const isProduction = window.location.hostname !== "localhost";
+    return isProduction
+      ? (import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api")
+      : "/api";
+  })();
   private gupshupApiUrl = "https://api.gupshup.io/wa/api/v1/msg";
   private gupshupApiKey =
     import.meta.env.VITE_GUPSHUP_API_KEY || "hfyvni2bshn1r3oo76wgupvlirijscwr";
