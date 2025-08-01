@@ -33,7 +33,8 @@ export class AddressService {
   private apiBaseUrl: string;
 
   constructor() {
-    this.apiBaseUrl = config.apiBaseUrl;
+    // Use relative path for proxy compatibility in development
+    this.apiBaseUrl = config.isProduction ? config.apiBaseUrl : "/api";
   }
 
   public static getInstance(): AddressService {
