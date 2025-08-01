@@ -1036,7 +1036,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         part.match(/^[A-Z]\d+/) // Like "A123", "B45"
       ) {
         extractedFlatNo = part;
-        console.log("🏠 House number extracted:", extractedFlatNo);
+        console.log("���� House number extracted:", extractedFlatNo);
         break;
       }
     }
@@ -1333,7 +1333,11 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         coordinates,
       });
       updateMapLocation(coordinates);
-      autoFillAddressFields(suggestion.description);
+
+      // Add delay to ensure state clearing is processed first
+      setTimeout(() => {
+        autoFillAddressFields(suggestion.description);
+      }, 50);
 
       return;
     }
