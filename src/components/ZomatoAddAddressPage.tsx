@@ -586,7 +586,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
           }
         } catch (attemptError) {
           console.warn(
-            `⚠️ Location attempt ${attempts + 1} failed:`,
+            `⚠��� Location attempt ${attempts + 1} failed:`,
             attemptError,
           );
         }
@@ -1508,13 +1508,13 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
         updateMapLocation(coordinates);
 
-        // Add delay to ensure state clearing is processed first
-        setTimeout(() => {
-          console.log("🏠 Autofilling address fields for Google Places result:", place.formatted_address || suggestion.description);
-          autoFillAddressFields(
+        // Use enhanced autofill method
+        setTimeout(async () => {
+          console.log("🏠 Enhanced autofilling for Google Places result:", place.formatted_address || suggestion.description);
+          await enhancedAutoFillFields(
             place.formatted_address || suggestion.description,
           );
-        }, 100);
+        }, 50);
       } else {
         console.log("🗺️ No place geometry found, using fallback");
         throw new Error("No place geometry found");
