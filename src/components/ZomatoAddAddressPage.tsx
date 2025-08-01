@@ -1556,9 +1556,14 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       });
       updateMapLocation(coordinates);
 
-      // Use simple autofill with small delay
+      // Immediate autofill for smart fallback
+      console.log("🏠 About to autofill for smart fallback:", suggestion.description);
+
+      simpleAutoFill(suggestion.description);
+
+      // Also try with delay
       setTimeout(() => {
-        console.log("🏠 Simple autofilling for smart fallback:", suggestion.description);
+        console.log("🏠 Second attempt - Simple autofilling for smart fallback:", suggestion.description);
         simpleAutoFill(suggestion.description);
       }, 100);
 
@@ -1700,7 +1705,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
                   <div
                     key={index}
                     onClick={() => {
-                      console.log("🖱�� SUGGESTION CLICKED:", suggestion);
+                      console.log("🖱️ SUGGESTION CLICKED:", suggestion);
                       handleSuggestionSelect(suggestion);
                     }}
                     className="px-4 py-3 cursor-pointer hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
