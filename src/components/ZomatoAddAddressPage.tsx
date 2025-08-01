@@ -1081,7 +1081,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       setArea(areaParts.join(", "));
 
       console.log("🛣️ Street name:", cleanParts[0]);
-      console.log("🏘️ Extended area:", areaParts.join(", "));
+      console.log("��️ Extended area:", areaParts.join(", "));
     }
   };
 
@@ -1517,9 +1517,6 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
                 spellCheck={false}
               />
             </div>
-
-            {/* Google Maps Configuration Notice */}
-            <GoogleMapsNotice className="mt-3" />
 
             {/* Search Suggestions */}
             {showSuggestions && suggestions.length > 0 && (
