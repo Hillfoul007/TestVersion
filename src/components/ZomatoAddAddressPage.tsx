@@ -1423,6 +1423,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         area, // city
         pincode,
         completeAddress,
+        selectedLocation?.coordinates, // Pass coordinates for Sector 69 GPS verification
       );
 
       console.log("🏠 Address availability result:", availability);
