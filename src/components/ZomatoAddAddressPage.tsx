@@ -1398,22 +1398,68 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     }
   };
 
-  // Force state updates to ensure form fields are properly cleared and filled
-  const forceStateUpdate = (updates: any) => {
-    return new Promise((resolve) => {
-      Object.entries(updates).forEach(([field, value]: [string, any]) => {
-        if (field === 'flatNo') setFlatNo(value);
-        else if (field === 'street') setStreet(value);
-        else if (field === 'area') setArea(value);
-        else if (field === 'pincode') setPincode(value);
-      });
+  // Simple and reliable autofill using React's automatic batching
+  const simpleAutoFill = (fullAddress: string) => {
+    console.log("🎯 Simple autofill starting for:", fullAddress);
 
-      // Allow React to process the state updates
-      setTimeout(() => {
-        console.log("🔄 Force updated states:", updates);
-        resolve(true);
-      }, 10);
+    if (!fullAddress || fullAddress.trim() === "") {
+      console.warn("⚠️ Empty address provided");
+      return;
+    }
+
+    // Parse the address
+    const parts = fullAddress.split(",").map(part => part.trim()).filter(Boolean);
+    console.log("📋 Address parts:", parts);
+
+    // Extract pincode
+    const pincodeMatch = fullAddress.match(/\b\d{6}\b/);
+    const extractedPincode = pincodeMatch ? pincodeMatch[0] : "";
+
+    // Extract flat/house number (first part with numbers)
+    let extractedFlatNo = "";
+    for (const part of parts) {
+      if (part.match(/^\d+/) && !part.match(/^\d{6}$/)) {
+        extractedFlatNo = part;
+        break;
+      }
+    }
+
+    // Filter out used parts and system parts
+    const usableParts = parts.filter(part => {
+      if (part === extractedFlatNo) return false;
+      if (part === extractedPincode) return false;
+      if (part.toLowerCase().includes("india")) return false;
+      if (part.toLowerCase().includes("pradesh")) return false;
+      return part.length > 1;
     });
+
+    console.log("🧹 Usable parts:", usableParts);
+
+    // Assign fields based on available parts
+    let street = "";
+    let area = "";
+
+    if (usableParts.length >= 2) {
+      street = usableParts[0];
+      area = usableParts.slice(1).join(", ");
+    } else if (usableParts.length === 1) {
+      area = usableParts[0];
+    }
+
+    console.log("📝 Setting fields:", {
+      flatNo: extractedFlatNo,
+      street: street,
+      area: area,
+      pincode: extractedPincode
+    });
+
+    // Set all states in one batch - React will batch these automatically
+    setFlatNo(extractedFlatNo);
+    setStreet(street);
+    setArea(area);
+    setPincode(extractedPincode);
+
+    console.log("✅ Simple autofill completed");
   };
 
   const handleSuggestionSelect = async (suggestion: any) => {
@@ -1467,7 +1513,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
       // Use enhanced autofill method
       setTimeout(async () => {
-        console.log("🏠 Enhanced autofilling for fallback suggestion:", suggestion.description);
+        console.log("�� Enhanced autofilling for fallback suggestion:", suggestion.description);
         await enhancedAutoFillFields(suggestion.description);
       }, 50);
 
