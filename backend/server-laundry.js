@@ -221,6 +221,15 @@ try {
   console.error("❌ Failed to load Detected Locations routes:", error.message);
 }
 
+// Register coupon management routes
+try {
+  const couponRoutes = require("./routes/coupons");
+  app.use("/api/coupons", couponRoutes);
+  console.log("🔗 Coupon routes registered at /api/coupons");
+} catch (error) {
+  console.error("❌ Failed to load coupon routes:", error.message);
+}
+
 // Google Sheets integration removed
 
 // Push notification endpoints
