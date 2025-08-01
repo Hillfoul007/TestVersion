@@ -627,7 +627,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
             enhancedAddress = streetDetails.address;
             finalComponents = streetDetails.components;
             console.log(
-              "�� Enhanced street-level details found:",
+              "✅ Enhanced street-level details found:",
               enhancedAddress,
             );
           }
@@ -1000,6 +1000,12 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
   // Enhanced auto-fill address fields from detailed address string
   const autoFillAddressFields = (fullAddress: string) => {
     console.log("🏠 Auto-filling address from:", fullAddress);
+    console.log("📋 Current field states before autofill:", {
+      flatNo,
+      street,
+      area,
+      pincode
+    });
 
     if (!fullAddress || fullAddress.trim() === "") {
       console.warn("⚠️ Empty address provided for autofill");
