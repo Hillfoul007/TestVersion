@@ -1289,8 +1289,15 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
   };
 
   const handleSuggestionSelect = async (suggestion: any) => {
+    console.log("🔍 Address suggestion selected:", suggestion);
     setSearchQuery(suggestion.description);
     setShowSuggestions(false);
+
+    // Clear form fields first to ensure fresh autofill
+    setFlatNo("");
+    setStreet("");
+    setArea("");
+    setPincode("");
 
     // Check if this is a fallback suggestion that doesn't need Google Maps API
     if (!suggestion.place_id ||
