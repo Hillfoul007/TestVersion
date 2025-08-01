@@ -249,6 +249,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         AutocompleteSuggestion,
         AutocompleteSessionToken,
       });
+      setMarkerLibrary(markerLibrary);
       setIsMapLoading(false);
 
       // Add click listener to map for pin placement
