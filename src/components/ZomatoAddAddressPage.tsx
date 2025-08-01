@@ -627,7 +627,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
             enhancedAddress = streetDetails.address;
             finalComponents = streetDetails.components;
             console.log(
-              "✅ Enhanced street-level details found:",
+              "�� Enhanced street-level details found:",
               enhancedAddress,
             );
           }
@@ -1294,10 +1294,17 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     setShowSuggestions(false);
 
     // Clear form fields first to ensure fresh autofill
+    console.log("🧹 Clearing form fields before autofill");
     setFlatNo("");
     setStreet("");
     setArea("");
     setPincode("");
+
+    // Force a re-render by using functional state updates
+    setFlatNo(() => "");
+    setStreet(() => "");
+    setArea(() => "");
+    setPincode(() => "");
 
     // Check if this is a fallback suggestion that doesn't need Google Maps API
     if (!suggestion.place_id ||
@@ -1336,8 +1343,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
       // Add delay to ensure state clearing is processed first
       setTimeout(() => {
+        console.log("🏠 Autofilling address fields for fallback suggestion:", suggestion.description);
         autoFillAddressFields(suggestion.description);
-      }, 50);
+      }, 100);
 
       return;
     }
@@ -1378,10 +1386,11 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
         // Add delay to ensure state clearing is processed first
         setTimeout(() => {
+          console.log("🏠 Autofilling address fields for Google Places result:", place.formatted_address || suggestion.description);
           autoFillAddressFields(
             place.formatted_address || suggestion.description,
           );
-        }, 50);
+        }, 100);
       } else {
         console.log("🗺️ No place geometry found, using fallback");
         throw new Error("No place geometry found");
@@ -1426,8 +1435,9 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
       // Add delay to ensure state clearing is processed first
       setTimeout(() => {
+        console.log("🏠 Autofilling address fields for smart fallback:", suggestion.description);
         autoFillAddressFields(suggestion.description);
-      }, 50);
+      }, 100);
 
       console.log(`✅ Used fallback coordinates for: ${suggestion.description}`);
     }
