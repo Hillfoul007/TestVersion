@@ -43,11 +43,14 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
   try {
     setBackendStatus("checking");
 
+    // Get API base URL with fallback
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
 
     const response = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/health`,
+      `${apiBaseUrl}/health`,
       {
         signal: controller.signal,
         method: "GET",
