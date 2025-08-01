@@ -99,7 +99,11 @@ const ZomatoAddressSelector: React.FC<ZomatoAddressSelectorProps> = ({
       }
 
     } catch (error) {
-      console.error("❌ Error loading addresses:", error);
+      console.error("❌ Error loading addresses:", {
+        error: error instanceof Error ? error.message : error,
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      // Set empty array to ensure component continues to work
       setSavedAddresses([]);
     } finally {
       setLoading(false);
