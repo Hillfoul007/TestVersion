@@ -454,7 +454,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
             anchor: new google.maps.Point(16, 32),
           },
         });
-        console.log("��� Created regular Marker at:", coordinates);
+        console.log("���� Created regular Marker at:", coordinates);
       }
 
       // Add event listeners that work with both marker types
@@ -1376,6 +1376,33 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     setStreet(street);
     setArea(area);
     setPincode(extractedPincode);
+
+    // Also update DOM directly as a fallback to ensure values are visible
+    setTimeout(() => {
+      const flatNoInput = document.getElementById('flatNo') as HTMLInputElement;
+      const streetInput = document.getElementById('street') as HTMLInputElement;
+      const areaInput = document.getElementById('area') as HTMLInputElement;
+      const pincodeInput = document.getElementById('pincode') as HTMLInputElement;
+
+      if (flatNoInput && extractedFlatNo) {
+        flatNoInput.value = extractedFlatNo;
+        flatNoInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      if (streetInput && street) {
+        streetInput.value = street;
+        streetInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      if (areaInput && area) {
+        areaInput.value = area;
+        areaInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      if (pincodeInput && extractedPincode) {
+        pincodeInput.value = extractedPincode;
+        pincodeInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      console.log("🔧 Direct DOM update completed");
+    }, 50);
 
     console.log("✅ Simple autofill completed");
   };
