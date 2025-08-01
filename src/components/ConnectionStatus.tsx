@@ -46,8 +46,6 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
     // Use relative path to leverage the proxy configuration
     const healthUrl = "/api/health";
 
-    console.log("🔍 ConnectionStatus: Checking backend via proxy at:", healthUrl);
-
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
 
@@ -57,10 +55,8 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
     });
 
     clearTimeout(timeoutId);
-    console.log("✅ ConnectionStatus: Backend response:", response.status, response.ok);
     setBackendStatus(response.ok ? "online" : "offline");
   } catch (error) {
-    console.error("❌ ConnectionStatus: Backend check failed:", error);
     setBackendStatus("offline");
   }
 };
