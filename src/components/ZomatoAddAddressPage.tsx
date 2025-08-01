@@ -448,7 +448,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
             anchor: new google.maps.Point(16, 32),
           },
         });
-        console.log("📍 Created regular Marker at:", coordinates);
+        console.log("��� Created regular Marker at:", coordinates);
       }
 
       // Add event listeners that work with both marker types
@@ -1118,6 +1118,12 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
             input: query,
             sessionToken: sessionToken,
             includedRegionCodes: ["in"],
+            // Bias results to Gurugram area (122101) for faster relevant results
+            locationBias: {
+              center: { latitude: 28.3960, longitude: 77.0370 },
+              radiusMeters: 10000, // 10km radius around Sector 69
+            },
+            origin: { latitude: 28.3960, longitude: 77.0370 },
           };
 
           const response =
