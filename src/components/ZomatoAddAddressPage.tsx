@@ -467,7 +467,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       }
 
       // Add event listeners that work with both marker types
-      if (newMarker instanceof google.maps.marker.AdvancedMarkerElement) {
+      if (markerLibrary?.AdvancedMarkerElement && newMarker instanceof markerLibrary.AdvancedMarkerElement) {
         // For AdvancedMarkerElement
         newMarker.addListener("dragstart", () => {
           // Visual feedback for advanced marker
