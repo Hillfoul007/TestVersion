@@ -1660,7 +1660,10 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
                 {suggestions.map((suggestion, index) => (
                   <div
                     key={index}
-                    onClick={() => handleSuggestionSelect(suggestion)}
+                    onClick={() => {
+                      console.log("🖱️ SUGGESTION CLICKED:", suggestion);
+                      handleSuggestionSelect(suggestion);
+                    }}
                     className="px-4 py-3 cursor-pointer hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
                   >
                     <div className="text-sm font-medium text-gray-900">
