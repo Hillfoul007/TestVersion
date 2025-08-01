@@ -586,7 +586,7 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
           }
         } catch (attemptError) {
           console.warn(
-            `⚠��� Location attempt ${attempts + 1} failed:`,
+            `⚠️ Location attempt ${attempts + 1} failed:`,
             attemptError,
           );
         }
@@ -1557,11 +1557,11 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
       });
       updateMapLocation(coordinates);
 
-      // Add delay to ensure state clearing is processed first
-      setTimeout(() => {
-        console.log("🏠 Autofilling address fields for smart fallback:", suggestion.description);
-        autoFillAddressFields(suggestion.description);
-      }, 100);
+      // Use enhanced autofill method
+      setTimeout(async () => {
+        console.log("🏠 Enhanced autofilling for smart fallback:", suggestion.description);
+        await enhancedAutoFillFields(suggestion.description);
+      }, 50);
 
       console.log(`✅ Used fallback coordinates for: ${suggestion.description}`);
     }
