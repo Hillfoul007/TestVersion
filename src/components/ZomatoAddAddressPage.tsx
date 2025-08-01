@@ -1423,7 +1423,11 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
         coordinates,
       });
       updateMapLocation(coordinates);
-      autoFillAddressFields(suggestion.description);
+
+      // Add delay to ensure state clearing is processed first
+      setTimeout(() => {
+        autoFillAddressFields(suggestion.description);
+      }, 50);
 
       console.log(`✅ Used fallback coordinates for: ${suggestion.description}`);
     }
