@@ -898,48 +898,10 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
 
           return null;
         } catch (error) {
-          console.warn("New Places API search failed, using fallback:", error);
-
-          // Fallback to legacy PlacesService if new API fails
-          try {
-            const service = new (
-              window as any
-            ).google.maps.places.PlacesService(document.createElement("div"));
-            const request = {
-              location: new (window as any).google.maps.LatLng(
-                coordinates.lat,
-                coordinates.lng,
-              ),
-              radius: 50, // 50 meter radius
-              type: "street_address",
-            };
-
-            return new Promise((resolve) => {
-              service.nearbySearch(request, (results: any, status: any) => {
-                if (
-                  status ===
-                    (window as any).google.maps.places.PlacesServiceStatus.OK &&
-                  results &&
-                  results.length > 0
-                ) {
-                  const nearbyStreet = results[0];
-                  console.log(
-                    "✅ Found nearby street via legacy Places API:",
-                    nearbyStreet.vicinity,
-                  );
-                  resolve({
-                    address: nearbyStreet.vicinity || nearbyStreet.name,
-                    components: null,
-                  });
-                } else {
-                  resolve(null);
-                }
-              });
-            });
-          } catch (fallbackError) {
-            console.warn("Legacy Places API also failed:", fallbackError);
-            return null;
-          }
+          console.warn("New Places API search failed:", error);
+          // Legacy PlacesService is deprecated and may not be enabled
+          // Return null to rely on other address detection methods
+          return null;
         }
       }
     } catch (error) {
