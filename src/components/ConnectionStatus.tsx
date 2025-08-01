@@ -45,21 +45,23 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
 
     // Get API base URL with fallback
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+    const healthUrl = `${apiBaseUrl}/health`;
+
+    console.log("🔍 ConnectionStatus: Checking backend at:", healthUrl);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-    const response = await fetch(
-      `${apiBaseUrl}/health`,
-      {
-        signal: controller.signal,
-        method: "GET",
-      }
-    );
+    const response = await fetch(healthUrl, {
+      signal: controller.signal,
+      method: "GET",
+    });
 
     clearTimeout(timeoutId);
+    console.log("✅ ConnectionStatus: Backend response:", response.status, response.ok);
     setBackendStatus(response.ok ? "online" : "offline");
   } catch (error) {
+    console.error("❌ ConnectionStatus: Backend check failed:", error);
     setBackendStatus("offline");
   }
 };
