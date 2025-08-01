@@ -202,8 +202,8 @@ class AutocompleteSuggestionService {
     } catch (error) {
       console.error("Error fetching place details with new Places API:", error);
 
-      // Fallback to old API if new one fails
-      return this.getPlaceDetailsLegacy(placeId);
+      // Don't fallback to legacy API since it's deprecated and may not be enabled
+      throw new Error(`New Places API failed: ${error.message}. Please ensure your Google Maps API key has the Places API (New) enabled.`);
     }
   }
 
