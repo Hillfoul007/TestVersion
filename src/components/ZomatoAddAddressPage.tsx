@@ -1119,6 +1119,96 @@ const ZomatoAddAddressPage: React.FC<ZomatoAddAddressPageProps> = ({
     }, 50);
   };
 
+  // Enhanced autofill that forces state updates
+  const enhancedAutoFillFields = async (fullAddress: string) => {
+    console.log("🚀 Enhanced autofill starting for:", fullAddress);
+
+    if (!fullAddress || fullAddress.trim() === "") {
+      console.warn("⚠️ Empty address provided for enhanced autofill");
+      return;
+    }
+
+    const parts = fullAddress.split(",").map((part) => part.trim());
+    console.log("📍 Address parts for enhanced autofill:", parts);
+
+    // Extract pincode first
+    const pincodeMatch = fullAddress.match(/\b\d{6}\b/);
+    let extractedPincode = "";
+    if (pincodeMatch && pincodeMatch[0]) {
+      extractedPincode = pincodeMatch[0];
+      console.log("📮 Pincode extracted:", extractedPincode);
+    }
+
+    // Extract house/flat number
+    let extractedFlatNo = "";
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+
+      // Skip if it's a pincode (exactly 6 digits)
+      if (part.match(/^\d{6}$/)) {
+        continue;
+      }
+
+      // Look for parts that start with numbers or contain typical house number patterns
+      if (
+        (part.match(/^\d+/) && !part.match(/^\d{5,}$/)) ||
+        part.match(/^[A-Z]-?\d+/) ||
+        part.match(/^\d+[A-Z]?\/\d+/) ||
+        part.match(/^(House|Plot|Building|Block)\s*(No\.?)?\s*\d+/i) ||
+        part.match(/^\d+[-\s][A-Z]+/) ||
+        part.match(/^[A-Z]\d+/)
+      ) {
+        extractedFlatNo = part;
+        console.log("🏠 House number extracted:", extractedFlatNo);
+        break;
+      }
+    }
+
+    // Filter and clean parts
+    const cleanParts = parts.filter((part) => {
+      if (!part || part.length < 2) return false;
+      if (part === extractedFlatNo) return false;
+      if (part.match(/^\d{6}$/)) return false;
+      if (part.toLowerCase() === "india") return false;
+      if (
+        part.toLowerCase().includes("pradesh") ||
+        part.toLowerCase().includes("state") ||
+        part.toLowerCase().includes("bharath") ||
+        part.toLowerCase().includes("bharat")
+      )
+        return false;
+      return true;
+    });
+
+    console.log("🧹 Clean parts for enhanced autofill:", cleanParts);
+
+    // Determine field values
+    let fieldUpdates = {
+      flatNo: extractedFlatNo,
+      street: "",
+      area: "",
+      pincode: extractedPincode
+    };
+
+    if (cleanParts.length === 1) {
+      fieldUpdates.area = cleanParts[0];
+    } else if (cleanParts.length === 2) {
+      fieldUpdates.street = cleanParts[0];
+      fieldUpdates.area = cleanParts[1];
+    } else if (cleanParts.length >= 3) {
+      fieldUpdates.street = cleanParts[0];
+      const areaParts = cleanParts.slice(1, Math.min(4, cleanParts.length));
+      fieldUpdates.area = areaParts.join(", ");
+    }
+
+    console.log("✨ Applying enhanced field updates:", fieldUpdates);
+
+    // Force update all fields at once
+    await forceStateUpdate(fieldUpdates);
+
+    console.log("✅ Enhanced autofill completed");
+  };
+
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
 
